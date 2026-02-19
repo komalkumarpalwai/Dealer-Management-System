@@ -1,0 +1,145 @@
+<template>
+    <div class="homepage">
+        <!-- HERO (powerful, dark gradient) -->
+        <section class="hero-outer">
+            <div class="hero-grid">
+                <div class="hero-copy">
+                    <div class="eyebrow">Partner Portal</div>
+                    <h1 class="hero-title">Empowering Dealers &amp; Distributors to Grow Faster</h1>
+                    <p class="hero-sub">Seamless onboarding, structured approvals, centralized order management, and real‑time collaboration — everything your channel needs to scale.</p>
+
+                    <div class="hero-ctas">
+                        <button class="btn btn-primary" onclick={handleBecomePartner}>Become a Partner</button>
+                        <button class="btn btn-ghost" onclick={handleLogin}>Partner Login</button>
+                    </div>
+
+                    <div class="hero-stats">
+                        <div class="stat"><div class="num">1,200+</div><div class="label">Partners onboarded</div></div>
+                        <div class="stat"><div class="num">2–3</div><div class="label">Day review time</div></div>
+                        <div class="stat"><div class="num">99.9%</div><div class="label">Platform uptime</div></div>
+                    </div>
+                </div>
+
+                <aside class="hero-panel">
+                    <div class="panel-inner">
+                        <h3>Choose Your Partnership Category</h3>
+                        <div class="categories">
+                            <article class="category-card" data-category="Distributor" onclick={handleApply} tabindex="0" role="button">
+                                <div class="icon-circle orange"><lightning-icon icon-name="standard:partner" size="small" alternative-text="Distributor"></lightning-icon></div>
+                                <div class="cat-title">Distributor</div>
+                                <div class="cat-desc">Manage regional supply operations and bulk distribution.</div>
+                                <a class="apply-btn" href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/partner-registration" data-category="Distributor">Apply Now →</a>
+                            </article>
+
+                            <article class="category-card" data-category="Dealer" onclick={handleApply} tabindex="0" role="button">
+                                <div class="icon-circle orange"><lightning-icon icon-name="standard:store" size="small" alternative-text="Dealer"></lightning-icon></div>
+                                <div class="cat-title">Dealer</div>
+                                <div class="cat-desc">Access inventory, manage orders, and expand your market reach.</div>
+                                <a class="apply-btn" href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/partner-registration" data-category="Dealer">Apply Now →</a>
+                            </article>
+
+                            <article class="category-card" data-category="Retailer" onclick={handleApply} tabindex="0" role="button">
+                                <div class="icon-circle orange"><lightning-icon icon-name="utility:shopping_cart" size="small" alternative-text="Retailer"></lightning-icon></div>
+                                <div class="cat-title">Retailer</div>
+                                <div class="cat-desc">Purchase products and manage billing efficiently.</div>
+                                <a class="apply-btn" href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/partner-registration" data-category="Retailer">Apply Now →</a>
+                            </article>
+
+                            <article class="category-card" data-category="Customer" onclick={handleApply} tabindex="0" role="button">
+                                <div class="icon-circle orange"><lightning-icon icon-name="standard:contact" size="small" alternative-text="Customer"></lightning-icon></div>
+                                <div class="cat-title">Customer</div>
+                                <div class="cat-desc">Track orders, service requests, and support cases.</div>
+                                <a class="apply-btn" href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/partner-registration" data-category="Customer">Apply Now →</a>
+                            </article>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- FEATURES (light background) -->
+        <section id="features" class="section section-light">
+            <div class="section-inner">
+                <h2>Why Join Our Network?</h2>
+                <p class="section-lead">Benefit from a partner-first platform built for speed, visibility and support.</p>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon"><lightning-icon icon-name="utility:bolt" size="small"></lightning-icon></div>
+                        <h4>Fast Digital Onboarding</h4>
+                        <p>Structured approval process ensures quick and transparent registration.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon"><lightning-icon icon-name="utility:apps" size="small"></lightning-icon></div>
+                        <h4>Centralized Order Management</h4>
+                        <p>Track, manage, and monitor orders from one dashboard.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon"><lightning-icon icon-name="utility:eye" size="small"></lightning-icon></div>
+                        <h4>Real-Time Visibility</h4>
+                        <p>Get access to inventory updates and fulfillment status instantly.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon"><lightning-icon icon-name="utility:headset" size="small"></lightning-icon></div>
+                        <h4>Dedicated Support</h4>
+                        <p>Our support team ensures smooth partner collaboration.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section id="how" class="section section-light">
+            <div class="section-inner how-grid">
+                <h2>How it works</h2>
+                <div class="how-cards">
+                    <div class="how-card"><div class="step-num">1</div><strong>Submit Application</strong><div class="muted">Fill the short application form</div></div>
+                    <div class="how-card"><div class="step-num">2</div><strong>Admin Review &amp; Approval</strong><div class="muted">Our team verifies and approves</div></div>
+                    <div class="how-card"><div class="step-num">3</div><strong>Get Login &amp; Start Operations</strong><div class="muted">Receive credentials and begin selling</div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TESTIMONIALS & KPIS -->
+        <section id="social" class="section section-light">
+            <div class="section-inner two-col">
+                <div class="testimonials-wrap">
+                    <h3>What partners say</h3>
+                    <div class="testimonials-grid">
+                        <figure class="quote-card">
+                            <div class="quote-icon">“</div>
+                            <blockquote>Onboarding was effortless and sales picked up within weeks — support is top-notch.</blockquote>
+                            <figcaption>— R. Sharma, Regional Distributor</figcaption>
+                        </figure>
+
+                        <figure class="quote-card">
+                            <div class="quote-icon">“</div>
+                            <blockquote>Centralized orders saved us hours every week.</blockquote>
+                            <figcaption>— M. Patel, Dealer</figcaption>
+                        </figure>
+                    </div>
+                </div>
+
+                <aside class="kpi-panel">
+                    <div class="kpi"><div class="kpi-num">98%</div><div class="kpi-label">Partner satisfaction</div></div>
+                    <div class="kpi"><div class="kpi-num">1,200+</div><div class="kpi-label">Active partners</div></div>
+                    <div class="kpi"><div class="kpi-num">24/7</div><div class="kpi-label">Support coverage</div></div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- FINAL CTA (dark) -->
+        <section id="final-cta" class="section final-cta-dark">
+            <div class="final-inner">
+                <h2>Ready to Grow With Us?</h2>
+                <p class="lead">Join our expanding partner ecosystem and unlock new business opportunities today.</p>
+                <div class="final-actions">
+                    <button class="btn btn-primary btn-xl" onclick={handleBecomePartner}>Apply Now</button>
+                </div>
+            </div>
+        </section>
+    </div>
+</template>

@@ -1,0 +1,98 @@
+<template>
+    <div class="container" aria-busy={isLoading}>
+        <template if:false={isSubmitted}>
+            <div class="card-header">
+                <lightning-icon icon-name="standard:partner" size="small" alternative-text="Partner"></lightning-icon>
+                <div class="title-and-subtitle">
+                    <h1>Partner Registration</h1>
+                    <p class="subtitle">Apply to become an authorized partner — review usually takes 2–3 business days.</p>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <div class="form-grid">
+                    <div class="field-group">
+                        <lightning-input label="Business Name" placeholder="Acme Pvt Ltd" value={businessName} onchange={handleChange} data-field="businessName" required></lightning-input>
+
+                        <lightning-combobox
+                            label="Business Type"
+                            value={businessType}
+                            options={businessTypeOptions}
+                            onchange={handleChange}
+                            data-field="businessType"
+                            required>
+                        </lightning-combobox>
+
+                        <lightning-input label="Brand Name" value={brandName} onchange={handleChange} data-field="brandName"></lightning-input>
+
+                        <lightning-input label="GST Number" placeholder="22AAAAA0000A1Z5" value={gstNumber} onchange={handleChange} data-field="gstNumber"></lightning-input>
+
+                        <lightning-input label="PAN Number" placeholder="ABCDE1234F" value={panNumber} onchange={handleChange} data-field="panNumber"></lightning-input>
+
+                        <lightning-input type="number" label="Annual Revenue" value={annualRevenue} onchange={handleChange} data-field="annualRevenue"></lightning-input>
+                    </div>
+
+                    <div class="field-group">
+                        <lightning-input label="Primary Contact Name" value={primaryContactName} onchange={handleChange} data-field="primaryContactName" required></lightning-input>
+
+                        <lightning-input type="email" label="Email" placeholder="name@company.com" value={email} onchange={handleChange} data-field="email" required></lightning-input>
+
+                        <lightning-input type="tel" label="Phone" placeholder="+91 98765 43210" value={phone} onchange={handleChange} data-field="phone" required></lightning-input>
+
+                        <lightning-textarea class="field-full" label="Address" value={address} onchange={handleChange} data-field="address"></lightning-textarea>
+
+                        <div class="helper">We will send application updates to the email address above.</div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <lightning-button
+                        label="Submit Application"
+                        variant="brand"
+                        onclick={handleSubmit}
+                        class="submit-btn"
+                        disabled={isLoading}>
+                    </lightning-button>
+                </div>
+            </div>
+        </template>
+
+        <template if:true={isSubmitted}>
+            <div class="confirmation">
+                <div class="confirmation-inner">
+                    <div class="success-visual">
+                        <lightning-icon icon-name="utility:check" size="large" alternative-text="Success"></lightning-icon>
+                    </div>
+
+                    <h2>Application submitted successfully</h2>
+                    <p class="lead">Thank you — your application has been received.</p>
+                    <p>Next steps: our team will review your application and you'll receive an email with further instructions.</p>
+
+                    <ol class="steps">
+                        <li><strong>We review your application</strong><div class="muted">(usually 2–3 business days)</div></li>
+                        <li><strong>You receive an email</strong><div class="muted">with next steps and any requests for documents</div></li>
+                        <li><strong>Complete verification</strong><div class="muted">follow the instructions in the email</div></li>
+                    </ol>
+
+                    <div class="actions confirmation-actions">
+                        <lightning-button label="Create another application" onclick={handleCreateAnother} variant="neutral"></lightning-button>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <template if:true={isLoading}>
+            <div class="spinner-overlay" role="status" aria-live="polite">
+                <lightning-spinner alternative-text="Saving" size="large"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:true={errorMessage}>
+            <div class="error" role="alert" aria-live="assertive">{errorMessage}</div>
+        </template>
+
+        <template if:true={errorMessage}>
+            <div class="error" role="alert" aria-live="assertive">{errorMessage}</div>
+        </template>
+    </div>
+</template>

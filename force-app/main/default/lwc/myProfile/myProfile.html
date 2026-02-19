@@ -1,0 +1,27 @@
+<template>
+    <template if:true={isLoaded}>
+        <lightning-card title="My Profile">
+            <div class="slds-p-around_medium">
+
+                <p><strong>Name:</strong> {user.Name}</p>
+                <p><strong>Email:</strong> {user.Email}</p>
+
+                <template if:true={user.Profile}>
+                    <p><strong>Profile:</strong> {user.Profile.Name}</p>
+                </template>
+
+
+                <template if:true={account}>
+                    <hr/>
+                    <h3><strong>Account Details</strong></h3>
+
+                    <p><strong>Account Name:</strong> {account.Name}</p>
+                  
+                    <p><strong>Phone:</strong> {account.Phone}</p>
+                    <p><strong>Industry:</strong> {account.Industry}</p>
+                </template>
+
+            </div>
+        </lightning-card>
+    </template>
+</template>

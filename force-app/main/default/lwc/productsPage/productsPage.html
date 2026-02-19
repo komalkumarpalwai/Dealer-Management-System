@@ -1,0 +1,457 @@
+<template>
+    <template if:true={isLoaded}>
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <template if:true={user.Name}>
+                    <h1 class="hero-title">Welcome, {user.Name}! 🎉</h1>
+                </template>
+                <template if:false={user.Name}>
+                    <h1 class="hero-title">Welcome to Our Portal! 🎉</h1>
+                </template>
+                <p class="hero-subtitle">Discover Our Premium Products & Services</p>
+                <template if:true={account}>
+                    <p class="hero-account">Explore products for {account.Name}</p>
+                </template>
+           
+               
+            </div>
+        </div>
+
+        <!-- Products Section -->
+        <div class="container">
+            <div class="products-section">
+
+                <!-- ======== SEARCH BAR ======== -->
+                <div class="search-section">
+                    <div class="search-input-wrapper">
+                        <svg class="search-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/>
+                            <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        <input 
+                            type="text" 
+                            class="search-input" 
+                            placeholder="Search by product name, code, or brand..." 
+                            onkeyup={handleSearchChange}
+                            value={searchQuery}
+                        />
+                        <template if:true={searchQuery}>
+                            <button class="search-clear" onclick={handleClearSearch} title="Clear search">✕</button>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- ======== CATEGORIES SECTION ======== -->
+                <div class="categories-section">
+                    <h2 class="categories-title">Shop amazing offers on the tech you love</h2>
+                    <div class="categories-grid">
+                        <template for:each={categoryItems} for:item="cat">
+                            <template if:true={cat.isSelected}>
+                                <div key={cat.name} class="category-card selected" onclick={handleCategoryCardClick} data-category={cat.name}>
+                                    <div class="category-icon">{cat.icon}</div>
+                                    <span class="category-name">{cat.name}</span>
+                                </div>
+                            </template>
+                            <template if:false={cat.isSelected}>
+                                <div key={cat.name} class="category-card" onclick={handleCategoryCardClick} data-category={cat.name}>
+                                    <div class="category-icon">{cat.icon}</div>
+                                    <span class="category-name">{cat.name}</span>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- ======== FEATURED PRODUCTS SECTION ======== -->
+                <div class="featured-section">
+                    <div class="section-header">
+                        <div class="section-header-top">
+                            <h2>Handpicked for You</h2>
+                            <template if:true={selectedCategory}>
+                                <div class="category-badge">
+                                    <span>{selectedCategory}</span>
+                                    <button class="badge-close" onclick={handleClearCategory} title="Clear category filter">✕</button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Products Grid -->
+                   <!-- Products Grid -->
+<template if:true={hasProducts}>
+    <div class="products-grid">
+        <template for:each={pagedProducts} for:item="product">
+            <div key={product.Id} class="product-card">
+
+                <!-- Product Image -->
+                <div class="product-image-container">
+                    <img src={product.imageUrl}
+                         alt={product.Name}
+                         class="product-image"
+                         onerror={handleImageError}/>
+                </div>
+
+                <!-- Product Body -->
+                <div class="product-body">
+
+                    <div class="product-info">
+                        <h3 class="product-name">{product.Name}</h3>
+                        <p class="product-price">{product.formattedPrice}</p>
+                    </div>
+
+                   <!--- <div class="quantity-selector">
+                        <span class="quantity-label">Select Quantity</span>
+
+                        <div class="quantity-control">
+                            <button class="qty-btn"
+                                    onclick={decrementQuantity}
+                                    data-product-id={product.Id}
+                                    disabled={product.quantityIsMin}>
+                                −
+                            </button>
+
+                            <input type="number"
+                                   class="qty-input"
+                                   value={product.selectedQuantity}
+                                   readonly />
+
+                            <button class="qty-btn"
+                                    onclick={incrementQuantity}
+                                    data-product-id={product.Id}
+                                    disabled={product.quantityIsMax}>
+                                +
+                            </button>
+                        </div>
+
+                        <span class="quantity-info">
+                            {product.selectedQuantity} unit(s) (Max: 100)
+                        </span>
+                    </div> --->
+
+                    <!-- Buttons -->
+                    <div class="product-actions">
+                        <button class="btn-primary"
+                                onclick={handleAddToCart}
+                                data-product-id={product.Id}>
+                            🛒 Add to Cart
+                        </button>
+
+                        <button class="btn-secondary"
+                                onclick={handleViewDetails}
+                                data-product-id={product.Id}>
+                            View Details
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </template>
+    </div>
+</template>
+
+
+                    <!-- No Products Message -->
+                    <template if:false={hasProducts}>
+                        <div class="no-products-message">
+                            <p>No products found. Try adjusting your filters or search query.</p>
+                        </div>
+                    </template>
+
+                    <!-- Pagination Controls -->
+                    <div class="pagination-section">
+                        <div class="pagination-info">
+                            <p>{paginationInfo}</p>
+                        </div>
+                        <div class="pagination-controls">
+                            <button 
+                                class="pagination-btn" 
+                                onclick={handlePrevPage}
+                                disabled={prevDisabled}>
+                                ← Previous
+                            </button>
+                            <div class="page-indicator">
+                                <span>Page {currentPage} of {totalPages}</span>
+                            </div>
+                            <button 
+                                class="pagination-btn" 
+                                onclick={handleNextPage}
+                                disabled={nextDisabled}>
+                                Next →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+        <!-- Product Detail Modal -->
+    <template if:true={showProductModal}>
+    <div class="modal-overlay" onclick={closeProductModal}></div>
+
+    <div class="product-detail-modal">
+
+        <button class="modal-close" onclick={closeProductModal}>✕</button>
+
+        <template if:true={selectedProduct}>
+
+            <div class="modal-content">
+
+                <!-- LEFT SIDE: IMAGE GALLERY -->
+                <div class="gallery-section">
+                    <!-- Main Image -->
+                    <div class="main-image-wrapper">
+                        <img src={mainProductImage}
+                             alt={selectedProduct.Name}
+                             class="main-product-image"
+                             onerror={handleImageError}/>
+                    </div>
+
+                    <!-- Thumbnail Images -->
+                    <template if:true={thumbnailImages}>
+                        <div class="thumbnail-grid">
+                            <template for:each={thumbnailImages} for:item="image" for:index="idx">
+                                <div key={image.VersionId} 
+                                     class="thumbnail-wrapper"
+                                     class:selected={image.isSelected}
+                                     onclick={handleImageThumbnailClick}
+                                     data-index={idx}>
+                                    <img src={image.ImageUrl}
+                                         alt="Product image {idx}"
+                                         class="thumbnail-image"
+                                         onerror={handleImageError}/>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- RIGHT SIDE: PRODUCT DETAILS -->
+                <div class="details-section">
+
+                    <!-- Brand Name -->
+                    <div class="brand-name">
+                        {selectedProduct.Brand__c}
+                    </div>
+
+                    <!-- Product Title -->
+                    <h2 class="product-title">{selectedProduct.Name}</h2>
+
+                    <!-- Price Section -->
+                    <div class="price-section">
+                        <!-- Current Price (Large & Bold) -->
+                        <div class="current-price-display">
+                            <span class="current-price">{formattedPrice}</span>
+                        </div>
+
+                        <!-- MRP & Discount Row -->
+                        <template if:true={hasMrp}>
+                            <div class="mrp-discount-row">
+                                <div class="mrp-group">
+                                    <span class="mrp-label">M.R.P.:</span>
+                                    <span class="mrp-value">{formattedMrp}</span>
+                                </div>
+                                <template if:true={discountPercentage}>
+                                    <span class="discount-badge">{discountPercentage}% OFF</span>
+                                </template>
+                            </div>
+
+                            <!-- You Save Text -->
+                            <div class="you-save-text">
+                                You save ₹{savingsAmount}
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Stock Status -->
+                    <div class="stock-status">
+                        <span class="stock-badge {stockStatusClass}">
+                            {stockStatusLabel}
+                        </span>
+                        <template if:true={selectedProduct.AvailableStock}>
+                            <span class="available-units-text">Available: {selectedProduct.AvailableStock} units</span>
+                        </template>
+                    </div>
+
+                    <!-- Quantity Selector -->
+                    <div class="quantity-section">
+                        <label class="quantity-label">Select Quantity:</label>
+                        <div class="quantity-control">
+                            <button class="qty-btn qty-minus"
+                                    onclick={decrementQuantity}
+                                    disabled={quantityIsMin}
+                                    title="Decrease quantity">−</button>
+
+                            <input type="number"
+                                   class="qty-input"
+                                   value={selectedQuantity}
+                                   min="1"
+                                   max={selectedProduct.AvailableStock}
+                                   onchange={handleQuantityChange} />
+
+                            <button class="qty-btn qty-plus"
+                                    onclick={incrementQuantity}
+                                    disabled={quantityIsMax}
+                                    title="Increase quantity">+</button>
+                        </div>
+                        <div class="available-stock-info">
+                            Available: {selectedProduct.AvailableStock} units
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <template if:true={selectedProduct.Product_Description__c}>
+                        <div class="description-section">
+                            <h3>Description</h3>
+                            <p>{selectedProduct.Product_Description__c}</p>
+                        </div>
+                    </template>
+
+                    <!-- Product Info Grid -->
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="label">Category:</span>
+                            <span class="value">{selectedProduct.Product_Category__c}</span>
+                        </div>
+                        
+                        <div class="info-item">
+                            <span class="label">Family:</span>
+                            <span class="value">{selectedProduct.Family}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="label">Product Code:</span>
+                            <span class="value">{selectedProduct.ProductCode}</span>
+                        </div>
+
+                        <template if:true={selectedProduct.Net_Weight__c}>
+                            <div class="info-item">
+                                <span class="label">Net Weight:</span>
+                                <span class="value">{selectedProduct.Net_Weight__c}</span>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Max Selling Price Warning for Resellers -->
+                    <template if:true={showMaxPriceWarning}>
+                        <div class="max-price-warning">
+                            <span class="warning-icon">⚠️</span>
+                            <span class="warning-text">{maxSellingPriceMessage}</span>
+                        </div>
+                    </template>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="add-to-cart-btn"
+                                onclick={handleAddToCart}
+                                disabled={isOutOfStock}>
+                            🛒 Add to Cart
+                        </button>
+
+                        <button class="close-modal-btn"
+                                onclick={closeProductModal}>
+                            ✕ Close
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </template>
+    </div>
+</template>
+<!-- FIXED CART BUTTON -->
+
+
+
+
+<!-- SLIDE PANEL -->
+<!-- FIXED CART BUTTON -->
+<!-- FIXED CART BUTTON -->
+<template if:false={showCartPanel}>
+    <div class="cart-toggle-btn" onclick={toggleCartPanel}>
+        🛒 Your Cart
+    </div>
+</template>
+
+<!-- SLIDE PANEL -->
+<template if:true={showCartPanel}>
+    <div class="cart-overlay" onclick={closeCartPanel}></div>
+
+    <div class="cart-panel">
+        
+        <!-- HEADER -->
+        <div class="cart-header">
+            <h3>Your Cart</h3>
+            <button class="cart-close" onclick={closeCartPanel}>✕</button>
+        </div>
+
+        <!-- BODY -->
+        <div class="cart-body">
+
+            <!-- CART ITEMS -->
+            <template if:true={cartItems.length}>
+                <template for:each={cartItems} for:item="item">
+                    <div key={item.productId} class="cart-item">
+                        <div class="cart-item-info">
+                            <p class="cart-item-name">{item.productName}</p>
+                            <p class="cart-item-details">
+                                Qty: {item.quantity} × {item.formattedPrice}
+                            </p>
+                        </div>
+
+                        <div class="cart-item-actions">
+                            <p class="cart-item-total">
+                                ₹{item.total}
+                            </p>
+                            <button class="remove-btn"
+                                    data-id={item.productId}
+                                    onclick={removeFromCart}>
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- TOTAL -->
+                <div class="cart-total-section">
+                    <h4>Total</h4>
+                    <h3>{formattedCartTotal}</h3>
+                </div>
+
+            </template>
+
+            <template if:false={cartItems.length}>
+                <div class="empty-cart">
+                    <p>Your cart is empty.</p>
+                </div>
+            </template>
+
+        </div>
+
+        <!-- BUY NOW FOOTER -->
+        <template if:true={cartItems.length}>
+            <div class="cart-footer">
+                <button class="buy-now-btn"  onclick={handleBuyNow}>
+                    Buy Now
+                </button>
+            </div>
+        </template>
+
+    </div>
+</template>
+
+
+
+
+                </div>
+            </div>
+        </div>
+
+    <template if:false={isLoaded}>
+        <div class="loading-spinner">
+            <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+            <p>Loading products...</p>
+        </div>
+    </template>
+</template>
