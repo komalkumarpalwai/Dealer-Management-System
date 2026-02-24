@@ -23,6 +23,7 @@
 .btn:hover { transform: scale(1.05); }
 
 .hero-stats { display:flex; gap:28px; margin-top: 6px; }
+.logged-in-stats { display:flex; gap:28px; margin-top: 12px; }
 .stat { display:flex; flex-direction:column; }
 .num { font-size: 28px; font-weight:800; color:#fff; }
 .label { font-size: 13px; color: rgba(255,255,255,0.75); margin-top:6px; }

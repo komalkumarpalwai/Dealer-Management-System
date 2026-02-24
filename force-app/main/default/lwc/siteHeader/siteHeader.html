@@ -3,14 +3,13 @@
         <div class="header-inner">
             <div class="brand">
                 <div class="logo">DMS</div>
-                <div class="brand-name">Dealer Management Portal</div>
+                <div class="brand-name">Array minds portal</div>
             </div>
 
             <nav class="main-nav" role="navigation" aria-label="Primary navigation">
-                <a class="nav-link" href="/" onclick={handleNavClick} class:active={isHomePage}>Home</a>
-           
-                <a class="nav-link" href="/s/support" onclick={handleNavClick} class:active={isSupportPage}>Support</a>
-                <a class="nav-link" href="/s/about-us" onclick={handleNavClick} class:active={isAboutPage}>About Us</a>
+                <a class="nav-link" class:active={isHomePage} href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/" onclick={handleNavClick}>Home</a>
+                <a class="nav-link" class:active={isSupportPage} href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/support" onclick={handleNavClick}>Support</a>
+                <a class="nav-link" class:active={isAboutPage} href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/about-us" onclick={handleNavClick}>About Us</a>
                 
                 <!-- Not Logged In -->
                 <template if:false={isLoggedIn}>
@@ -33,7 +32,7 @@
                                     <div class="dropdown-info">
                                         <p class="dropdown-name">{user.Name}</p>
                                         <p class="dropdown-email">{user.Email}</p>
-                                          <p class="hero-account"><strong>Account Type:</strong> {displayAccountType}</p>
+                                        <p class="hero-account"><strong>Account Type:</strong> {displayAccountType}</p>
                                     </div>
                                 </div>
                                 <div class="dropdown-divider"></div>

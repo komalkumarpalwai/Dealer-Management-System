@@ -281,12 +281,7 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
 
     handleContinueShopping() {
         // Navigate to Products Page
-        this[NavigationMixin.Navigate]({
-            type: 'standard__component',
-            attributes: {
-                componentName: 'c__productsPage'
-            }
-        });
+        window.location.assign('https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/products');
     }
 
     handleViewAllOrders() {

@@ -86,7 +86,7 @@ export default class SiteHeader extends LightningElement {
         this.isOrderPage = false;
 
         // Set active based on URL
-        if (url === '/' || url === '') {
+        if (url === '/' || url === '' || url.endsWith('/s/')) {
             this.isHomePage = true;
         } else if (url.includes('/partner-registration')) {
             this.isPartnerPage = true;
@@ -94,10 +94,10 @@ export default class SiteHeader extends LightningElement {
             this.isSupportPage = true;
         } else if (url.includes('/about')) {
             this.isAboutPage = true;
-        } else if (url.includes('/order-page')) {
-            this.isOrderPage = true;
         } else if (url.includes('/products') || url.includes('products')) {
             this.isPortalPage = true;
+        } else if (url.includes('/orders')) {
+            this.isOrderPage = true;
         }
     }
 
@@ -127,15 +127,15 @@ export default class SiteHeader extends LightningElement {
     }
 
     handleLogin() {
-        window.location.assign('/s/products');
+        window.location.assign('https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/login/');
     }
 
     handlePortal() {
-        window.location.assign('/s/products');
+        window.location.assign('https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/products');
     }
 
     handleOrderPage() {
-        window.location.assign('/s//Orders');
+        window.location.assign('https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/Orders');
     }
 
     toggleProfileDropdown(event) {

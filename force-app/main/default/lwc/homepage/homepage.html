@@ -5,22 +5,44 @@
             <div class="hero-grid">
                 <div class="hero-copy">
                     <div class="eyebrow">Partner Portal</div>
-                    <h1 class="hero-title">Empowering Dealers &amp; Distributors to Grow Faster</h1>
-                    <p class="hero-sub">Seamless onboarding, structured approvals, centralized order management, and real‑time collaboration — everything your channel needs to scale.</p>
+                    
+                    <!-- Not Logged In -->
+                    <template if:false={isLoggedIn}>
+                        <h1 class="hero-title">Empowering Dealers &amp; Distributors to Grow Faster</h1>
+                        <p class="hero-sub">Seamless onboarding, structured approvals, centralized order management, and real‑time collaboration — everything your channel needs to scale.</p>
 
-                    <div class="hero-ctas">
-                        <button class="btn btn-primary" onclick={handleBecomePartner}>Become a Partner</button>
-                        <button class="btn btn-ghost" onclick={handleLogin}>Partner Login</button>
-                    </div>
+                        <div class="hero-ctas">
+                            <button class="btn btn-primary" onclick={handleBecomePartner}>Become a Partner</button>
+                            <button class="btn btn-ghost" onclick={handleLogin}>Partner Login</button>
+                        </div>
 
-                    <div class="hero-stats">
-                        <div class="stat"><div class="num">1,200+</div><div class="label">Partners onboarded</div></div>
-                        <div class="stat"><div class="num">2–3</div><div class="label">Day review time</div></div>
-                        <div class="stat"><div class="num">99.9%</div><div class="label">Platform uptime</div></div>
-                    </div>
+                        <div class="hero-stats">
+                            <div class="stat"><div class="num">1,200+</div><div class="label">Partners onboarded</div></div>
+                            <div class="stat"><div class="num">2–3</div><div class="label">Day review time</div></div>
+                            <div class="stat"><div class="num">99.9%</div><div class="label">Platform uptime</div></div>
+                        </div>
+                    </template>
+
+                    <!-- Logged In -->
+                    <template if:true={isLoggedIn}>
+                        <h1 class="hero-title">Welcome Back, {user.Name}!</h1>
+                        <p class="hero-sub">Access your dashboard and manage your partnership with ease. Quick access to your products, orders, and account information.</p>
+
+                        <div class="hero-ctas">
+                            <button class="btn btn-primary" onclick={handleViewProducts}>View Products</button>
+                            <button class="btn btn-ghost" onclick={handleViewOrders}>My Orders</button>
+                        </div>
+
+                        <div class="logged-in-stats">
+                            <div class="stat"><div class="label">Account Type</div><div class="num">{user.AccountType}</div></div>
+                            <div class="stat"><div class="label">Account Name</div><div class="num">{user.AccountName}</div></div>
+                            <div class="stat"><div class="label">Email</div><div class="num">{user.Email}</div></div>
+                        </div>
+                    </template>
                 </div>
 
-                <aside class="hero-panel">
+                <!-- Only show partnership categories for non-logged-in users -->
+                <template if:false={isLoggedIn}>
                     <div class="panel-inner">
                         <h3>Choose Your Partnership Category</h3>
                         <div class="categories">
@@ -54,6 +76,7 @@
                         </div>
                     </div>
                 </aside>
+                </template>
             </div>
         </section>
 

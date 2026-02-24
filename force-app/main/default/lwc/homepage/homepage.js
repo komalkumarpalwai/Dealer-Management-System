@@ -1,10 +1,30 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import getCurrentUserInfo from '@salesforce/apex/ProductsPageController.getCurrentUserInfo';
 
 const COMMUNITY_PARTNER_REG_URL = 'https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/partner-registration';
 
 export default class Homepage extends LightningElement {
+    user = {};
+    isLoggedIn = false;
     _observerInitialized = false;
+
+    @wire(getCurrentUserInfo)
+    wiredUserInfo({ error, data }) {
+        if (data) {
+            this.user = {
+                Name: data.Name && data.Name.trim() ? data.Name : 'User',
+                Email: data.Email && data.Email.trim() ? data.Email : '',
+                Id: data.Id && data.Id.trim() ? data.Id : '',
+                AccountType: data.AccountType && data.AccountType.trim() ? data.AccountType : 'N/A',
+                AccountName: data.AccountName && data.AccountName.trim() ? data.AccountName : ''
+            };
+            this.isLoggedIn = this.user.Id && this.user.Id.length > 0;
+        } else if (error) {
+            console.error('getCurrentUserInfo error:', error);
+            this.isLoggedIn = false;
+        }
+    }
 
     renderedCallback() {
         // reveal-on-scroll effect
@@ -61,6 +81,14 @@ export default class Homepage extends LightningElement {
 
     handleLogin() {
         // Navigate to login
-        window.location.assign('/s/products');
+        window.location.assign('https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/login/');
+    }
+
+    handleViewProducts() {
+        window.location.assign('https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/products');
+    }
+
+    handleViewOrders() {
+        window.location.assign('https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/Orders');
     }
 }
