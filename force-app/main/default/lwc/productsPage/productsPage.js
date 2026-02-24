@@ -1,8 +1,12 @@
 import { LightningElement, wire } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getPageData from '@salesforce/apex/ProductsPageController.getPageData';
 import getProductImages from '@salesforce/apex/ProductsPageController.getProductImages';
+import createOrderWithLineItems from '@salesforce/apex/OrderPage.createOrderWithLineItems';
+import getUserAccountDetails from '@salesforce/apex/OrderPage.getUserAccountDetails';
 
-export default class ProductsPage extends LightningElement {
+export default class ProductsPage extends NavigationMixin(LightningElement) {
 
     user;
     account;
@@ -372,7 +376,96 @@ get cartToggleLabel() {
     return this.showCartPanel ? '✖ Close Cart' : '🛒 Your Cart';
 }
 handleBuyNow() {
-    alert('This functionality is under development.');
+    if (!this.cartItems || this.cartItems.length === 0) {
+        this.showToast('Empty Cart', 'Please add items to your cart before proceeding.', 'error');
+        return;
+    }
+
+    if (!this.account || !this.account.Id) {
+        this.showToast('Error', 'Account information not available. Please refresh the page and try again.', 'error');
+        return;
+    }
+
+    if (!this.pricebookUsed) {
+        this.showToast('Error', 'Pricebook information not available. Please try again.', 'error');
+        return;
+    }
+
+    // Show loading state
+    const buyNowBtn = this.template.querySelector('.buy-now-btn');
+    if (buyNowBtn) {
+        buyNowBtn.disabled = true;
+        buyNowBtn.textContent = 'Processing...';
+    }
+
+    // Prepare order items from cart
+    const orderItems = this.cartItems.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: item.price,
+        priceBookEntryId: null // Will be resolved on the backend
+    }));
+
+    // Prepare the order request
+    const orderRequest = {
+        accountId: this.account.Id,
+        pricebookId: this.pricebookUsed,
+        orderName: `Order - ${new Date().toLocaleDateString()}`,
+        effectiveDate: new Date().toISOString().split('T')[0],
+        status: 'Draft',
+        description: 'Order created from product page',
+        orderItems: orderItems
+    };
+
+    // Call the Apex method to create the order
+    createOrderWithLineItems({ orderRequest })
+        .then(response => {
+            if (response.success) {
+                // Clear the cart
+                this.cartItems = [];
+                this.saveCartToStorage();
+                
+                // Show success message
+                this.showToast('Success', `Order created successfully! Order #${response.orderNumber}`, 'success');
+                
+                // Close cart panel
+                this.closeCartPanel();
+                
+                // Redirect to the Orders page after a short delay
+                setTimeout(() => {
+                    this[NavigationMixin.Navigate]({
+                        type: 'standard__namedPage',
+                        attributes: {
+                            pageName: 'Orders'
+                        }
+                    });
+                }, 500);
+            } else {
+                this.showToast('Error', `Failed to create order: ${response.message}`, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error creating order:', error);
+            const errorMsg = error.body?.message || error.message || 'An unexpected error occurred';
+            this.showToast('Error', `Order creation failed: ${errorMsg}`, 'error');
+        })
+        .finally(() => {
+            // Re-enable the button
+            const buyNowBtn = this.template.querySelector('.buy-now-btn');
+            if (buyNowBtn) {
+                buyNowBtn.disabled = false;
+                buyNowBtn.textContent = 'Buy Now';
+            }
+        });
+}
+
+showToast(title, message, variant) {
+    const evt = new ShowToastEvent({
+        title: title,
+        message: message,
+        variant: variant
+    });
+    this.dispatchEvent(evt);
 }
 
 get hasMrp() {

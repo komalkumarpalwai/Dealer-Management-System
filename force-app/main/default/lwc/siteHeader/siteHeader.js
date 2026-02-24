@@ -13,6 +13,7 @@ export default class SiteHeader extends LightningElement {
     isSupportPage = false;
     isAboutPage = false;
     isPortalPage = false;
+    isOrderPage = false;
 
     get displayAccountType() {
         return this.user.AccountType && this.user.AccountType.trim() ? this.user.AccountType : 'N/A';
@@ -82,6 +83,7 @@ export default class SiteHeader extends LightningElement {
         this.isSupportPage = false;
         this.isAboutPage = false;
         this.isPortalPage = false;
+        this.isOrderPage = false;
 
         // Set active based on URL
         if (url === '/' || url === '') {
@@ -92,6 +94,8 @@ export default class SiteHeader extends LightningElement {
             this.isSupportPage = true;
         } else if (url.includes('/about')) {
             this.isAboutPage = true;
+        } else if (url.includes('/order-page')) {
+            this.isOrderPage = true;
         } else if (url.includes('/products') || url.includes('products')) {
             this.isPortalPage = true;
         }
@@ -130,6 +134,10 @@ export default class SiteHeader extends LightningElement {
         window.location.assign('/s/products');
     }
 
+    handleOrderPage() {
+        window.location.assign('/s//Orders');
+    }
+
     toggleProfileDropdown(event) {
         event.stopPropagation();
         this.showProfileDropdown = !this.showProfileDropdown;
@@ -137,6 +145,10 @@ export default class SiteHeader extends LightningElement {
 
     get portalBtnClass() {
         return this.isPortalPage ? 'nav-portal active' : 'nav-portal';
+    }
+
+    get orderPageBtnClass() {
+        return this.isOrderPage ? 'nav-order active' : 'nav-order';
     }
 
     handleLogout() {

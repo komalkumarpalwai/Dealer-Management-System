@@ -20,6 +20,7 @@
                 <!-- Logged In -->
                 <template if:true={isLoggedIn}>
                     <button class={portalBtnClass} onclick={handlePortal} aria-label="View Portal">📊 View Products</button>
+                    <button class={orderPageBtnClass} onclick={handleOrderPage} aria-label="View Order Page">🛒 My Orders</button>
                     <div class="profile-menu">
                         <button class="profile-btn" onclick={toggleProfileDropdown} aria-label="Profile Menu" title={user.Name}>
                             <span class="profile-avatar">{userInitials}</span>

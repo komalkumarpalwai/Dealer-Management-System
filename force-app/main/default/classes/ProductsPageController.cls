@@ -51,6 +51,32 @@ public with sharing class ProductsPageController {
         return selectedPricebookId;
     }
 
+    /**
+     * Public method to get the Pricebook ID for the current user
+     * Used by OrderPage component
+     */
+    @AuraEnabled(cacheable=true)
+    public static String getPricebookIdForUser() {
+        try {
+            User u = [
+                SELECT Id,
+                       Contact.Account.Account_Type__c
+                FROM User
+                WHERE Id = :UserInfo.getUserId()
+                LIMIT 1
+            ];
+
+            String accountType = (u.Contact != null && u.Contact.Account != null)
+                ? u.Contact.Account.Account_Type__c
+                : null;
+
+            Id pricebookId = determinePricebookId(accountType);
+            return pricebookId;
+        } catch (Exception e) {
+            throw new AuraHandledException('Error determining pricebook: ' + e.getMessage());
+        }
+    }
+
 
     @AuraEnabled(cacheable=true)
     public static Map<String, Object> getPageData() {
@@ -224,29 +250,13 @@ public with sharing class ProductsPageController {
         categories.addAll(categoriesSet);
         categories.sort();
 
-        String pricebookName = 'Standard Pricebook';
-
-        if (pricebookId != null) {
-            try {
-                Pricebook2 pb = [
-                    SELECT Name
-                    FROM Pricebook2
-                    WHERE Id = :pricebookId
-                    LIMIT 1
-                ];
-                pricebookName = pb.Name;
-            } catch (Exception e) {
-                // ignore
-            }
-        }
-
         Map<String, Object> result = new Map<String, Object>();
         result.put('user', u);
         result.put('account', u.Contact != null ? u.Contact.Account : null);
         result.put('products', productsWithPrice);
         result.put('categories', categories);
         result.put('accountType', accountType != null ? accountType : '');
-        result.put('pricebookUsed', pricebookName);
+        result.put('pricebookUsed', pricebookId != null ? pricebookId : '');
 
         return result;
     }

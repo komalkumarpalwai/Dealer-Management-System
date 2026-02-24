@@ -1,0 +1,426 @@
+<template>
+    <template if:true={isLoading}>
+        <div class="loading-spinner">
+            <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+            <p>Loading your orders...</p>
+        </div>
+    </template>
+
+    <template if:false={isLoading}>
+        <div class="orders-container">
+            
+            <!-- Header Section -->
+            <div class="orders-header">
+                <div class="header-top">
+                    <h1>My Orders</h1>
+                    <button class="btn-my-account" onclick={handleOpenAccountModal}>
+                        👤 My Account
+                    </button>
+                </div>
+                <template if:true={accountName}>
+                    <p class="account-info">Account: <span>{accountName}</span></p>
+                </template>
+            </div>
+
+            <!-- Account Modal -->
+            <template if:true={showAccountModal}>
+                <div class="modal-overlay" onclick={handleCloseAccountModal}>
+                    <div class="modal-content" onclick={handleModalContentClick}>
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                            <h2>👤 My Account</h2>
+                            <button class="close-btn" onclick={handleCloseAccountModal}>✕</button>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="modal-body">
+                            <!-- Account Information Section -->
+                            <div class="account-section">
+                                <h3 class="section-title">Account Information</h3>
+                                <div class="info-row">
+                                    <label class="info-label">Business Name:</label>
+                                    <span class="info-value">{accountData.BusinessName}</span>
+                                </div>
+                                <div class="info-row">
+                                    <label class="info-label">Email:</label>
+                                    <span class="info-value">{accountData.Email}</span>
+                                </div>
+                                <div class="info-row">
+                                    <label class="info-label">Phone:</label>
+                                    <span class="info-value">{accountData.Phone}</span>
+                                </div>
+                                <div class="info-row">
+                                    <label class="info-label">Brand Name:</label>
+                                    <span class="info-value">{accountData.BrandName}</span>
+                                </div>
+                            </div>
+
+                            <!-- Shipping Address Section -->
+                            <div class="account-section">
+                                <div class="section-header">
+                                    <h3 class="section-title">Shipping Address</h3>
+                                    <button class="btn-edit" onclick={handleToggleEditMode}>
+                                        {isEditingAddress ? '❌ Cancel' : '✏️ Edit'}
+                                    </button>
+                                </div>
+
+                                <template if:false={isEditingAddress}>
+                                    <div class="address-display">
+                                        <div class="info-row">
+                                            <label class="info-label">Street:</label>
+                                            <span class="info-value">{accountData.ShippingStreet}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <label class="info-label">City:</label>
+                                            <span class="info-value">{accountData.ShippingCity}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <label class="info-label">State:</label>
+                                            <span class="info-value">{accountData.ShippingState}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <label class="info-label">Postal Code:</label>
+                                            <span class="info-value">{accountData.ShippingPostalCode}</span>
+                                        </div>
+                                        <div class="info-row">
+                                            <label class="info-label">Country:</label>
+                                            <span class="info-value">{accountData.ShippingCountry}</span>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <template if:true={isEditingAddress}>
+                                    <div class="address-form">
+                                        <div class="form-group">
+                                            <label class="form-label">Street</label>
+                                            <input 
+                                                type="text" 
+                                                class="form-input" 
+                                                value={accountData.ShippingStreet}
+                                                onchange={handleAddressFieldChange}
+                                                data-field="ShippingStreet">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">City</label>
+                                            <input 
+                                                type="text" 
+                                                class="form-input" 
+                                                value={accountData.ShippingCity}
+                                                onchange={handleAddressFieldChange}
+                                                data-field="ShippingCity">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">State</label>
+                                            <input 
+                                                type="text" 
+                                                class="form-input" 
+                                                value={accountData.ShippingState}
+                                                onchange={handleAddressFieldChange}
+                                                data-field="ShippingState">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Postal Code</label>
+                                            <input 
+                                                type="text" 
+                                                class="form-input" 
+                                                value={accountData.ShippingPostalCode}
+                                                onchange={handleAddressFieldChange}
+                                                data-field="ShippingPostalCode">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Country</label>
+                                            <input 
+                                                type="text" 
+                                                class="form-input" 
+                                                value={accountData.ShippingCountry}
+                                                onchange={handleAddressFieldChange}
+                                                data-field="ShippingCountry">
+                                        </div>
+                                        <button class="btn-save-address" onclick={handleSaveAddress}>
+                                            💾 Save Address
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Search Bar -->
+            <template if:true={hasPreviousOrders}>
+                <div class="search-filter-container">
+                    <div class="search-section">
+                        <input 
+                            type="text" 
+                            class="search-input" 
+                            placeholder="🔍 Search by Order ID or Order Number..." 
+                            value={searchTerm}
+                            onchange={handleSearchChange}>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Dashboard Section -->
+            <template if:true={hasCurrentOrder}>
+                <div class="dashboard-section">
+                    <!-- Order Summary Cards -->
+                    <div class="dashboard-title">
+                        <h2>📊 Order Dashboard</h2>
+                    </div>
+
+                    <div class="summary-cards-container">
+                        <div class="summary-card total-orders">
+                            <div class="card-icon">📦</div>
+                            <div class="card-content">
+                                <span class="card-label">Total Orders</span>
+                                <span class="card-value">{orderSummary.totalOrders}</span>
+                            </div>
+                        </div>
+
+                        <div class="summary-card pending-orders">
+                            <div class="card-icon">⏳</div>
+                            <div class="card-content">
+                                <span class="card-label">Pending Orders</span>
+                                <span class="card-value">{orderSummary.pendingOrders}</span>
+                            </div>
+                        </div>
+
+                        <div class="summary-card monthly-spent">
+                            <div class="card-icon">💰</div>
+                            <div class="card-content">
+                                <span class="card-label">Spent This Month</span>
+                                <span class="card-value">{formattedMonthlySpent}</span>
+                            </div>
+                        </div>
+
+                        <div class="summary-card avg-value">
+                            <div class="card-icon">📈</div>
+                            <div class="card-content">
+                                <span class="card-label">Avg Order Value</span>
+                                <span class="card-value">{formattedAvgOrderValue}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status Breakdown -->
+                    <div class="dashboard-row">
+                        <div class="dashboard-column">
+                            <h3 class="dashboard-subtitle">Order Status Breakdown</h3>
+                            <div class="status-breakdown">
+                                <template for:each={statusBreakdownList} for:item="status">
+                                    <div key={status.name} class="status-item">
+                                        <div class="status-bar">
+                                            <div class="status-label">{status.name}</div>
+                                            <div class="status-count">{status.count}</div>
+                                        </div>
+                                        <div class="status-progress">
+                                            <div class="progress-fill" style={status.progressStyle}></div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Top Products -->
+                        <div class="dashboard-column">
+                            <h3 class="dashboard-subtitle">Top Products Ordered</h3>
+                            <div class="top-products">
+                                <template for:each={topProducts} for:item="product">
+                                    <div key={product.productId} class="product-item">
+                                        <div class="product-rank">#{product.rank}</div>
+                                        <div class="product-info">
+                                            <div class="product-name">{product.productName}</div>
+                                            <div class="product-stats">{product.totalQuantity} items • {product.orderCount} orders</div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Continue Shopping Button -->
+                    <div class="continue-shopping-container">
+                        <button class="btn-continue-shopping" onclick={handleContinueShopping}>
+                            🛍️ Continue Shopping
+                        </button>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Current Order Section -->
+            <template if:true={hasCurrentOrder}>
+                <div class="current-order-section">
+                    <h2 class="section-title">🎉 Your Latest Order</h2>
+                    
+                    <div class="order-card current-order-card">
+                        <div class="order-header-row">
+                            <div class="order-number-section">
+                                <h3 class="order-number">Order #{currentOrder.OrderNumber}</h3>
+                                <p class="order-date">{formattedCurrentCreatedDate}</p>
+                            </div>
+                            <div class="order-status-section">
+                                <span class="status-badge {statusBadgeClass}">
+                                    {currentOrder.Status}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="order-details-grid">
+                            <div class="detail-item">
+                                <span class="detail-label">Order Total:</span>
+                                <span class="detail-value total-value">{formattedCurrentOrderTotal}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Items:</span>
+                                <span class="detail-value">{currentOrder.LineItemCount__c}</span>
+                            </div>
+                        </div>
+
+                        <div class="order-actions">
+                            <button class="btn-primary" onclick={handleViewOrderDetails} data-order-id={currentOrder.Id}>
+                                📋 View Order Details
+                            </button>
+                            <button class="btn-secondary" onclick={handleContinueShopping}>
+                                🛍️ Continue Shopping
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Order Details Section -->
+            <template if:true={showOrderDetails}>
+                <div class="order-details-section">
+                    <div class="details-header">
+                        <h2>Order #{selectedOrderDetails.OrderNumber}</h2>
+                        <button class="close-btn" onclick={handleCloseDetails}>✕</button>
+                    </div>
+
+                    <div class="details-content">
+                        <!-- Order Info -->
+                        <div class="info-section">
+                            <h3>Order Information</h3>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="info-label">Order Number:</span>
+                                    <span class="info-value">{selectedOrderDetails.OrderNumber}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Status:</span>
+                                    <span class="info-value">{selectedOrderDetails.Status}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Created Date:</span>
+                                    <span class="info-value">{formattedSelectedCreatedDate}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Account:</span>
+                                    <span class="info-value">{selectedOrderDetails.Account.Name}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Order Total:</span>
+                                    <span class="info-value total-value">{formattedOrderTotal}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Line Items -->
+                        <template if:true={selectedOrderDetails.lineItems.length}>
+                            <div class="line-items-section">
+                                <h3>Order Items</h3>
+                                <div class="line-items-table">
+                                    <div class="table-header">
+                                        <div class="col-product">Product</div>
+                                        <div class="col-code">Code</div>
+                                        <div class="col-qty">Quantity</div>
+                                        <div class="col-price">Unit Price</div>
+                                        <div class="col-total">Total</div>
+                                    </div>
+
+                                    <template for:each={formattedLineItems} for:item="item">
+                                        <div key={item.Id} class="table-row">
+                                            <div class="col-product">{item.Product2.Name}</div>
+                                            <div class="col-code">{item.Product2.ProductCode}</div>
+                                            <div class="col-qty">{item.Quantity}</div>
+                                            <div class="col-price">{item.formattedUnitPrice}</div>
+                                            <div class="col-total">{item.formattedTotalPrice}</div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Previous Orders Section -->
+            <template if:true={hasPreviousOrders}>
+                <div class="previous-orders-section">
+                    <h2 class="section-title">📜 Previous Orders</h2>
+                    
+                    <!-- No Results Message -->
+                    <template if:false={filteredOrdersCount}>
+                        <div class="no-results">
+                            <p>No orders found matching your search or filters.</p>
+                        </div>
+                    </template>
+                    
+                    <div class="orders-list">
+                        <template for:each={displayedPreviousOrders} for:item="order">
+                            <div key={order.Id} class="order-card previous-order-card">
+                                <div class="order-card-content">
+                                    <div class="order-left-section">
+                                        <div class="order-number-badge">#{order.OrderNumber}</div>
+                                        <div class="order-meta">
+                                            <p class="order-date">📅 {order.formattedCreatedDate}</p>
+                                            <p class="order-items">📦 {order.LineItemCount__c} items</p>
+                                        </div>
+                                    </div>
+                                    <div class="order-middle-divider"></div>
+                                    <div class="order-right-section">
+                                        <div class="order-total">
+                                            <span class="total-label">Total Amount</span>
+                                            <span class="total-amount">{order.formattedTotalAmount}</span>
+                                        </div>
+                                        <span class="status-badge status-{order.Status.toLowerCase()}">{order.Status}</span>
+                                    </div>
+                                </div>
+                                <button class="btn-view-details" onclick={handleViewOrderDetails} data-order-id={order.Id}>
+                                    View Details →
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- View All / Show Less Buttons -->
+                    <template if:true={shouldShowViewAllButton}>
+                        <div class="view-all-container">
+                            <button class="btn-view-all" onclick={handleViewAllOrders}>
+                                📋 View All Orders ({formattedPreviousOrders.length} total)
+                            </button>
+                        </div>
+                    </template>
+
+                    <template if:true={shouldShowCollapseButton}>
+                        <div class="view-all-container">
+                            <button class="btn-collapse" onclick={handleCollapsePreviousOrders}>
+                                ⬆️ Show Less
+                            </button>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- No Orders Message -->
+            <template if:false={hasCurrentOrder}>
+                <div class="no-orders-message">
+                    <p>📭 No orders found yet.</p>
+                    <button class="btn-primary" onclick={handleContinueShopping}>
+                        Start Shopping
+                    </button>
+                </div>
+            </template>
+        </div>
+    </template>
+</template>
