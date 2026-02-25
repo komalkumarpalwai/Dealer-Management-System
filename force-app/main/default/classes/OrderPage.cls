@@ -567,25 +567,23 @@ public with sharing class OrderPage {
             Decimal totalSpentThisMonth = 0;
             Date firstDayOfMonth = Date.today().toStartOfMonth();
             
-            List<AggregateResult> monthlyTotal = [
-                SELECT SUM(TotalAmount) totalAmount
-                FROM Order
-                WHERE AccountId = :accountId
-                AND CreatedDate >= :firstDayOfMonth
-                AND Status != 'Draft'
-            ];
+           List<AggregateResult> monthlyTotal = [
+    SELECT SUM(TotalAmount) totalAmount
+    FROM Order
+    WHERE AccountId = :accountId
+    AND CreatedDate >= :firstDayOfMonth
+];
             
             if (!monthlyTotal.isEmpty() && monthlyTotal[0].get('totalAmount') != null) {
                 totalSpentThisMonth = (Decimal) monthlyTotal[0].get('totalAmount');
             }
             
             // Calculate average order value
-            List<AggregateResult> avgTotal = [
-                SELECT AVG(TotalAmount) avgAmount
-                FROM Order
-                WHERE AccountId = :accountId
-                AND Status != 'Draft'
-            ];
+          List<AggregateResult> avgTotal = [
+    SELECT AVG(TotalAmount) avgAmount
+    FROM Order
+    WHERE AccountId = :accountId
+];
             
             Decimal avgOrderValue = 0;
             if (!avgTotal.isEmpty() && avgTotal[0].get('avgAmount') != null) {
