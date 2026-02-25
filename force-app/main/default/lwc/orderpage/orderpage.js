@@ -1,5 +1,6 @@
 import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getAccountOrders from '@salesforce/apex/OrderPage.getAccountOrders';
 import getOrderDetails from '@salesforce/apex/OrderPage.getOrderDetails';
 import getUserAccount from '@salesforce/apex/OrderPage.getUserAccount';
@@ -8,6 +9,8 @@ import getOrderSummary from '@salesforce/apex/OrderPage.getOrderSummary';
 import getOrderTrends from '@salesforce/apex/OrderPage.getOrderTrends';
 import getTopProducts from '@salesforce/apex/OrderPage.getTopProducts';
 import getOrderStatusBreakdown from '@salesforce/apex/OrderPage.getOrderStatusBreakdown';
+import getPaymentsByOrder from '@salesforce/apex/OrderPayments.getPaymentsByOrder';
+import createPayment from '@salesforce/apex/OrderPayments.createPayment';
 
 export default class OrdersList extends NavigationMixin(LightningElement) {
     
@@ -39,8 +42,30 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
 
     // Payment modal state
     showPaymentModal = false;
+    showTransactionHistory = false;
     selectedPaymentMethod = '';
     paymentModalOrder = null;
+    orderPayments = [];
+    
+    // Payment form state (dynamic fields based on payment method)
+    paymentFormData = {
+        amount: '',
+        cashReceivedBy: '',
+        cashReceiptNumber: '',
+        notes: '',
+        upiId: '',
+        upiName: '',
+        upiAppName: '',
+        upiReferenceNumber: '',
+        transactionId: '',
+        cardHolderName: '',
+        cardNumber: '',
+        cardType: '',
+        bankName: '',
+        accountNumber: '',
+        ifscCode: '',
+        transferReferenceNumber: ''
+    };
 
     // Dashboard data
     orderSummary = {
@@ -298,13 +323,68 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
         if (this.paymentModalOrder) {
             this.showPaymentModal = true;
             this.selectedPaymentMethod = '';
+            this.resetPaymentForm();
+            // Load existing payments for this order
+            this.loadOrderPayments(orderId);
         }
     }
 
     handleClosePaymentModal() {
         this.showPaymentModal = false;
+        this.showTransactionHistory = false;
         this.selectedPaymentMethod = '';
         this.paymentModalOrder = null;
+        this.resetPaymentForm();
+        this.orderPayments = [];
+    }
+
+    handleToggleTransactionHistory() {
+        this.showTransactionHistory = !this.showTransactionHistory;
+    }
+
+    handleBackFromHistory() {
+        this.showTransactionHistory = false;
+    }
+
+    resetPaymentForm() {
+        this.paymentFormData = {
+            amount: '',
+            cashReceivedBy: '',
+            cashReceiptNumber: '',
+            notes: '',
+            upiId: '',
+            upiName: '',
+            upiAppName: '',
+            upiReferenceNumber: '',
+            transactionId: '',
+            cardHolderName: '',
+            cardNumber: '',
+            cardType: '',
+            bankName: '',
+            accountNumber: '',
+            ifscCode: '',
+            transferReferenceNumber: ''
+        };
+    }
+
+    loadOrderPayments(orderId) {
+        getPaymentsByOrder({ orderId })
+            .then(result => {
+                if (result.success) {
+                    // Payment__c records are returned directly with all fields
+                    this.orderPayments = result.payments || [];
+                }
+            })
+            .catch(error => {
+                console.error('Error loading payments:', error);
+                this.orderPayments = [];
+            });
+    }
+
+    handlePaymentFormChange(event) {
+        const fieldName = event.target.dataset.field;
+        const value = event.target.value;
+        this.paymentFormData[fieldName] = value;
     }
 
     handlePaymentMethodSelect(event) {
@@ -313,13 +393,104 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
 
     handlePaymentSubmit() {
         if (!this.selectedPaymentMethod) {
-            alert('Please select a payment method');
+            this.showToast('error', 'Payment Method Required', 'Please select a payment method');
             return;
         }
         
-        // TODO: Implement payment processing logic
-        alert(`Payment of ${this.formatCurrency(this.paymentModalOrder.Outstanding_Amount__c)} via ${this.selectedPaymentMethod} submitted!`);
-        this.handleClosePaymentModal();
+        // Validate form based on payment method
+        const validationError = this.validatePaymentForm();
+        if (validationError) {
+            this.showToast('error', 'Validation Error', validationError);
+            return;
+        }
+        
+        // Prepare payment data for Apex
+        const paymentData = {
+            orderId: this.paymentModalOrder.Id,
+            accountId: this.paymentModalOrder.AccountId || this.accountId,
+            amount: parseFloat(this.paymentFormData.amount),
+            paymentMethod: this.selectedPaymentMethod,
+            outstandingAmount: this.paymentModalOrder.Outstanding_Amount__c,
+            formData: { ...this.paymentFormData }
+        };
+        
+        console.log('Submitting payment data:', paymentData);
+        
+        // Call Apex method to create payment
+        createPayment({ paymentData })
+            .then(result => {
+                console.log('Payment response:', result);
+                if (result.success) {
+                    this.showToast('success', 'Payment Recorded', `Payment of ${this.formatCurrency(paymentData.amount)} via ${this.selectedPaymentMethod} has been recorded successfully`);
+                    
+                    // Refresh order data
+                    this.loadOrders();
+                    
+                    // Close modal
+                    this.handleClosePaymentModal();
+                } else {
+                    console.error('Payment error:', result.message);
+                    this.showToast('error', 'Payment Error', result.message || 'An error occurred while recording the payment');
+                }
+            })
+            .catch(error => {
+                console.error('Error creating payment:', error);
+                console.error('Error details:', error.body);
+                const errorMsg = error.body?.message || 'An error occurred while recording the payment';
+                this.showToast('error', 'Payment Error', errorMsg);
+            });
+    }
+
+    validatePaymentForm() {
+        if (!this.paymentFormData.amount || this.paymentFormData.amount <= 0) {
+            return 'Please enter a valid amount';
+        }
+
+        switch (this.selectedPaymentMethod) {
+            case 'Cash':
+                if (!this.paymentFormData.cashReceivedBy) {
+                    return 'Please enter Cash Received By';
+                }
+                if (!this.paymentFormData.cashReceiptNumber) {
+                    return 'Please enter Cash Receipt Number';
+                }
+                break;
+
+            case 'UPI':
+                if (!this.paymentFormData.upiId) {
+                    return 'Please enter UPI ID';
+                }
+                if (!this.paymentFormData.upiName) {
+                    return 'Please enter UPI Name';
+                }
+                break;
+
+            case 'Card':
+                if (!this.paymentFormData.cardHolderName) {
+                    return 'Please enter Card Holder Name';
+                }
+                if (!this.paymentFormData.cardNumber) {
+                    return 'Please enter Card Number';
+                }
+                if (!this.paymentFormData.cardType) {
+                    return 'Please select Card Type';
+                }
+                break;
+
+            case 'Bank Transfer':
+                if (!this.paymentFormData.bankName) {
+                    return 'Please enter Bank Name';
+                }
+                if (!this.paymentFormData.accountNumber) {
+                    return 'Please enter Account Number';
+                }
+                if (!this.paymentFormData.ifscCode) {
+                    return 'Please enter IFSC Code';
+                }
+                break;
+        }
+
+        return null;
     }
 
     handleModalPaymentContentClick(event) {
@@ -574,12 +745,62 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
     }
 
     get formattedPaymentAmountPaid() {
-        if (!this.paymentModalOrder || !this.paymentModalOrder.Amount_Paid__c) return '₹0.00';
-        return this.formatCurrency(this.paymentModalOrder.Amount_Paid__c);
+        if (!this.paymentModalOrder || !this.paymentModalOrder.Amount_Paid_From_Payments__c) return '₹0.00';
+        return this.formatCurrency(this.paymentModalOrder.Amount_Paid_From_Payments__c);
     }
 
     get formattedPaymentOutstandingAmount() {
         if (!this.paymentModalOrder || !this.paymentModalOrder.Outstanding_Amount__c) return '₹0.00';
         return this.formatCurrency(this.paymentModalOrder.Outstanding_Amount__c);
+    }
+
+    // Payment Method Field Visibility Getters
+    get showCashFields() {
+        return this.selectedPaymentMethod === 'Cash';
+    }
+
+    get showUPIFields() {
+        return this.selectedPaymentMethod === 'UPI';
+    }
+
+    get showCardFields() {
+        return this.selectedPaymentMethod === 'Card';
+    }
+
+    get showBankTransferFields() {
+        return this.selectedPaymentMethod === 'Bank Transfer';
+    }
+
+    get showAmountField() {
+        return this.selectedPaymentMethod !== '';
+    }
+
+    get showTransactionIdField() {
+        return this.selectedPaymentMethod === 'UPI' || 
+               this.selectedPaymentMethod === 'Card' || 
+               this.selectedPaymentMethod === 'Bank Transfer';
+    }
+
+    // Format payment history for display
+    get formattedPaymentHistory() {
+        return this.orderPayments.map(payment => ({
+            ...payment,
+            formattedPaymentDate: payment.Payment_Date__c ? 
+                new Date(payment.Payment_Date__c).toLocaleDateString('en-IN', { 
+                    year: 'numeric', month: 'short', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                }) : '-',
+            formattedAmount: payment.Amount__c ? this.formatCurrency(payment.Amount__c) : '₹0.00'
+        }));
+    }
+
+    showToast(variant, title, message) {
+        const event = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant,
+            mode: 'dismissable'
+        });
+        this.dispatchEvent(event);
     }
 }

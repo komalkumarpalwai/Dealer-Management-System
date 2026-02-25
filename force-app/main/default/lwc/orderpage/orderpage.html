@@ -60,7 +60,8 @@
                                 <div class="section-header">
                                     <h3 class="section-title">Shipping Address</h3>
                                     <button class="btn-edit" onclick={handleToggleEditMode}>
-                                        {isEditingAddress ? '❌ Cancel' : '✏️ Edit'}
+                                        <template if:true={isEditingAddress}>❌ Cancel</template>
+                                        <template if:false={isEditingAddress}>✏️ Edit</template>
                                     </button>
                                 </div>
 
@@ -215,7 +216,7 @@
                                             <div class="status-count">{status.count}</div>
                                         </div>
                                         <div class="status-progress">
-                                            <div class="progress-fill" style={status.progressStyle}></div>
+                                            <div class="progress-fill" style="width: 100%;"></div>
                                         </div>
                                     </div>
                                 </template>
@@ -356,6 +357,29 @@
                             </div>
                         </template>
 
+                        <!-- Payment History Section -->
+                        <template if:true={orderPayments.length}>
+                            <div class="payment-history-section">
+                                <h3>📜 Payment History</h3>
+                                <div class="payment-history-table">
+                                    <div class="table-header">
+                                        <div class="col-date">Payment Date</div>
+                                        <div class="col-method">Method</div>
+                                        <div class="col-amount">Amount</div>
+                                        <div class="col-status">Status</div>
+                                    </div>
+                                    <template for:each={formattedPaymentHistory} for:item="payment">
+                                        <div key={payment.Id} class="table-row">
+                                            <div class="col-date">{payment.formattedPaymentDate}</div>
+                                            <div class="col-method">{payment.Payment_Mode__c}</div>
+                                            <div class="col-amount">{payment.formattedAmount}</div>
+                                            <div class="col-status">{payment.Payment_Status__c}</div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
                         <!-- Action Buttons -->
                         <div class="details-actions">
                             <template if:true={shouldShowPaymentButtonInDetails}>
@@ -437,7 +461,7 @@
             <template if:false={hasCurrentOrder}>
                 <div class="no-orders-message">
                     <p>📭 No orders found yet.</p>
-                    <button class="btn-primary" onclick={handleContinueShopping} href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/products">
+                    <button class="btn-primary" onclick={handleContinueShopping}>
                         Start Shopping
                     </button>
                 </div>
@@ -449,12 +473,59 @@
                     <div class="payment-modal-content" onclick={handleModalPaymentContentClick}>
                         <!-- Modal Header -->
                         <div class="payment-modal-header">
-                            <h2>💳 Make Payment</h2>
+                            <template if:true={showTransactionHistory}>
+                                <button class="back-btn" onclick={handleBackFromHistory}>← Back</button>
+                                <h2>📜 Transaction History</h2>
+                            </template>
+                            <template if:false={showTransactionHistory}>
+                                <h2>💳 Make Payment</h2>
+                                <button class="history-btn" onclick={handleToggleTransactionHistory}>📋 View History</button>
+                            </template>
                             <button class="close-btn" onclick={handleClosePaymentModal}>✕</button>
                         </div>
 
                         <!-- Modal Body -->
                         <div class="payment-modal-body">
+                            <!-- Transaction History View -->
+                            <template if:true={showTransactionHistory}>
+                                <template if:true={orderPayments.length}>
+                                    <div class="transaction-history-view">
+                                        <div class="history-table">
+                                            <div class="table-header">
+                                                <div class="col-date">Payment Date</div>
+                                                <div class="col-method">Method</div>
+                                                <div class="col-amount">Amount</div>
+                                                <div class="col-transaction">Reference/ID</div>
+                                                <div class="col-status">Status</div>
+                                            </div>
+                                            <template for:each={formattedPaymentHistory} for:item="payment">
+                                                <div key={payment.Id} class="table-row">
+                                                    <div class="col-date">{payment.formattedPaymentDate}</div>
+                                                    <div class="col-method">{payment.Payment_Mode__c}</div>
+                                                    <div class="col-amount">{payment.formattedAmount}</div>
+                                                    <div class="col-transaction">
+                                                        <template if:true={payment.Transaction_Id__c}>
+                                                            {payment.Transaction_Id__c}
+                                                        </template>
+                                                        <template if:false={payment.Transaction_Id__c}>
+                                                            {payment.Cash_Receipt_Number__c}
+                                                        </template>
+                                                    </div>
+                                                    <div class="col-status">{payment.Payment_Status__c}</div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+                                <template if:false={orderPayments.length}>
+                                    <div class="no-transactions">
+                                        <p>📭 No payment history found for this order.</p>
+                                    </div>
+                                </template>
+                            </template>
+
+                            <!-- Payment Form View -->
+                            <template if:false={showTransactionHistory}>
                             <!-- Summary Section -->
                             <div class="payment-summary-section">
                                 <h3 class="summary-title">Order Summary</h3>
@@ -512,15 +583,214 @@
                                 </div>
                             </div>
 
+                            <!-- Payment Form: Dynamic Fields Based on Payment Method -->
+                            <template if:true={showAmountField}>
+                                <div class="payment-form-section">
+                                    <h3 class="form-title">Payment Details</h3>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Amount <span class="required">*</span></label>
+                                        <input 
+                                            type="number" 
+                                            class="form-control" 
+                                            placeholder="Enter payment amount"
+                                            value={paymentFormData.amount}
+                                            data-field="amount"
+                                            onchange={handlePaymentFormChange}
+                                            step="0.01"
+                                            min="0">
+                                    </div>
+
+                                    <!-- Cash Payment Fields -->
+                                    <template if:true={showCashFields}>
+                                        <div class="form-group">
+                                            <label class="form-label">Cash Received By <span class="required">*</span></label>
+                                            <input 
+                                                type="text" 
+                                                class="form-control" 
+                                                placeholder="Enter name of person who received cash"
+                                                value={paymentFormData.cashReceivedBy}
+                                                data-field="cashReceivedBy"
+                                                onchange={handlePaymentFormChange}>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">Cash Receipt Number <span class="required">*</span></label>
+                                            <input 
+                                                type="text" 
+                                                class="form-control" 
+                                                placeholder="Enter receipt number"
+                                                value={paymentFormData.cashReceiptNumber}
+                                                data-field="cashReceiptNumber"
+                                                onchange={handlePaymentFormChange}>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">Notes</label>
+                                            <textarea 
+                                                class="form-control" 
+                                                placeholder="Additional notes (optional)"
+                                                data-field="notes"
+                                                onchange={handlePaymentFormChange}
+                                                rows="3"></textarea>
+                                        </div>
+                                    </template>
+
+                                    <!-- UPI Payment Fields -->
+                                    <template if:true={showUPIFields}>
+                                        <div class="form-group">
+                                            <label class="form-label">UPI ID <span class="required">*</span></label>
+                                            <input 
+                                                type="text" 
+                                                class="form-control" 
+                                                placeholder="e.g., user@bankname"
+                                                value={paymentFormData.upiId}
+                                                data-field="upiId"
+                                                onchange={handlePaymentFormChange}>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">UPI Name <span class="required">*</span></label>
+                                            <input 
+                                                type="text" 
+                                                class="form-control" 
+                                                placeholder="Name on UPI account"
+                                                value={paymentFormData.upiName}
+                                                data-field="upiName"
+                                                onchange={handlePaymentFormChange}>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">UPI App Name</label>
+                                            <input 
+                                                type="text" 
+                                                class="form-control" 
+                                                placeholder="e.g., Google Pay, PhonePe"
+                                                value={paymentFormData.upiAppName}
+                                                data-field="upiAppName"
+                                                onchange={handlePaymentFormChange}>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">UPI Reference Number</label>
+                                            <input 
+                                                type="text" 
+                                                class="form-control" 
+                                                placeholder="UPI reference number (optional)"
+                                                value={paymentFormData.upiReferenceNumber}
+                                                data-field="upiReferenceNumber"
+                                                onchange={handlePaymentFormChange}>
+                                        </div>
+                                    </template>
+
+                                    <!-- Card Payment Fields -->
+                                    <template if:true={showCardFields}>
+                                        <div class="form-group">
+                                            <label class="form-label">Card Holder Name <span class="required">*</span></label>
+                                            <input 
+                                                type="text" 
+                                                class="form-control" 
+                                                placeholder="Name on card"
+                                                value={paymentFormData.cardHolderName}
+                                                data-field="cardHolderName"
+                                                onchange={handlePaymentFormChange}>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">Card Number <span class="required">*</span></label>
+                                            <input 
+                                                type="text" 
+                                                class="form-control" 
+                                                placeholder="XXXX XXXX XXXX 1234"
+                                                value={paymentFormData.cardNumber}
+                                                data-field="cardNumber"
+                                                onchange={handlePaymentFormChange}>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">Card Type <span class="required">*</span></label>
+                                            <select 
+                                                class="form-control"
+                                                data-field="cardType"
+                                                onchange={handlePaymentFormChange}>
+                                                <option value="">-- Select Card Type --</option>
+                                                <option value="Debit">Debit Card</option>
+                                                <option value="Credit">Credit Card</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">Transaction ID <span class="required">*</span></label>
+                                            <input 
+                                                type="text" 
+                                                class="form-control" 
+                                                placeholder="Enter transaction ID"
+                                                value={paymentFormData.transactionId}
+                                                data-field="transactionId"
+                                                onchange={handlePaymentFormChange}>
+                                        </div>
+                                    </template>
+
+                                    <!-- Bank Transfer Fields -->
+                                    <template if:true={showBankTransferFields}>
+                                        <div class="form-group">
+                                            <label class="form-label">Bank Name <span class="required">*</span></label>
+                                            <input 
+                                                type="text" 
+                                                class="form-control" 
+                                                placeholder="Enter bank name"
+                                                value={paymentFormData.bankName}
+                                                data-field="bankName"
+                                                onchange={handlePaymentFormChange}>
+                                        </div>
+
+                                        <div class="form-group">
+
+                                            <label class="form-label">IFSC Code <span class="required">*</span></label>
+                                            <input 
+                                                type="text" 
+                                                class="form-control" 
+                                                placeholder="Enter IFSC code"
+                                                value={paymentFormData.ifscCode}
+                                                data-field="ifscCode"
+                                                onchange={handlePaymentFormChange}>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">Transfer Reference Number</label>
+                                            <input 
+                                                type="text" 
+                                                class="form-control" 
+                                                placeholder="e.g., UTR or Reference Number"
+                                                value={paymentFormData.transferReferenceNumber}
+                                                data-field="transferReferenceNumber"
+                                                onchange={handlePaymentFormChange}>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">Transaction ID <span class="required">*</span></label>
+                                            <input 
+                                                type="text" 
+                                                class="form-control" 
+                                                placeholder="Enter transaction ID"
+                                                value={paymentFormData.transactionId}
+                                                data-field="transactionId"
+                                                onchange={handlePaymentFormChange}>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+
                             <!-- Action Buttons -->
                             <div class="payment-actions">
                                 <button class="btn-cancel" onclick={handleClosePaymentModal}>
                                     Cancel
                                 </button>
                                 <button class="btn-submit-payment" onclick={handlePaymentSubmit}>
-                                    Proceed with Payment
+                                    ✓ Confirm Payment
                                 </button>
                             </div>
+                            </template>
                         </div>
                     </div>
                 </div>

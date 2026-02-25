@@ -1090,6 +1090,76 @@
     color: var(--text-primary);
 }
 
+/* Payment Form Section */
+.payment-form-section {
+    background: linear-gradient(135deg, #f8f9fb 0%, #f0f2f5 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+    border: 1px solid var(--border-color);
+}
+
+.form-title {
+    margin: 0 0 1.5rem;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.required {
+    color: #ef4444;
+    font-weight: 700;
+}
+
+.form-control {
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--text-primary);
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-control::placeholder {
+    color: var(--text-secondary);
+}
+
+.form-control textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+select.form-control {
+    cursor: pointer;
+    padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg width='1em' height='1em' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 9L12 15L18 9' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.25rem;
+    padding-right: 2.5rem;
+}
+
 /* Payment Actions */
 .payment-actions {
     display: flex;
@@ -2354,4 +2424,138 @@
     .col-total::before {
         content: "Total: ";
     }
+}
+/* Payment History Styling */
+.payment-history-section {
+    background: linear-gradient(135deg, #f8f9fb 0%, #f0f2f5 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    border: 1px solid var(--border-color);
+}
+
+.payment-history-section h3 {
+    margin: 0 0 1.5rem;
+    font-size: 1.125rem;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.payment-history-table,
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.payment-history-table .table-header,
+.history-table .table-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    font-weight: 700;
+}
+
+.history-table .table-header {
+    grid-template-columns: 1.5fr 1fr 1fr 1.5fr 1fr;
+}
+
+.payment-history-table .table-row,
+.history-table .table-row {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    align-items: center;
+}
+
+.history-table .table-row {
+    grid-template-columns: 1.5fr 1fr 1fr 1.5fr 1fr;
+}
+
+.payment-history-table .table-row:last-child,
+.history-table .table-row:last-child {
+    border-bottom: none;
+}
+
+.payment-history-table .table-row:hover,
+.history-table .table-row:hover {
+    background: #f9fafb;
+}
+
+.col-date, .col-method, .col-amount, .col-status, .col-transaction {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.col-amount {
+    color: var(--success-color);
+    font-weight: 700;
+}
+
+.col-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-color);
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.transaction-history-view {
+    padding: 1rem;
+}
+
+.no-transactions {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+/* Modal Header Button Styling */
+.payment-modal-header {
+    display: flexbox;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.history-btn,
+.back-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--primary-color);
+    color: white;
+}
+
+.history-btn:hover,
+.back-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.back-btn {
+    background: var(--border-color);
+    color: var(--text-primary);
+}
+
+.back-btn:hover {
+    background: var(--text-secondary);
 }
