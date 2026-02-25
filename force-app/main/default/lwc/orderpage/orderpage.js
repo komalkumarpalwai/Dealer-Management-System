@@ -338,6 +338,20 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
         this.orderPayments = [];
     }
 
+    handleViewPaymentHistory(event) {
+        const orderId = event.currentTarget.dataset.orderId;
+        const order = this.currentOrder && this.currentOrder.Id === orderId 
+            ? this.currentOrder 
+            : this.selectedOrderDetails;
+        
+        if (order) {
+            this.paymentModalOrder = order;
+            this.showPaymentModal = true;
+            this.showTransactionHistory = true;
+            this.loadOrderPayments(orderId);
+        }
+    }
+
     handleToggleTransactionHistory() {
         this.showTransactionHistory = !this.showTransactionHistory;
     }
@@ -389,6 +403,14 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
 
     handlePaymentMethodSelect(event) {
         this.selectedPaymentMethod = event.currentTarget.dataset.method;
+        
+        // Auto-scroll to the payment details form section
+        setTimeout(() => {
+            const paymentFormSection = this.template.querySelector('.payment-form-section');
+            if (paymentFormSection) {
+                paymentFormSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
     }
 
     handlePaymentSubmit() {
@@ -402,6 +424,11 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
         if (validationError) {
             this.showToast('error', 'Validation Error', validationError);
             return;
+        }
+        
+        // Auto-generate Transaction ID for digital payment methods
+        if (this.selectedPaymentMethod === 'UPI' || this.selectedPaymentMethod === 'Card' || this.selectedPaymentMethod === 'Bank Transfer') {
+            this.paymentFormData.transactionId = this.generateTransactionId(this.selectedPaymentMethod);
         }
         
         // Prepare payment data for Apex
@@ -491,6 +518,18 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
         }
 
         return null;
+    }
+
+    /**
+     * Generates a unique transaction ID for digital payment methods
+     * @param {String} paymentMethod - The payment method (UPI, Card, Bank Transfer)
+     * @returns {String} The generated transaction ID
+     */
+    generateTransactionId(paymentMethod) {
+        const prefix = paymentMethod === 'Bank Transfer' ? 'BANK' : paymentMethod.substring(0, 3).toUpperCase();
+        const timestamp = Date.now();
+        const randomPart = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+        return `${prefix}-${timestamp}-${randomPart}`;
     }
 
     handleModalPaymentContentClick(event) {
@@ -737,6 +776,18 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
 
     get shouldShowPaymentButtonInDetails() {
         return this.canShowPaymentButton(this.selectedOrderDetails);
+    }
+
+    get isPaymentFulfilled() {
+        return this.currentOrder && 
+               this.currentOrder.Status === 'Activated' && 
+               (!this.currentOrder.Outstanding_Amount__c || this.currentOrder.Outstanding_Amount__c <= 0);
+    }
+
+    get isOrderDetailsFulfilled() {
+        return this.selectedOrderDetails && 
+               this.selectedOrderDetails.Status === 'Activated' && 
+               (!this.selectedOrderDetails.Outstanding_Amount__c || this.selectedOrderDetails.Outstanding_Amount__c <= 0);
     }
 
     get formattedPaymentOrderTotal() {
