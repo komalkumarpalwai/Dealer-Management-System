@@ -305,7 +305,9 @@ public with sharing class OrderPage {
                        Account.Name,
                        EffectiveDate,
                        TotalAmount,
-                       CreatedDate
+                       CreatedDate,
+                       Outstanding_Amount__c,
+                       Amount_Paid__c
                 FROM Order
                 WHERE Id = :orderId
                 LIMIT 1
@@ -352,7 +354,9 @@ public with sharing class OrderPage {
                        Name,
                        CreatedDate,
                        EffectiveDate,
-                       TotalAmount
+                       TotalAmount,
+                       Outstanding_Amount__c,
+                       Amount_Paid__c
                 FROM Order
                 WHERE AccountId = :accountId
                 ORDER BY CreatedDate DESC
@@ -390,6 +394,8 @@ public with sharing class OrderPage {
                 orderMap.put('CreatedDate', order.CreatedDate);
                 orderMap.put('EffectiveDate', order.EffectiveDate);
                 orderMap.put('TotalAmount', order.TotalAmount);
+                orderMap.put('Outstanding_Amount__c', order.Outstanding_Amount__c);
+                orderMap.put('Amount_Paid__c', order.Amount_Paid__c);
                 orderMap.put('LineItemCount__c', orderLineItemCounts.containsKey(order.Id) ? orderLineItemCounts.get(order.Id) : 0);
                 
                 ordersList.add(orderMap);

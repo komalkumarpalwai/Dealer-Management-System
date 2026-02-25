@@ -281,6 +281,11 @@
                             <button class="btn-primary" onclick={handleViewOrderDetails} data-order-id={currentOrder.Id}>
                                 📋 View Order Details
                             </button>
+                            <template if:true={shouldShowMakePaymentButton}>
+                                <button class="btn-payment" onclick={handleOpenPaymentModal} data-order-id={currentOrder.Id}>
+                                    💳 Make Payment
+                                </button>
+                            </template>
                             <button class="btn-secondary" onclick={handleContinueShopping}>
                                 🛍️ Continue Shopping
                             </button>
@@ -350,6 +355,15 @@
                                 </div>
                             </div>
                         </template>
+
+                        <!-- Action Buttons -->
+                        <div class="details-actions">
+                            <template if:true={shouldShowPaymentButtonInDetails}>
+                                <button class="btn-payment" onclick={handleOpenPaymentModal} data-order-id={selectedOrderDetails.Id}>
+                                    💳 Make Payment
+                                </button>
+                            </template>
+                        </div>
                     </div>
                 </div>
             </template>
@@ -386,9 +400,16 @@
                                         <span class="status-badge status-{order.Status.toLowerCase()}">{order.Status}</span>
                                     </div>
                                 </div>
-                                <button class="btn-view-details" onclick={handleViewOrderDetails} data-order-id={order.Id}>
-                                    View Details →
-                                </button>
+                                <div class="order-card-actions">
+                                    <button class="btn-view-details" onclick={handleViewOrderDetails} data-order-id={order.Id}>
+                                        View Details →
+                                    </button>
+                                    <template if:true={order.shouldShowPayment}>
+                                        <button class="btn-payment btn-small" onclick={handleOpenPaymentModal} data-order-id={order.Id}>
+                                            💳 Pay Now
+                                        </button>
+                                    </template>
+                                </div>
                             </div>
                         </template>
                     </div>
@@ -419,6 +440,89 @@
                     <button class="btn-primary" onclick={handleContinueShopping} href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/products">
                         Start Shopping
                     </button>
+                </div>
+            </template>
+
+            <!-- Payment Modal -->
+            <template if:true={showPaymentModal}>
+                <div class="payment-modal-overlay" onclick={handleClosePaymentModal}>
+                    <div class="payment-modal-content" onclick={handleModalPaymentContentClick}>
+                        <!-- Modal Header -->
+                        <div class="payment-modal-header">
+                            <h2>💳 Make Payment</h2>
+                            <button class="close-btn" onclick={handleClosePaymentModal}>✕</button>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="payment-modal-body">
+                            <!-- Summary Section -->
+                            <div class="payment-summary-section">
+                                <h3 class="summary-title">Order Summary</h3>
+                                <div class="summary-grid">
+                                    <div class="summary-item">
+                                        <span class="summary-label">Order Amount</span>
+                                        <span class="summary-value">{formattedPaymentOrderTotal}</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <span class="summary-label">Amount Paid</span>
+                                        <span class="summary-value">{formattedPaymentAmountPaid}</span>
+                                    </div>
+                                    <div class="summary-item outstanding">
+                                        <span class="summary-label">Outstanding Amount</span>
+                                        <span class="summary-value">{formattedPaymentOutstandingAmount}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Payment Method Selection -->
+                            <div class="payment-methods-section">
+                                <h3 class="methods-title">Select Payment Method</h3>
+                                <div class="payment-options">
+                                    <div 
+                                        class="payment-option {selectedPaymentMethod === 'Cash' ? 'selected' : ''}" 
+                                        data-method="Cash"
+                                        onclick={handlePaymentMethodSelect}>
+                                        <div class="option-icon">💵</div>
+                                        <div class="option-label">Cash</div>
+                                    </div>
+
+                                    <div 
+                                        class="payment-option {selectedPaymentMethod === 'UPI' ? 'selected' : ''}" 
+                                        data-method="UPI"
+                                        onclick={handlePaymentMethodSelect}>
+                                        <div class="option-icon">📱</div>
+                                        <div class="option-label">UPI</div>
+                                    </div>
+
+                                    <div 
+                                        class="payment-option {selectedPaymentMethod === 'Card' ? 'selected' : ''}" 
+                                        data-method="Card"
+                                        onclick={handlePaymentMethodSelect}>
+                                        <div class="option-icon">💳</div>
+                                        <div class="option-label">Card</div>
+                                    </div>
+
+                                    <div 
+                                        class="payment-option {selectedPaymentMethod === 'Bank Transfer' ? 'selected' : ''}" 
+                                        data-method="Bank Transfer"
+                                        onclick={handlePaymentMethodSelect}>
+                                        <div class="option-icon">🏦</div>
+                                        <div class="option-label">Bank Transfer</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="payment-actions">
+                                <button class="btn-cancel" onclick={handleClosePaymentModal}>
+                                    Cancel
+                                </button>
+                                <button class="btn-submit-payment" onclick={handlePaymentSubmit}>
+                                    Proceed with Payment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </template>
         </div>

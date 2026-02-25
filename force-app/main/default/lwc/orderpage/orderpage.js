@@ -37,6 +37,11 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
     dateSort = 'newest'; // 'newest' or 'oldest'
     showAllPreviousOrders = false; // Toggle to show all orders
 
+    // Payment modal state
+    showPaymentModal = false;
+    selectedPaymentMethod = '';
+    paymentModalOrder = null;
+
     // Dashboard data
     orderSummary = {
         totalOrders: 0,
@@ -284,6 +289,44 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
         window.location.assign('https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/products');
     }
 
+    handleOpenPaymentModal(event) {
+        const orderId = event.currentTarget.dataset.orderId;
+        this.paymentModalOrder = this.currentOrder && this.currentOrder.Id === orderId 
+            ? this.currentOrder 
+            : this.previousOrders.find(order => order.Id === orderId);
+        
+        if (this.paymentModalOrder) {
+            this.showPaymentModal = true;
+            this.selectedPaymentMethod = '';
+        }
+    }
+
+    handleClosePaymentModal() {
+        this.showPaymentModal = false;
+        this.selectedPaymentMethod = '';
+        this.paymentModalOrder = null;
+    }
+
+    handlePaymentMethodSelect(event) {
+        this.selectedPaymentMethod = event.currentTarget.dataset.method;
+    }
+
+    handlePaymentSubmit() {
+        if (!this.selectedPaymentMethod) {
+            alert('Please select a payment method');
+            return;
+        }
+        
+        // TODO: Implement payment processing logic
+        alert(`Payment of ${this.formatCurrency(this.paymentModalOrder.Outstanding_Amount__c)} via ${this.selectedPaymentMethod} submitted!`);
+        this.handleClosePaymentModal();
+    }
+
+    handleModalPaymentContentClick(event) {
+        // Prevent closing modal when clicking inside the modal content
+        event.stopPropagation();
+    }
+
     handleViewAllOrders() {
         this.showAllPreviousOrders = true;
     }
@@ -370,7 +413,8 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
         return filteredOrders.map(order => ({
             ...order,
             formattedCreatedDate: this.formatDate(order.CreatedDate),
-            formattedTotalAmount: this.formatCurrency(order.TotalAmount)
+            formattedTotalAmount: this.formatCurrency(order.TotalAmount),
+            shouldShowPayment: this.canShowPaymentButton(order)
         }));
     }
 
@@ -468,6 +512,13 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
         return this.formattedPreviousOrders.length;
     }
 
+    canShowPaymentButton(order) {
+        return order && 
+               order.Status === 'Activated' && 
+               order.Outstanding_Amount__c && 
+               order.Outstanding_Amount__c > 0;
+    }
+
     get formattedMonthlySpent() {
         return new Intl.NumberFormat('en-IN', {
             style: 'currency',
@@ -507,5 +558,28 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
 
     get topProducts() {
         return this.topProductsList;
+    }
+
+    get shouldShowMakePaymentButton() {
+        return this.canShowPaymentButton(this.currentOrder);
+    }
+
+    get shouldShowPaymentButtonInDetails() {
+        return this.canShowPaymentButton(this.selectedOrderDetails);
+    }
+
+    get formattedPaymentOrderTotal() {
+        if (!this.paymentModalOrder || !this.paymentModalOrder.TotalAmount) return '₹0.00';
+        return this.formatCurrency(this.paymentModalOrder.TotalAmount);
+    }
+
+    get formattedPaymentAmountPaid() {
+        if (!this.paymentModalOrder || !this.paymentModalOrder.Amount_Paid__c) return '₹0.00';
+        return this.formatCurrency(this.paymentModalOrder.Amount_Paid__c);
+    }
+
+    get formattedPaymentOutstandingAmount() {
+        if (!this.paymentModalOrder || !this.paymentModalOrder.Outstanding_Amount__c) return '₹0.00';
+        return this.formatCurrency(this.paymentModalOrder.Outstanding_Amount__c);
     }
 }
