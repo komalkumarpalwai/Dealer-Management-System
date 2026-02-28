@@ -77,147 +77,6 @@
                             </div>
                         </div>
 
-                        <!-- Tracking Status Section -->
-                        <div class="tracking-status-section">
-                            <h3 class="section-title">📍 Tracking Status</h3>
-                            <div class="tracking-timeline">
-                                <!-- Stage 1: Ordered -->
-                                <div class="tracking-stage">
-                                    <div class={trackedOrderedStageIcon}>
-                                        <span class="icon-text">✓</span>
-                                    </div>
-                                    <div class="tracking-info">
-                                        <div class="stage-title">Ordered Date</div>
-                                        <div class="stage-date">{formattedSelectedCreatedDate}</div>
-                                    </div>
-                                </div>
-
-                                <!-- Stage 2: Order Activated -->
-                                <div class="tracking-stage">
-                                    <div class={trackedActivatedStageIcon}>
-                                        <template if:true={orderActivatedDate}>
-                                            <span class="icon-text">✓</span>
-                                        </template>
-                                        <template if:false={orderActivatedDate}>
-                                            <span class="icon-text">○</span>
-                                        </template>
-                                    </div>
-                                    <div class="tracking-info">
-                                        <div class="stage-title">Order Activated</div>
-                                        <div class="stage-date">{orderActivatedDate}</div>
-                                    </div>
-                                </div>
-
-                                <!-- Stage 3: Payment Status -->
-                                <div class="tracking-stage">
-                                    <div class={trackedPaymentStageIcon}>
-                                        <template if:true={isOrderFulfilled}>
-                                            <span class="icon-text">✓</span>
-                                        </template>
-                                        <template if:false={isOrderFulfilled}>
-                                            <span class="icon-text">●</span>
-                                        </template>
-                                    </div>
-                                    <div class="tracking-info">
-                                        <div class="stage-title">Payment Status</div>
-                                        <div class="stage-date">{paymentStatusText}</div>
-                                        <div class={paymentStatusBadgeClass}>{paymentStatusBadge}</div>
-                                    </div>
-                                </div>
-
-                                <!-- Stage 4: Delivery Status -->
-                                <div class="tracking-stage">
-                                    <div class={trackedDeliveryStageIcon}>
-                                        <span class="icon-text">○</span>
-                                    </div>
-                                    <div class="tracking-info">
-                                        <div class="stage-title">Delivery Status</div>
-                                        <div class="stage-date">{deliveryStatusText}</div>
-                                        <div class={deliveryStatusBadgeClass}>{deliveryStatusBadge}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Line Items Section -->
-                        <template if:true={formattedLineItems.length}>
-                            <div class="line-items-section">
-                                <h3 class="section-title">📦 Order Items ({formattedLineItems.length})</h3>
-                                <div class="line-items-table">
-                                    <div class="table-header">
-                                        <div class="col-product">Product</div>
-                                        <div class="col-code">Code</div>
-                                        <div class="col-qty">Qty</div>
-                                        <div class="col-price">Unit Price</div>
-                                        <div class="col-total">Total</div>
-                                    </div>
-                                    <template for:each={formattedLineItems} for:item="item">
-                                        <div key={item.Id} class="table-row">
-                                            <div class="col-product">{item.Product2.Name}</div>
-                                            <div class="col-code">{item.Product2.ProductCode}</div>
-                                            <div class="col-qty">{item.Quantity}</div>
-                                            <div class="col-price">{item.formattedUnitPrice}</div>
-                                            <div class="col-total">{item.formattedTotalPrice}</div>
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
-                        </template>
-
-                        <!-- Shipping Address Section -->
-                        <div class="shipping-address-section">
-                            <h3 class="section-title">🏠 Shipping Address</h3>
-                            <template if:true={shippingAddress}>
-                                <div class="address-card">
-                                    <template if:true={shippingAddress.Name}>
-                                        <div class="address-item">
-                                            <label class="address-label">Business:</label>
-                                            <p class="address-value">{shippingAddress.Name}</p>
-                                        </div>
-                                    </template>
-                                    <template if:true={shippingAddress.Phone}>
-                                        <div class="address-item">
-                                            <label class="address-label">Mobile:</label>
-                                            <p class="address-value">{shippingAddress.Phone}</p>
-                                        </div>
-                                    </template>
-                                    <template if:true={shippingAddress.ShippingCity}>
-                                        <div class="address-item">
-                                            <label class="address-label">City:</label>
-                                            <p class="address-value">{shippingAddress.ShippingCity}</p>
-                                        </div>
-                                    </template>
-                                    <template if:true={shippingAddress.ShippingState}>
-                                        <div class="address-item">
-                                            <label class="address-label">State:</label>
-                                            <p class="address-value">{shippingAddress.ShippingState}</p>
-                                        </div>
-                                    </template>
-                                    <template if:true={shippingAddress.ShippingPostalCode}>
-                                        <div class="address-item">
-                                            <label class="address-label">Postal Code:</label>
-                                            <p class="address-value">{shippingAddress.ShippingPostalCode}</p>
-                                        </div>
-                                    </template>
-                                    <template if:true={shippingAddress.ShippingCountry}>
-                                        <div class="address-item">
-                                            <label class="address-label">Country:</label>
-                                            <p class="address-value">{shippingAddress.ShippingCountry}</p>
-                                        </div>
-                                    </template>
-                                    <template if:true={shippingAddress.ShippingStreet}>
-                                        <div class="address-item">
-                                            <label class="address-label">Street:</label>
-                                            <p class="address-value">{shippingAddress.ShippingStreet}</p>
-                                        </div>
-                                    </template>
-                                </div>
-                            </template>
-                            <template if:false={shippingAddress}>
-                                <p class="no-address-message">No shipping address available</p>
-                            </template>
-                        </div>
-
                         <!-- Payment Summary Section -->
                         <div class="payment-summary-section">
                             <h3 class="section-title">💳 Payment Summary</h3>
@@ -286,10 +145,193 @@
                             </div>
                         </template>
 
-                        <!-- Delivery Location Map Component -->
-                        <div class="map-section">
-                            <h3 class="section-title">📍 Delivery Location Map</h3>
-                            <c-delivery-location-map order-status={orderDetails.Status} activated-date={orderDetails.Order_Activated_Date__c} ondeliverydatecalculated={handleDeliveryDateCalculated}></c-delivery-location-map>
+                        <!-- Line Items Section -->
+                        <template if:true={formattedLineItems.length}>
+                            <div class="line-items-section">
+                                <h3 class="section-title">📦 Order Items ({formattedLineItems.length})</h3>
+                                <div class="line-items-table">
+                                    <div class="table-header">
+                                        <div class="col-product">Product</div>
+                                        <div class="col-code">Code</div>
+                                        <div class="col-qty">Qty</div>
+                                        <div class="col-price">Unit Price</div>
+                                        <div class="col-total">Total</div>
+                                    </div>
+                                    <template for:each={formattedLineItems} for:item="item">
+                                        <div key={item.Id} class="table-row">
+                                            <div class="col-product">{item.Product2.Name}</div>
+                                            <div class="col-code">{item.Product2.ProductCode}</div>
+                                            <div class="col-qty">{item.Quantity}</div>
+                                            <div class="col-price">{item.formattedUnitPrice}</div>
+                                            <div class="col-total">{item.formattedTotalPrice}</div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Sections 4-6: Shipping Address, Tracking Status, and Map (Grouped Together) -->
+                        <div class="logistics-section-wrapper">
+                            <!-- Left Column: Tracking Status and Map -->
+                            <div class="logistics-left-column">
+                                <!-- Tracking Status Section -->
+                                <div class="tracking-status-section">
+                                    <h3 class="section-title">📍 Tracking Status</h3>
+                                    <div class="tracking-timeline">
+                                        <!-- Stage 1: Ordered -->
+                                        <div class="tracking-stage">
+                                            <div class={trackedOrderedStageIcon}>
+                                                <span class="icon-text">✓</span>
+                                            </div>
+                                            <div class="tracking-info">
+                                                <div class="stage-title">Ordered Date</div>
+                                                <div class="stage-date">{formattedSelectedCreatedDate}</div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Stage 2: Order Activated -->
+                                        <div class="tracking-stage">
+                                            <div class={trackedActivatedStageIcon}>
+                                                <template if:true={orderActivatedDate}>
+                                                    <span class="icon-text">✓</span>
+                                                </template>
+                                                <template if:false={orderActivatedDate}>
+                                                    <span class="icon-text">○</span>
+                                                </template>
+                                            </div>
+                                            <div class="tracking-info">
+                                                <div class="stage-title">Order Activated</div>
+                                                <div class="stage-date">{orderActivatedDate}</div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Stage 3: Payment Status -->
+                                        <div class="tracking-stage">
+                                            <div class={trackedPaymentStageIcon}>
+                                                <template if:true={isOrderFulfilled}>
+                                                    <span class="icon-text">✓</span>
+                                                </template>
+                                                <template if:false={isOrderFulfilled}>
+                                                    <span class="icon-text">●</span>
+                                                </template>
+                                            </div>
+                                            <div class="tracking-info">
+                                                <div class="stage-title">Payment Status</div>
+                                                <div class="stage-date">{paymentStatusText}</div>
+                                                <div class={paymentStatusBadgeClass}>{paymentStatusBadge}</div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Stage 4: Delivery Status -->
+                                        <div class="tracking-stage">
+                                            <div class={trackedDeliveryStageIcon}>
+                                                <span class="icon-text">○</span>
+                                            </div>
+                                            <div class="tracking-info">
+                                                <div class="stage-title">Delivery Status</div>
+                                                <div class="stage-date">{deliveryStatusText}</div>
+                                                <div class={deliveryStatusBadgeClass}>{deliveryStatusBadge}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delivery Location Map Component -->
+                                <div class="map-section">
+                                    <h3 class="section-title">📍 Live Tracking</h3>
+                                    <c-delivery-location-map order-status={orderDetails.Status} activated-date={orderDetails.Order_Activated_Date__c} ondeliverydatecalculated={handleDeliveryDateCalculated}></c-delivery-location-map>
+                                </div>
+                            </div>
+
+                            <!-- Right Column: Shipping Address -->
+                            <div class="logistics-right-column">
+                                <!-- Estimated Delivery Card -->
+                                <div class="estimated-delivery-card">
+                                    <h3 class="estimated-delivery-title">📦 ESTIMATED DELIVERY</h3>
+                                    
+                                    <template if:false={isOrderActivated}>
+                                        <div class="estimated-date">Pending</div>
+                                        <p class="estimated-subtitle">Your order is being processed. Once it's activated, the estimated delivery date will be calculated and displayed here. Please wait for confirmation.</p>
+                                    </template>
+                                    
+                                    <template if:true={isOrderActivated}>
+                                        <template if:true={deliveryDateCalculated}>
+                                            <div class="estimated-date">{deliveryDateCalculated}</div>
+                                            <p class="estimated-subtitle">Your order is currently moving through our network and is expected to arrive within the timeframe.</p>
+                                        </template>
+                                        <template if:false={deliveryDateCalculated}>
+                                            <div class="estimated-date">Calculating...</div>
+                                            <p class="estimated-subtitle">Your order has been activated. The delivery date is being calculated based on the shipping route and current logistics.</p>
+                                        </template>
+                                    </template>
+                                </div>
+
+                                <!-- Shipping Address Section -->
+                                <div class="shipping-address-section">
+                                    <div class="address-section-header">
+                                        <span class="address-icon">📍</span>
+                                        <h3 class="address-section-title">Shipping Address</h3>
+                                    </div>
+                                    
+                                    <template if:true={shippingAddress}>
+                                        <div class="address-card">
+                                            <!-- Recipient Business -->
+                                            <template if:true={shippingAddress.Name}>
+                                                <div class="address-block">
+                                                    <span class="address-label">RECIPIENT BUSINESS</span>
+                                                    <p class="address-value">{shippingAddress.Name}</p>
+                                                </div>
+                                            </template>
+
+                                            <!-- Mobile -->
+                                            <template if:true={shippingAddress.Phone}>
+                                                <div class="address-block">
+                                                    <span class="address-label">MOBILE</span>
+                                                    <p class="address-value">{shippingAddress.Phone}</p>
+                                                </div>
+                                            </template>
+
+                                            <!-- Address Details -->
+                                            <div class="address-block">
+                                                <span class="address-label">ADDRESS DETAILS</span>
+                                                <div class="address-details">
+                                                    <template if:true={shippingAddress.ShippingCity}>
+                                                        <span class="detail-text">{shippingAddress.ShippingCity}</span>
+                                                    </template>
+                                                    <template if:true={shippingAddress.ShippingState}>
+                                                        <span class="detail-text">{shippingAddress.ShippingState}</span>
+                                                    </template>
+                                                    <template if:true={shippingAddress.ShippingPostalCode}>
+                                                        <span class="detail-text">{shippingAddress.ShippingPostalCode}</span>
+                                                    </template>
+                                                    <template if:false={shippingAddress.ShippingCity}>
+                                                        <span class="detail-text">-</span>
+                                                    </template>
+                                                </div>
+                                            </div>
+
+                                            <!-- Country -->
+                                            <template if:true={shippingAddress.ShippingCountry}>
+                                                <div class="address-block">
+                                                    <span class="address-label">COUNTRY</span>
+                                                    <p class="address-value">{shippingAddress.ShippingCountry}</p>
+                                                </div>
+                                            </template>
+
+                                            <!-- Full Street Address (Optional Full View) -->
+                                            <template if:true={shippingAddress.ShippingStreet}>
+                                                <div class="address-block">
+                                                    <span class="address-label">STREET ADDRESS</span>
+                                                    <p class="address-value address-street">{shippingAddress.ShippingStreet}</p>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                    <template if:false={shippingAddress}>
+                                        <p class="no-address-message">No shipping address available</p>
+                                    </template>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Delayed Delivery Alert (if applicable) -->

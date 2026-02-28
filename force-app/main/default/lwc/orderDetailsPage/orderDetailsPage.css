@@ -348,28 +348,112 @@
 /* ===== SECTION STYLES ===== */
 .order-info-section,
 .line-items-section,
-.shipping-address-section,
 .payment-summary-section,
-.payment-history-section,
-.map-section,
-.tracking-status-section {
+.payment-history-section {
     margin-bottom: 2rem;
     background: white;
-    border-radius: 4px;
+    border-radius: 8px;
     padding: 2rem;
-    border: 1px solid #e8e8e8;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== LOGISTICS SECTION WRAPPER (4, 5, 6 GROUPED) ===== */
+.logistics-section-wrapper {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.logistics-left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.logistics-right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.estimated-delivery-card {
+    background: linear-gradient(135deg, #0052cc 0%, #0040a5 100%);
+    color: white;
+    border-radius: 8px;
+    padding: 2rem;
+    border: none;
+    box-shadow: 0 4px 16px rgba(0, 82, 204, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.estimated-delivery-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(30px, -30px);
+}
+
+.estimated-delivery-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.95);
+    position: relative;
+    z-index: 1;
+}
+
+.estimated-date {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: white;
+    position: relative;
+    z-index: 1;
+}
+
+.estimated-subtitle {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.85);
+    position: relative;
+    z-index: 1;
+}
+
+/* Responsive Design for Logistics Section */
+@media (max-width: 1200px) {
+    .logistics-section-wrapper {
+        grid-template-columns: 1fr;
+    }
+    
+    .logistics-left-column {
+        order: 1;
+    }
+    
+    .logistics-right-column {
+        order: 2;
+    }
 }
 
 .section-title {
-    font-size: 1.4rem;
-    color: #333;
+    font-size: 1.1rem;
+    color: #1a1a1a;
     margin: 0 0 1.5rem 0;
     font-weight: 700;
     padding-bottom: 0.75rem;
-    border-bottom: 3px solid #0b5394;
+    border-bottom: 2px solid #0052cc;
     display: inline-block;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.2px;
 }
 
 /* ===== ORDER INFO GRID ===== */
@@ -408,83 +492,97 @@
     word-break: break-word;
 }
 
-/* ===== TRACKING STATUS TIMELINE ===== */
+/* ===== TRACKING STATUS SECTION & TIMELINE ===== */
+.tracking-status-section {
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
 .tracking-timeline {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 1.5rem;
+    gap: 1rem;
     overflow-x: auto;
-    padding: 1rem 0;
+    padding: 1.5rem 0;
+    position: relative;
+}
+
+.tracking-timeline::before {
+    content: '';
+    position: absolute;
+    top: 40px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, #e0e0e0 0%, #e0e0e0 85%, transparent 85%);
+    z-index: 0;
 }
 
 .tracking-stage {
     flex: 1;
-    min-width: 200px;
+    min-width: 150px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     position: relative;
-}
-
-.tracking-stage:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    top: 30px;
-    left: 50%;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(to right, #ddd 0%, #ddd 50%, transparent 50%);
-    transform: translateX(50%);
-    z-index: 0;
+    z-index: 1;
 }
 
 .tracking-icon {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 700;
     margin-bottom: 1rem;
     position: relative;
-    z-index: 1;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    background: white;
+    border: 3px solid #e0e0e0;
 }
 
 .tracking-icon-completed {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(135deg, #00b040 0%, #00d85f 100%);
     color: white;
+    border-color: #00b040;
 }
 
 .tracking-icon-processing {
-    background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+    background: linear-gradient(135deg, #f0a500 0%, #ffc107 100%);
     color: white;
+    border-color: #f0a500;
 }
 
 .tracking-icon-pending {
-    background: #e8e8e8;
-    color: #999;
+    background: #f5f5f5;
+    color: #bbb;
+    border-color: #e0e0e0;
 }
 
 .tracking-info {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.35rem;
 }
 
 .stage-title {
-    font-weight: 700;
-    color: #333;
-    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    font-size: 0.95rem;
 }
 
 .stage-date {
-    font-size: 0.85rem;
-    color: #666;
+    font-size: 0.8rem;
+    color: #888;
+    font-weight: 500;
 }
 
 /* ===== STATUS BADGES ===== */
@@ -593,40 +691,89 @@
 }
 
 /* ===== SHIPPING ADDRESS SECTION ===== */
-.address-card {
+.shipping-address-section {
     background: white;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    border-radius: 8px;
     padding: 2rem;
-    border-left: 5px solid #0b5394;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.address-item {
+.address-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
     margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #0052cc;
+}
+
+.address-icon {
+    font-size: 1.5rem;
+}
+
+.address-section-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.address-card {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
     display: flex;
     flex-direction: column;
+    gap: 1.25rem;
 }
 
-.address-item:last-child {
-    margin-bottom: 0;
+.address-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
 }
 
 .address-label {
-    font-weight: 700;
-    color: #5f6a6a;
-    font-size: 0.85rem;
-    margin: 0 0 0.6rem 0;
+    font-weight: 600;
+    color: #999;
+    font-size: 0.75rem;
+    margin: 0;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
 }
 
 .address-value {
-    color: #333;
+    color: #1a1a1a;
     margin: 0;
-    font-size: 1rem;
-    font-weight: 400;
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.address-street {
+    font-size: 0.9rem;
     line-height: 1.5;
+}
+
+.address-details {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+}
+
+.detail-text {
+    color: #1a1a1a;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.detail-text:not(:last-child)::after {
+    content: ',';
+    margin-right: 0.3rem;
 }
 
 .no-address-message {

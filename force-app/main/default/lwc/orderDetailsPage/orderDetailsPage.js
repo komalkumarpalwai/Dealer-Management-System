@@ -18,6 +18,7 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
     errorMessage = '';
     showPaymentHistory = false;
     @track isDeliveryDelayedFlag = false;
+    deliveryDateCalculated = '';
     
     // Account Modal State
     showAccountModal = false;
@@ -107,6 +108,8 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
     handleDeliveryDateCalculated(event) {
         const expectedDate = event.detail.expectedDate;
         if (expectedDate) {
+            // Format the delivery date for display
+            this.deliveryDateCalculated = this.formatDate(expectedDate);
             this.checkDeliveryDelayStatus(expectedDate);
         }
     }
@@ -230,6 +233,26 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         }).format(amount);
+    }
+
+    /**
+     * Format date with day of week and month/day
+     * Example: "Thursday, Oct 24"
+     */
+    formatDate(dateValue) {
+        if (!dateValue) return '';
+        try {
+            const date = new Date(dateValue);
+            const options = { 
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric'
+            };
+            return date.toLocaleDateString('en-US', options);
+        } catch (error) {
+            console.error('Error formatting date:', error);
+            return '';
+        }
     }
 
     /**

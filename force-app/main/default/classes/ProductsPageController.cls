@@ -167,7 +167,7 @@ public with sharing class ProductsPageController {
 
             System.debug('Aggregated Stock Results Count: ' + stockResults.size());
             for (AggregateResult ar : stockResults) {
-                Id prodId = (Id) ar.get('Product__c');
+                Id prodId = (Id) ar.get('AMERP_Product__c');
                 Decimal total = (Decimal) ar.get('totalQty');
                 productStockMap.put(prodId, total);
                 System.debug('Stock Mapped - Product ID: ' + prodId + ', Quantity: ' + total);
