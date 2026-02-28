@@ -59,7 +59,7 @@
                             <!-- Quick Summary Cards -->
                             <div class="summary-cards">
                                 <div class="summary-card">
-                                    <span class="card-label">Created Date</span>
+                                    <span class="card-label">Ordered Date</span>
                                     <span class="card-value">{formattedSelectedCreatedDate}</span>
                                 </div>
                                 <div class="summary-card">
@@ -77,32 +77,65 @@
                             </div>
                         </div>
 
-                        <!-- Order Information Section -->
-                        <div class="order-info-section">
-                            <h3 class="section-title">📋 Order Information</h3>
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <label class="info-label">Order Number:</label>
-                                    <span class="info-value">{orderDetails.OrderNumber}</span>
-                                </div>
-                                <div class="info-item">
-                                    <label class="info-label">Status:</label>
-                                    <span class="info-value">{orderDetails.Status}</span>
-                                </div>
-                                <div class="info-item">
-                                    <label class="info-label">Created Date:</label>
-                                    <span class="info-value">{formattedSelectedCreatedDate}</span>
-                                </div>
-                                <div class="info-item">
-                                    <label class="info-label">Account:</label>
-                                    <span class="info-value">{orderDetails.Account.Name}</span>
-                                </div>
-                                <template if:true={orderDetails.Description}>
-                                    <div class="info-item full-width">
-                                        <label class="info-label">Description:</label>
-                                        <span class="info-value">{orderDetails.Description}</span>
+                        <!-- Tracking Status Section -->
+                        <div class="tracking-status-section">
+                            <h3 class="section-title">📍 Tracking Status</h3>
+                            <div class="tracking-timeline">
+                                <!-- Stage 1: Ordered -->
+                                <div class="tracking-stage">
+                                    <div class={trackedOrderedStageIcon}>
+                                        <span class="icon-text">✓</span>
                                     </div>
-                                </template>
+                                    <div class="tracking-info">
+                                        <div class="stage-title">Ordered Date</div>
+                                        <div class="stage-date">{formattedSelectedCreatedDate}</div>
+                                    </div>
+                                </div>
+
+                                <!-- Stage 2: Order Activated -->
+                                <div class="tracking-stage">
+                                    <div class={trackedActivatedStageIcon}>
+                                        <template if:true={orderActivatedDate}>
+                                            <span class="icon-text">✓</span>
+                                        </template>
+                                        <template if:false={orderActivatedDate}>
+                                            <span class="icon-text">○</span>
+                                        </template>
+                                    </div>
+                                    <div class="tracking-info">
+                                        <div class="stage-title">Order Activated</div>
+                                        <div class="stage-date">{orderActivatedDate}</div>
+                                    </div>
+                                </div>
+
+                                <!-- Stage 3: Payment Status -->
+                                <div class="tracking-stage">
+                                    <div class={trackedPaymentStageIcon}>
+                                        <template if:true={isOrderFulfilled}>
+                                            <span class="icon-text">✓</span>
+                                        </template>
+                                        <template if:false={isOrderFulfilled}>
+                                            <span class="icon-text">●</span>
+                                        </template>
+                                    </div>
+                                    <div class="tracking-info">
+                                        <div class="stage-title">Payment Status</div>
+                                        <div class="stage-date">{paymentStatusText}</div>
+                                        <div class={paymentStatusBadgeClass}>{paymentStatusBadge}</div>
+                                    </div>
+                                </div>
+
+                                <!-- Stage 4: Delivery Status -->
+                                <div class="tracking-stage">
+                                    <div class={trackedDeliveryStageIcon}>
+                                        <span class="icon-text">○</span>
+                                    </div>
+                                    <div class="tracking-info">
+                                        <div class="stage-title">Delivery Status</div>
+                                        <div class="stage-date">{deliveryStatusText}</div>
+                                        <div class={deliveryStatusBadgeClass}>{deliveryStatusBadge}</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -136,11 +169,48 @@
                             <h3 class="section-title">🏠 Shipping Address</h3>
                             <template if:true={shippingAddress}>
                                 <div class="address-card">
-                                    <div class="address-item">
-                                        <p class="address-label">Business:</p>
-                                        <p class="address-value">{shippingAddress.Name}</p>
-                                    </div>
-                                    <p class="no-address-message">Address details from account record</p>
+                                    <template if:true={shippingAddress.Name}>
+                                        <div class="address-item">
+                                            <label class="address-label">Business:</label>
+                                            <p class="address-value">{shippingAddress.Name}</p>
+                                        </div>
+                                    </template>
+                                    <template if:true={shippingAddress.Phone}>
+                                        <div class="address-item">
+                                            <label class="address-label">Mobile:</label>
+                                            <p class="address-value">{shippingAddress.Phone}</p>
+                                        </div>
+                                    </template>
+                                    <template if:true={shippingAddress.ShippingCity}>
+                                        <div class="address-item">
+                                            <label class="address-label">City:</label>
+                                            <p class="address-value">{shippingAddress.ShippingCity}</p>
+                                        </div>
+                                    </template>
+                                    <template if:true={shippingAddress.ShippingState}>
+                                        <div class="address-item">
+                                            <label class="address-label">State:</label>
+                                            <p class="address-value">{shippingAddress.ShippingState}</p>
+                                        </div>
+                                    </template>
+                                    <template if:true={shippingAddress.ShippingPostalCode}>
+                                        <div class="address-item">
+                                            <label class="address-label">Postal Code:</label>
+                                            <p class="address-value">{shippingAddress.ShippingPostalCode}</p>
+                                        </div>
+                                    </template>
+                                    <template if:true={shippingAddress.ShippingCountry}>
+                                        <div class="address-item">
+                                            <label class="address-label">Country:</label>
+                                            <p class="address-value">{shippingAddress.ShippingCountry}</p>
+                                        </div>
+                                    </template>
+                                    <template if:true={shippingAddress.ShippingStreet}>
+                                        <div class="address-item">
+                                            <label class="address-label">Street:</label>
+                                            <p class="address-value">{shippingAddress.ShippingStreet}</p>
+                                        </div>
+                                    </template>
                                 </div>
                             </template>
                             <template if:false={shippingAddress}>
@@ -165,6 +235,21 @@
                                     <span class="payment-value outstanding">{formattedOutstandingAmount}</span>
                                 </div>
                             </div>
+                            
+                            <!-- Payment Actions -->
+                            <template if:true={shouldShowPaymentButton}>
+                                <button class="btn-payment" onclick={handleOpenPaymentModal}>
+                                    💳 Make Payment
+                                </button>
+                            </template>
+                            <template if:false={shouldShowPaymentButton}>
+                                <template if:true={isOrderFulfilled}>
+                                    <div class="payment-success-message">
+                                        <span class="success-icon">✓</span>
+                                        <span class="success-text">Your payment has been completed for this Order</span>
+                                    </div>
+                                </template>
+                            </template>
                         </div>
 
                         <!-- Payment History Section -->
@@ -204,23 +289,25 @@
                         <!-- Delivery Location Map Component -->
                         <div class="map-section">
                             <h3 class="section-title">📍 Delivery Location Map</h3>
-                            <c-delivery-location-map order-status={orderDetails.Status}></c-delivery-location-map>
+                            <c-delivery-location-map order-status={orderDetails.Status} activated-date={orderDetails.Order_Activated_Date__c} ondeliverydatecalculated={handleDeliveryDateCalculated}></c-delivery-location-map>
                         </div>
+
+                        <!-- Delayed Delivery Alert (if applicable) -->
+                        <template if:true={isDeliveryDelayed}>
+                            <div class="delayed-delivery-alert">
+                                <div class="alert-content">
+                                    <div class="alert-icon">⚠️</div>
+                                    <div class="alert-message">
+                                        <div class="alert-title">Delivery Has Been Delayed</div>
+                                        <div class="alert-subtitle">For uncertain reasons, we are pushing our limits to deliver your order.</div>
+                                        <div class="alert-action"><a href="javascript:void(0)" onclick={handleRaiseTicket}>Raise a Support Ticket →</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
 
                         <!-- Action Buttons -->
                         <div class="page-actions">
-                            <template if:true={shouldShowPaymentButton}>
-                                <button class="btn-payment" onclick={handleOpenPaymentModal}>
-                                    💳 Make Payment
-                                </button>
-                            </template>
-                            <template if:false={shouldShowPaymentButton}>
-                                <template if:true={isOrderFulfilled}>
-                                    <div class="payment-fulfilled">
-                                        <span class="fulfilled-badge">✓ PAYMENT FULFILLED</span>
-                                    </div>
-                                </template>
-                            </template>
                             <button class="btn-secondary" onclick={handleBackToOrders}>
                                 ← Back to Orders
                             </button>

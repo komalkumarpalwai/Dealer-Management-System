@@ -6,6 +6,8 @@ import getDeliveryLocations from '@salesforce/apex/DeliveryLocationMapController
 export default class DeliveryLocationMap extends LightningElement {
 
     @api orderStatus;
+    @api activatedDate;
+    @api expectedDeliveryDate = null;
     @track isLoading = true;
     @track errorMessage = '';
     @track shippingAddress = '';
@@ -22,6 +24,8 @@ export default class DeliveryLocationMap extends LightningElement {
     get isOrderActivated() {
         return this.orderStatus === 'Activated';
     }
+
+
 
     renderedCallback() {
         if (this.leafletInitialized) return;
@@ -187,10 +191,16 @@ export default class DeliveryLocationMap extends LightningElement {
                     else if (distanceValue < 1500) transitDays = 4;
                     else transitDays = 5;
 
-                    // Calculate dates
-                    const today = new Date();
-                    const dispatchDate = new Date(today);
-                    dispatchDate.setDate(dispatchDate.getDate() + 1);
+                    // Calculate dates using Order_Activated_Date__c as starting point
+                    let dispatchDate;
+                    if (this.activatedDate) {
+                        dispatchDate = new Date(this.activatedDate);
+                    } else {
+                        // Fallback to today + 1 if no activated date provided
+                        const today = new Date();
+                        dispatchDate = new Date(today);
+                        dispatchDate.setDate(dispatchDate.getDate() + 1);
+                    }
 
                     const expectedDate = new Date(dispatchDate);
                     expectedDate.setDate(expectedDate.getDate() + transitDays);
@@ -200,6 +210,14 @@ export default class DeliveryLocationMap extends LightningElement {
 
                     const latestDate = new Date(expectedDate);
                     latestDate.setDate(latestDate.getDate() + 1);
+
+                    // Store raw expectedDate for delayed check
+                    // Store the expected date and dispatch event for parent
+                    this.expectedDeliveryDate = new Date(expectedDate);
+                    this.dispatchEvent(new CustomEvent('deliverydatecalculated', {
+                        detail: { expectedDate: this.expectedDeliveryDate },
+                        bubbles: true
+                    }));
 
                     // Date formatter
                     const dateFormatter = (d) => d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });

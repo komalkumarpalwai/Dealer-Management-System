@@ -303,11 +303,18 @@ public with sharing class OrderPage {
                        Name,
                        Description,
                        Account.Name,
+                       Account.Phone,
+                       Account.ShippingStreet,
+                       Account.ShippingCity,
+                       Account.ShippingState,
+                       Account.ShippingPostalCode,
+                       Account.ShippingCountry,
                        EffectiveDate,
                        TotalAmount,
                        CreatedDate,
                        Outstanding_Amount__c,
-                       Amount_Paid_From_Payments__c
+                       Amount_Paid_From_Payments__c,
+                       Order_Activated_Date__c
                 FROM Order
                 WHERE Id = :orderId
                 LIMIT 1

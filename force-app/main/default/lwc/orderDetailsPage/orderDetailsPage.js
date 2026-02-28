@@ -1,4 +1,4 @@
-import { LightningElement, wire } from 'lwc';
+import { LightningElement, wire, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getOrderDetails from '@salesforce/apex/OrderPage.getOrderDetails';
@@ -17,6 +17,7 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
     hasError = false;
     errorMessage = '';
     showPaymentHistory = false;
+    @track isDeliveryDelayedFlag = false;
     
     // Account Modal State
     showAccountModal = false;
@@ -97,6 +98,16 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
             this.hasError = true;
             this.errorMessage = 'Order ID not found in URL. Please navigate back and try again.';
             this.isLoading = false;
+        }
+    }
+
+    /**
+     * Handle delivery date calculated event from child component
+     */
+    handleDeliveryDateCalculated(event) {
+        const expectedDate = event.detail.expectedDate;
+        if (expectedDate) {
+            this.checkDeliveryDelayStatus(expectedDate);
         }
     }
 
@@ -537,10 +548,125 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
     }
 
     /**
+     * Get formatted activated date
+     */
+    get orderActivatedDate() {
+        if (!this.orderDetails || !this.orderDetails.Order_Activated_Date__c) {
+            return '-';
+        }
+        const activatedDate = new Date(this.orderDetails.Order_Activated_Date__c);
+        return activatedDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+    }
+
+    /**
+     * Get payment status text
+     */
+    get paymentStatusText() {
+        if (this.isOrderFulfilled) {
+            return 'Completed';
+        }
+        return 'Processing verification';
+    }
+
+    /**
+     * Get payment status badge
+     */
+    get paymentStatusBadge() {
+        if (this.isOrderFulfilled) {
+            return 'PAID';
+        }
+        return 'NOT PAID';
+    }
+
+    /**
+     * Get payment status badge class
+     */
+    get paymentStatusBadgeClass() {
+        if (this.isOrderFulfilled) {
+            return 'status-badge status-badge-paid';
+        }
+        return 'status-badge status-badge-unpaid';
+    }
+
+    /**
+     * Get delivery status text
+     */
+    get deliveryStatusText() {
+        if (this.isDeliveryDelayedFlag) {
+            return 'Delayed';
+        }
+        return 'Arriving soon';
+    }
+
+    /**
+     * Get delivery status badge
+     */
+    get deliveryStatusBadge() {
+        if (this.isDeliveryDelayedFlag) {
+            return 'DELAYED';
+        }
+        return 'IN TRANSIT';
+    }
+
+    /**
+     * Get delivery status badge class
+     */
+    get deliveryStatusBadgeClass() {
+        if (this.isDeliveryDelayedFlag) {
+            return 'status-badge status-badge-delayed';
+        }
+        return 'status-badge status-badge-transit';
+    }
+
+    /**
+     * Get tracking stage icon class for Ordered
+     */
+    get trackedOrderedStageIcon() {
+        return 'tracking-icon tracking-icon-completed';
+    }
+
+    /**
+     * Get tracking stage icon class for Activated
+     */
+    get trackedActivatedStageIcon() {
+        if (this.orderActivatedDate && this.orderActivatedDate !== '-') {
+            return 'tracking-icon tracking-icon-completed';
+        }
+        return 'tracking-icon tracking-icon-pending';
+    }
+
+    /**
+     * Get tracking stage icon class for Payment
+     */
+    get trackedPaymentStageIcon() {
+        if (this.isOrderFulfilled) {
+            return 'tracking-icon tracking-icon-completed';
+        }
+        return 'tracking-icon tracking-icon-processing';
+    }
+
+    /**
+     * Get tracking stage icon class for Delivery
+     */
+    get trackedDeliveryStageIcon() {
+        return 'tracking-icon tracking-icon-pending';
+    }
+
+    /**
      * Check if payment button should be shown
      */
     get shouldShowPaymentButton() {
-        return !this.isOrderFulfilled && this.orderDetails;
+        if (!this.orderDetails) return false;
+        // Show payment button only if:
+        // 1. Order is Activated
+        // 2. Outstanding amount is greater than 0
+        const isActivated = this.orderDetails.Status === 'Activated';
+        const outstandingAmount = this.orderDetails.Outstanding_Amount__c || 0;
+        return isActivated && outstandingAmount > 0;
     }
 
     /**
@@ -610,5 +736,48 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
     get statusClass() {
         if (!this.orderDetails) return '';
         return `status-${this.orderDetails.Status.toLowerCase()}`;
+    }
+
+    /**
+     * Check if delivery is delayed
+     */
+    get isDeliveryDelayed() {
+        return this.isDeliveryDelayedFlag;
+    }
+
+    /**
+     * Check if delivery date indicates a delay
+     */
+    checkDeliveryDelayStatus(expectedDate) {
+        try {
+            if (!expectedDate) {
+                return;
+            }
+
+            // Normalize dates to compare only the date portion
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const expectedDateNormalized = new Date(expectedDate);
+            expectedDateNormalized.setHours(0, 0, 0, 0);
+
+            // Delayed if expected date is before or equal to today
+            const isDelayed = expectedDateNormalized <= today;
+            
+            if (isDelayed !== this.isDeliveryDelayedFlag) {
+                this.isDeliveryDelayedFlag = isDelayed;
+                console.log('✓ Delivery Status: ' + (isDelayed ? 'DELAYED' : 'ON TIME'), 
+                           'Expected:', expectedDateNormalized, 'Today:', today);
+            }
+        } catch (error) {
+            console.error('Error checking delivery delay:', error);
+        }
+    }
+
+    /**
+     * Handle raise support ticket
+     */
+    handleRaiseTicket() {
+        this.showToast('info', 'Support Ticket', 'Please navigate to the Support section to raise a ticket or contact our support team for more information.');
     }
 }
