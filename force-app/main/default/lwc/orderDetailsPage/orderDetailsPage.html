@@ -1,0 +1,645 @@
+<template>
+    <div class="order-details-page">
+        <!-- Loading State -->
+        <template if:true={isLoading}>
+            <div class="loading-container">
+                <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+                <p class="loading-text">Loading order details...</p>
+            </div>
+        </template>
+
+        <!-- Error State -->
+        <template if:true={hasError}>
+            <div class="error-container">
+                <div class="error-content">
+                    <div class="error-icon">⚠️</div>
+                    <h2>Unable to Load Order</h2>
+                    <p class="error-message">{errorMessage}</p>
+                    <button class="btn-back" onclick={handleBackToOrders}>
+                        ← Back to Orders
+                    </button>
+                </div>
+            </div>
+        </template>
+
+        <!-- Main Content -->
+        <template if:false={isLoading}>
+            <template if:false={hasError}>
+                <div class="page-wrapper">
+                    <!-- Page Header -->
+                    <div class="page-header">
+                        <div class="header-content">
+                            <button class="btn-back-header" onclick={handleBackToOrders}>← Back</button>
+                            <h1 class="page-title">Order Details</h1>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn-my-account" onclick={handleOpenAccountModal}>
+                                👤 My Account
+                            </button>
+                            <button class="btn-back-top" onclick={handleBackToOrders}>
+                                ← Back to Orders
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Order Summary Section -->
+                    <template if:true={orderDetails}>
+                        <div class="order-summary-section">
+                            <div class="summary-header">
+                                <div class="summary-title">
+                                    <h2>Order #{orderDetails.OrderNumber}</h2>
+                                    <span class={statusClass}>{orderDetails.Status}</span>
+                                </div>
+                                <div class="summary-amount">
+                                    <h3>{formattedOrderTotal}</h3>
+                                    <p>Total Amount</p>
+                                </div>
+                            </div>
+
+                            <!-- Quick Summary Cards -->
+                            <div class="summary-cards">
+                                <div class="summary-card">
+                                    <span class="card-label">Created Date</span>
+                                    <span class="card-value">{formattedSelectedCreatedDate}</span>
+                                </div>
+                                <div class="summary-card">
+                                    <span class="card-label">Account</span>
+                                    <span class="card-value">{orderDetails.Account.Name}</span>
+                                </div>
+                                <div class="summary-card">
+                                    <span class="card-label">Amount Paid</span>
+                                    <span class="card-value">{formattedAmountPaid}</span>
+                                </div>
+                                <div class="summary-card">
+                                    <span class="card-label">Outstanding</span>
+                                    <span class="card-value outstanding">{formattedOutstandingAmount}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Information Section -->
+                        <div class="order-info-section">
+                            <h3 class="section-title">📋 Order Information</h3>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label class="info-label">Order Number:</label>
+                                    <span class="info-value">{orderDetails.OrderNumber}</span>
+                                </div>
+                                <div class="info-item">
+                                    <label class="info-label">Status:</label>
+                                    <span class="info-value">{orderDetails.Status}</span>
+                                </div>
+                                <div class="info-item">
+                                    <label class="info-label">Created Date:</label>
+                                    <span class="info-value">{formattedSelectedCreatedDate}</span>
+                                </div>
+                                <div class="info-item">
+                                    <label class="info-label">Account:</label>
+                                    <span class="info-value">{orderDetails.Account.Name}</span>
+                                </div>
+                                <template if:true={orderDetails.Description}>
+                                    <div class="info-item full-width">
+                                        <label class="info-label">Description:</label>
+                                        <span class="info-value">{orderDetails.Description}</span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Line Items Section -->
+                        <template if:true={formattedLineItems.length}>
+                            <div class="line-items-section">
+                                <h3 class="section-title">📦 Order Items ({formattedLineItems.length})</h3>
+                                <div class="line-items-table">
+                                    <div class="table-header">
+                                        <div class="col-product">Product</div>
+                                        <div class="col-code">Code</div>
+                                        <div class="col-qty">Qty</div>
+                                        <div class="col-price">Unit Price</div>
+                                        <div class="col-total">Total</div>
+                                    </div>
+                                    <template for:each={formattedLineItems} for:item="item">
+                                        <div key={item.Id} class="table-row">
+                                            <div class="col-product">{item.Product2.Name}</div>
+                                            <div class="col-code">{item.Product2.ProductCode}</div>
+                                            <div class="col-qty">{item.Quantity}</div>
+                                            <div class="col-price">{item.formattedUnitPrice}</div>
+                                            <div class="col-total">{item.formattedTotalPrice}</div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Shipping Address Section -->
+                        <div class="shipping-address-section">
+                            <h3 class="section-title">🏠 Shipping Address</h3>
+                            <template if:true={shippingAddress}>
+                                <div class="address-card">
+                                    <div class="address-item">
+                                        <p class="address-label">Business:</p>
+                                        <p class="address-value">{shippingAddress.Name}</p>
+                                    </div>
+                                    <p class="no-address-message">Address details from account record</p>
+                                </div>
+                            </template>
+                            <template if:false={shippingAddress}>
+                                <p class="no-address-message">No shipping address available</p>
+                            </template>
+                        </div>
+
+                        <!-- Payment Summary Section -->
+                        <div class="payment-summary-section">
+                            <h3 class="section-title">💳 Payment Summary</h3>
+                            <div class="payment-summary-grid">
+                                <div class="payment-summary-item">
+                                    <span class="payment-label">Total Amount:</span>
+                                    <span class="payment-value">{formattedOrderTotal}</span>
+                                </div>
+                                <div class="payment-summary-item">
+                                    <span class="payment-label">Amount Paid:</span>
+                                    <span class="payment-value">{formattedAmountPaid}</span>
+                                </div>
+                                <div class="payment-summary-item">
+                                    <span class="payment-label">Outstanding:</span>
+                                    <span class="payment-value outstanding">{formattedOutstandingAmount}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment History Section -->
+                        <template if:true={formattedPaymentHistory.length}>
+                            <div class="payment-history-section">
+                                <div class="payment-history-header">
+                                    <h3 class="section-title">📜 Payment History</h3>
+                                    <button 
+                                        class="btn-toggle-history" 
+                                        onclick={handleTogglePaymentHistory}>
+                                        <template if:true={showPaymentHistory}>Hide </template>
+                                        <template if:false={showPaymentHistory}>Show </template>
+                                        Payments
+                                    </button>
+                                </div>
+                                <template if:true={showPaymentHistory}>
+                                    <div class="payment-history-table">
+                                        <div class="table-header">
+                                            <div class="col-date">Payment Date</div>
+                                            <div class="col-method">Method</div>
+                                            <div class="col-amount">Amount</div>
+                                            <div class="col-status">Status</div>
+                                        </div>
+                                        <template for:each={formattedPaymentHistory} for:item="payment">
+                                            <div key={payment.Id} class="table-row">
+                                                <div class="col-date">{payment.formattedPaymentDate}</div>
+                                                <div class="col-method">{payment.Payment_Mode__c}</div>
+                                                <div class="col-amount">{payment.formattedAmount}</div>
+                                                <div class="col-status">{payment.Payment_Status__c}</div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+
+                        <!-- Delivery Location Map Component -->
+                        <div class="map-section">
+                            <h3 class="section-title">📍 Delivery Location Map</h3>
+                            <c-delivery-location-map order-status={orderDetails.Status}></c-delivery-location-map>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="page-actions">
+                            <template if:true={shouldShowPaymentButton}>
+                                <button class="btn-payment" onclick={handleOpenPaymentModal}>
+                                    💳 Make Payment
+                                </button>
+                            </template>
+                            <template if:false={shouldShowPaymentButton}>
+                                <template if:true={isOrderFulfilled}>
+                                    <div class="payment-fulfilled">
+                                        <span class="fulfilled-badge">✓ PAYMENT FULFILLED</span>
+                                    </div>
+                                </template>
+                            </template>
+                            <button class="btn-secondary" onclick={handleBackToOrders}>
+                                ← Back to Orders
+                            </button>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </template>
+
+        <!-- Account Modal -->
+        <template if:true={showAccountModal}>
+            <div class="account-modal-overlay" onclick={handleCloseAccountModal}>
+                <div class="account-modal-content" onclick={handleAccountModalContentClick}>
+                    <!-- Modal Header -->
+                    <div class="account-modal-header">
+                        <h2>👤 My Account</h2>
+                        <button class="close-btn" onclick={handleCloseAccountModal}>✕</button>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="account-modal-body">
+                        <!-- Account Information Section -->
+                        <div class="account-section">
+                            <h3 class="section-title">Account Information</h3>
+                            <div class="info-row">
+                                <label class="info-label">Business Name:</label>
+                                <span class="info-value">{accountData.BusinessName}</span>
+                            </div>
+                            <div class="info-row">
+                                <label class="info-label">Email:</label>
+                                <span class="info-value">{accountData.Email}</span>
+                            </div>
+                            <div class="info-row">
+                                <label class="info-label">Phone:</label>
+                                <span class="info-value">{accountData.Phone}</span>
+                            </div>
+                            <div class="info-row">
+                                <label class="info-label">Brand Name:</label>
+                                <span class="info-value">{accountData.BrandName}</span>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Address Section -->
+                        <div class="account-section">
+                            <div class="section-header">
+                                <h3 class="section-title">Shipping Address</h3>
+                                <template if:true={canEditAddress}>
+                                    <button class="btn-edit" onclick={handleToggleEditMode}>
+                                        <template if:true={isEditingAddress}>❌ Cancel</template>
+                                        <template if:false={isEditingAddress}>✏️ Edit</template>
+                                    </button>
+                                </template>
+                            </div>
+
+                            <!-- Address Display Mode -->
+                            <template if:false={isEditingAddress}>
+                                <div class="address-display">
+                                    <div class="info-row">
+                                        <label class="info-label">Street:</label>
+                                        <span class="info-value">{accountData.ShippingStreet}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <label class="info-label">City:</label>
+                                        <span class="info-value">{accountData.ShippingCity}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <label class="info-label">State:</label>
+                                        <span class="info-value">{accountData.ShippingState}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <label class="info-label">Postal Code:</label>
+                                        <span class="info-value">{accountData.ShippingPostalCode}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <label class="info-label">Country:</label>
+                                        <span class="info-value">{accountData.ShippingCountry}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Message for Activated Orders -->
+                                <template if:true={isOrderActivated}>
+                                    <div class="address-locked-message">
+                                        <p>⚠️ Order has been Activated. To change the shipping address, please raise a support ticket.</p>
+                                    </div>
+                                </template>
+                            </template>
+
+                            <!-- Address Edit Mode -->
+                            <template if:true={isEditingAddress}>
+                                <div class="address-form">
+                                    <div class="form-group">
+                                        <label class="form-label">Street</label>
+                                        <input 
+                                            type="text" 
+                                            class="form-input" 
+                                            value={accountData.ShippingStreet}
+                                            onchange={handleAddressFieldChange}
+                                            data-field="ShippingStreet">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">City</label>
+                                        <input 
+                                            type="text" 
+                                            class="form-input" 
+                                            value={accountData.ShippingCity}
+                                            onchange={handleAddressFieldChange}
+                                            data-field="ShippingCity">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">State</label>
+                                        <input 
+                                            type="text" 
+                                            class="form-input" 
+                                            value={accountData.ShippingState}
+                                            onchange={handleAddressFieldChange}
+                                            data-field="ShippingState">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Postal Code</label>
+                                        <input 
+                                            type="text" 
+                                            class="form-input" 
+                                            value={accountData.ShippingPostalCode}
+                                            onchange={handleAddressFieldChange}
+                                            data-field="ShippingPostalCode">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Country</label>
+                                        <input 
+                                            type="text" 
+                                            class="form-input" 
+                                            value={accountData.ShippingCountry}
+                                            onchange={handleAddressFieldChange}
+                                            data-field="ShippingCountry">
+                                    </div>
+                                    <button class="btn-save-address" onclick={handleSaveAddress}>
+                                        💾 Save Address
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template if:true={showPaymentModal}>
+            <div class="payment-modal-overlay" onclick={handleClosePaymentModal}>
+                <div class="payment-modal-content" onclick={handleModalContentClick}>
+                    <!-- Modal Header -->
+                    <div class="payment-modal-header">
+                        <h2>💳 Make Payment</h2>
+                        <button class="close-btn" onclick={handleClosePaymentModal}>✕</button>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="payment-modal-body">
+                        <!-- Payment Summary -->
+                        <div class="payment-summary-modal">
+                            <h3>Order Summary</h3>
+                            <div class="summary-row">
+                                <span class="label">Order Amount:</span>
+                                <span class="value">{formattedOrderTotal}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span class="label">Amount Paid:</span>
+                                <span class="value">{formattedAmountPaid}</span>
+                            </div>
+                            <div class="summary-row outstanding">
+                                <span class="label">Outstanding Amount:</span>
+                                <span class="value">{formattedOutstandingAmount}</span>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method Selection -->
+                        <div class="payment-methods-section">
+                            <h3>Select Payment Method</h3>
+                            <div class="payment-options">
+                                <div 
+                                    class="payment-option {selectedPaymentMethod === 'Cash' ? 'selected' : ''}" 
+                                    data-method="Cash"
+                                    onclick={handlePaymentMethodSelect}>
+                                    <div class="option-icon">💵</div>
+                                    <div class="option-label">Cash</div>
+                                </div>
+
+                                <div 
+                                    class="payment-option {selectedPaymentMethod === 'UPI' ? 'selected' : ''}" 
+                                    data-method="UPI"
+                                    onclick={handlePaymentMethodSelect}>
+                                    <div class="option-icon">📱</div>
+                                    <div class="option-label">UPI</div>
+                                </div>
+
+                                <div 
+                                    class="payment-option {selectedPaymentMethod === 'Card' ? 'selected' : ''}" 
+                                    data-method="Card"
+                                    onclick={handlePaymentMethodSelect}>
+                                    <div class="option-icon">💳</div>
+                                    <div class="option-label">Card</div>
+                                </div>
+
+                                <div 
+                                    class="payment-option {selectedPaymentMethod === 'Bank Transfer' ? 'selected' : ''}" 
+                                    data-method="Bank Transfer"
+                                    onclick={handlePaymentMethodSelect}>
+                                    <div class="option-icon">🏦</div>
+                                    <div class="option-label">Bank Transfer</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Form -->
+                        <template if:true={showAmountField}>
+                            <div class="payment-form-section">
+                                <h3>Payment Details</h3>
+                                
+                                <!-- Amount Field -->
+                                <div class="form-group">
+                                    <label class="form-label">Amount <span class="required">*</span></label>
+                                    <input 
+                                        type="number" 
+                                        class="form-control" 
+                                        placeholder="Enter payment amount"
+                                        value={paymentFormData.amount}
+                                        data-field="amount"
+                                        onchange={handlePaymentFormChange}
+                                        step="0.01"
+                                        min="0">
+                                </div>
+
+                                <!-- Cash Payment Fields -->
+                                <template if:true={showCashFields}>
+                                    <div class="form-group">
+                                        <label class="form-label">Cash Received By <span class="required">*</span></label>
+                                        <input 
+                                            type="text" 
+                                            class="form-control" 
+                                            placeholder="Enter name of person who received cash"
+                                            value={paymentFormData.cashReceivedBy}
+                                            data-field="cashReceivedBy"
+                                            onchange={handlePaymentFormChange}>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Cash Receipt Number <span class="required">*</span></label>
+                                        <input 
+                                            type="text" 
+                                            class="form-control" 
+                                            placeholder="Enter receipt number"
+                                            value={paymentFormData.cashReceiptNumber}
+                                            data-field="cashReceiptNumber"
+                                            onchange={handlePaymentFormChange}>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Notes</label>
+                                        <textarea 
+                                            class="form-control" 
+                                            placeholder="Additional notes (optional)"
+                                            data-field="notes"
+                                            onchange={handlePaymentFormChange}
+                                            rows="3"></textarea>
+                                    </div>
+                                </template>
+
+                                <!-- UPI Payment Fields -->
+                                <template if:true={showUPIFields}>
+                                    <div class="form-group">
+                                        <label class="form-label">UPI ID <span class="required">*</span></label>
+                                        <input 
+                                            type="text" 
+                                            class="form-control" 
+                                            placeholder="e.g., user@bankname"
+                                            value={paymentFormData.upiId}
+                                            data-field="upiId"
+                                            onchange={handlePaymentFormChange}>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">UPI Name <span class="required">*</span></label>
+                                        <input 
+                                            type="text" 
+                                            class="form-control" 
+                                            placeholder="Name on UPI account"
+                                            value={paymentFormData.upiName}
+                                            data-field="upiName"
+                                            onchange={handlePaymentFormChange}>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">UPI App Name</label>
+                                        <input 
+                                            type="text" 
+                                            class="form-control" 
+                                            placeholder="e.g., Google Pay, PhonePe"
+                                            value={paymentFormData.upiAppName}
+                                            data-field="upiAppName"
+                                            onchange={handlePaymentFormChange}>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">UPI Reference Number</label>
+                                        <input 
+                                            type="text" 
+                                            class="form-control" 
+                                            placeholder="UPI reference number (optional)"
+                                            value={paymentFormData.upiReferenceNumber}
+                                            data-field="upiReferenceNumber"
+                                            onchange={handlePaymentFormChange}>
+                                    </div>
+                                </template>
+
+                                <!-- Card Payment Fields -->
+                                <template if:true={showCardFields}>
+                                    <div class="form-group">
+                                        <label class="form-label">Card Holder Name <span class="required">*</span></label>
+                                        <input 
+                                            type="text" 
+                                            class="form-control" 
+                                            placeholder="Name on card"
+                                            value={paymentFormData.cardHolderName}
+                                            data-field="cardHolderName"
+                                            onchange={handlePaymentFormChange}>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Card Number <span class="required">*</span></label>
+                                        <input 
+                                            type="text" 
+                                            class="form-control" 
+                                            placeholder="XXXX XXXX XXXX 1234"
+                                            value={paymentFormData.cardNumber}
+                                            data-field="cardNumber"
+                                            onchange={handlePaymentFormChange}>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Card Type <span class="required">*</span></label>
+                                        <select 
+                                            class="form-control"
+                                            data-field="cardType"
+                                            onchange={handlePaymentFormChange}>
+                                            <option value="">-- Select Card Type --</option>
+                                            <option value="Visa">Visa</option>
+                                            <option value="MasterCard">MasterCard</option>
+                                            <option value="RuPay">RuPay</option>
+                                            <option value="Amex">Amex</option>
+                                            <option value="Others">Others</option>
+                                        </select>
+                                    </div>
+                                </template>
+
+                                <!-- Bank Transfer Fields -->
+                                <template if:true={showBankTransferFields}>
+                                    <div class="form-group">
+                                        <label class="form-label">Bank Name <span class="required">*</span></label>
+                                        <input 
+                                            type="text" 
+                                            class="form-control" 
+                                            placeholder="Enter bank name"
+                                            value={paymentFormData.bankName}
+                                            data-field="bankName"
+                                            onchange={handlePaymentFormChange}>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Account Number <span class="required">*</span></label>
+                                        <input 
+                                            type="text" 
+                                            class="form-control" 
+                                            placeholder="Enter account number"
+                                            value={paymentFormData.accountNumber}
+                                            data-field="accountNumber"
+                                            onchange={handlePaymentFormChange}>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">IFSC Code <span class="required">*</span></label>
+                                        <input 
+                                            type="text" 
+                                            class="form-control" 
+                                            placeholder="Enter IFSC code"
+                                            value={paymentFormData.ifscCode}
+                                            data-field="ifscCode"
+                                            onchange={handlePaymentFormChange}>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Transfer Reference Number</label>
+                                        <input 
+                                            type="text" 
+                                            class="form-control" 
+                                            placeholder="e.g., UTR or Reference Number"
+                                            value={paymentFormData.transferReferenceNumber}
+                                            data-field="transferReferenceNumber"
+                                            onchange={handlePaymentFormChange}>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+
+                        <!-- Action Buttons -->
+                        <div class="payment-modal-actions">
+                            <button class="btn-cancel" onclick={handleClosePaymentModal} disabled={isSubmittingPayment}>
+                                Cancel
+                            </button>
+                            <button class="btn-submit-payment" onclick={handlePaymentSubmit} disabled={isSubmittingPayment}>
+                                <template if:true={isSubmittingPayment}>
+                                    <lightning-spinner alternative-text="Processing"></lightning-spinner>
+                                    Processing...
+                                </template>
+                                <template if:false={isSubmittingPayment}>
+                                    💳 Make Payment
+                                </template>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</template>

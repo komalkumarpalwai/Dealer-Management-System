@@ -1,26 +1,35 @@
 <template>
     <template if:true={isLoaded}>
         <!-- Hero Section -->
-        <div class="hero-section">
+    <div class="hero-section">
             <div class="hero-overlay"></div>
             <div class="hero-content">
-                <template if:true={user.Name}>
-                    <h1 class="hero-title">Welcome, {user.Name}! 🎉</h1>
-                </template>
-                <template if:false={user.Name}>
-                    <h1 class="hero-title">Welcome to Our Portal! 🎉</h1>
-                </template>
-                <p class="hero-subtitle">Discover Our Premium Products & Services</p>
-                <template if:true={account}>
-                    <p class="hero-account">Explore products for {account.Name}</p>
-                </template>
-           
-               
-            </div>
-        </div>
 
+    <!-- Welcome Message -->
+    <template if:true={hasUserName}>
+        <h1 class="hero-title">Welcome, {userName}! 🎉</h1>
+    </template>
+
+    <template if:false={hasUserName}>
+        <h1 class="hero-title">Welcome to Our Portal! 🎉</h1>
+    </template>
+
+    <p class="hero-subtitle">
+        Discover Our Premium Products & Services
+    </p>
+
+    <!-- Account Info -->
+    <template if:true={hasAccountName}>
+        <p class="hero-account">
+            Explore products for {accountName}
+        </p>
+    </template>
+
+</div>
+        </div>
+ 
         <!-- Products Section -->
-        <div class="container">
+        <div class="container"> 
             <div class="products-section">
 
                 <!-- ======== SEARCH BAR ======== -->

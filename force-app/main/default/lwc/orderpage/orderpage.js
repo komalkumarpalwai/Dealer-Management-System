@@ -9,8 +9,6 @@ import getOrderSummary from '@salesforce/apex/OrderPage.getOrderSummary';
 import getOrderTrends from '@salesforce/apex/OrderPage.getOrderTrends';
 import getTopProducts from '@salesforce/apex/OrderPage.getTopProducts';
 import getOrderStatusBreakdown from '@salesforce/apex/OrderPage.getOrderStatusBreakdown';
-import getPaymentsByOrder from '@salesforce/apex/OrderPayments.getPaymentsByOrder';
-import createPayment from '@salesforce/apex/OrderPayments.createPayment';
 
 export default class OrdersList extends NavigationMixin(LightningElement) {
     
@@ -39,33 +37,6 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
     searchTerm = '';
     dateSort = 'newest'; // 'newest' or 'oldest'
     showAllPreviousOrders = false; // Toggle to show all orders
-
-    // Payment modal state
-    showPaymentModal = false;
-    showTransactionHistory = false;
-    selectedPaymentMethod = '';
-    paymentModalOrder = null;
-    orderPayments = [];
-    
-    // Payment form state (dynamic fields based on payment method)
-    paymentFormData = {
-        amount: '',
-        cashReceivedBy: '',
-        cashReceiptNumber: '',
-        notes: '',
-        upiId: '',
-        upiName: '',
-        upiAppName: '',
-        upiReferenceNumber: '',
-        transactionId: '',
-        cardHolderName: '',
-        cardNumber: '',
-        cardType: '',
-        bankName: '',
-        accountNumber: '',
-        ifscCode: '',
-        transferReferenceNumber: ''
-    };
 
     // Dashboard data
     orderSummary = {
@@ -204,16 +175,13 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
 
     handleViewOrderDetails(event) {
         const orderId = event.currentTarget.dataset.orderId;
-        this.loadOrderDetails(orderId);
-        this.showOrderDetails = true;
-        
-        // Scroll to details section
-        setTimeout(() => {
-            const detailsSection = this.template.querySelector('.order-details-section');
-            if (detailsSection) {
-                detailsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Navigate to the dedicated Order Details page with orderId as URL parameter
+        this[NavigationMixin.Navigate]({
+            type: 'standard__webPage',
+            attributes: {
+                url: `/order-details?orderId=${orderId}`
             }
-        }, 100);
+        });
     }
 
     handleCloseDetails() {
@@ -314,228 +282,11 @@ export default class OrdersList extends NavigationMixin(LightningElement) {
         window.location.assign('https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/products');
     }
 
-    handleOpenPaymentModal(event) {
-        const orderId = event.currentTarget.dataset.orderId;
-        this.paymentModalOrder = this.currentOrder && this.currentOrder.Id === orderId 
-            ? this.currentOrder 
-            : this.previousOrders.find(order => order.Id === orderId);
-        
-        if (this.paymentModalOrder) {
-            this.showPaymentModal = true;
-            this.selectedPaymentMethod = '';
-            this.resetPaymentForm();
-            // Load existing payments for this order
-            this.loadOrderPayments(orderId);
-        }
-    }
-
-    handleClosePaymentModal() {
-        this.showPaymentModal = false;
-        this.showTransactionHistory = false;
-        this.selectedPaymentMethod = '';
-        this.paymentModalOrder = null;
-        this.resetPaymentForm();
-        this.orderPayments = [];
-    }
-
-    handleViewPaymentHistory(event) {
-        const orderId = event.currentTarget.dataset.orderId;
-        const order = this.currentOrder && this.currentOrder.Id === orderId 
-            ? this.currentOrder 
-            : this.selectedOrderDetails;
-        
-        if (order) {
-            this.paymentModalOrder = order;
-            this.showPaymentModal = true;
-            this.showTransactionHistory = true;
-            this.loadOrderPayments(orderId);
-        }
-    }
-
-    handleToggleTransactionHistory() {
-        this.showTransactionHistory = !this.showTransactionHistory;
-    }
-
-    handleBackFromHistory() {
-        this.showTransactionHistory = false;
-    }
-
-    resetPaymentForm() {
-        this.paymentFormData = {
-            amount: '',
-            cashReceivedBy: '',
-            cashReceiptNumber: '',
-            notes: '',
-            upiId: '',
-            upiName: '',
-            upiAppName: '',
-            upiReferenceNumber: '',
-            transactionId: '',
-            cardHolderName: '',
-            cardNumber: '',
-            cardType: '',
-            bankName: '',
-            accountNumber: '',
-            ifscCode: '',
-            transferReferenceNumber: ''
-        };
-    }
-
-    loadOrderPayments(orderId) {
-        getPaymentsByOrder({ orderId })
-            .then(result => {
-                if (result.success) {
-                    // Payment__c records are returned directly with all fields
-                    this.orderPayments = result.payments || [];
-                }
-            })
-            .catch(error => {
-                console.error('Error loading payments:', error);
-                this.orderPayments = [];
-            });
-    }
-
-    handlePaymentFormChange(event) {
-        const fieldName = event.target.dataset.field;
-        const value = event.target.value;
-        this.paymentFormData[fieldName] = value;
-    }
-
-    handlePaymentMethodSelect(event) {
-        this.selectedPaymentMethod = event.currentTarget.dataset.method;
-        
-        // Auto-scroll to the payment details form section
-        setTimeout(() => {
-            const paymentFormSection = this.template.querySelector('.payment-form-section');
-            if (paymentFormSection) {
-                paymentFormSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }, 100);
-    }
-
-    handlePaymentSubmit() {
-        if (!this.selectedPaymentMethod) {
-            this.showToast('error', 'Payment Method Required', 'Please select a payment method');
-            return;
-        }
-        
-        // Validate form based on payment method
-        const validationError = this.validatePaymentForm();
-        if (validationError) {
-            this.showToast('error', 'Validation Error', validationError);
-            return;
-        }
-        
-        // Auto-generate Transaction ID for digital payment methods
-        if (this.selectedPaymentMethod === 'UPI' || this.selectedPaymentMethod === 'Card' || this.selectedPaymentMethod === 'Bank Transfer') {
-            this.paymentFormData.transactionId = this.generateTransactionId(this.selectedPaymentMethod);
-        }
-        
-        // Prepare payment data for Apex
-        const paymentData = {
-            orderId: this.paymentModalOrder.Id,
-            accountId: this.paymentModalOrder.AccountId || this.accountId,
-            amount: parseFloat(this.paymentFormData.amount),
-            paymentMethod: this.selectedPaymentMethod,
-            outstandingAmount: this.paymentModalOrder.Outstanding_Amount__c,
-            formData: { ...this.paymentFormData }
-        };
-        
-        console.log('Submitting payment data:', paymentData);
-        
-        // Call Apex method to create payment
-        createPayment({ paymentData })
-            .then(result => {
-                console.log('Payment response:', result);
-                if (result.success) {
-                    this.showToast('success', 'Payment Recorded', `Payment of ${this.formatCurrency(paymentData.amount)} via ${this.selectedPaymentMethod} has been recorded successfully`);
-                    
-                    // Refresh order data
-                    this.loadOrders();
-                    
-                    // Close modal
-                    this.handleClosePaymentModal();
-                } else {
-                    console.error('Payment error:', result.message);
-                    this.showToast('error', 'Payment Error', result.message || 'An error occurred while recording the payment');
-                }
-            })
-            .catch(error => {
-                console.error('Error creating payment:', error);
-                console.error('Error details:', error.body);
-                const errorMsg = error.body?.message || 'An error occurred while recording the payment';
-                this.showToast('error', 'Payment Error', errorMsg);
-            });
-    }
-
-    validatePaymentForm() {
-        if (!this.paymentFormData.amount || this.paymentFormData.amount <= 0) {
-            return 'Please enter a valid amount';
-        }
-
-        switch (this.selectedPaymentMethod) {
-            case 'Cash':
-                if (!this.paymentFormData.cashReceivedBy) {
-                    return 'Please enter Cash Received By';
-                }
-                if (!this.paymentFormData.cashReceiptNumber) {
-                    return 'Please enter Cash Receipt Number';
-                }
-                break;
-
-            case 'UPI':
-                if (!this.paymentFormData.upiId) {
-                    return 'Please enter UPI ID';
-                }
-                if (!this.paymentFormData.upiName) {
-                    return 'Please enter UPI Name';
-                }
-                break;
-
-            case 'Card':
-                if (!this.paymentFormData.cardHolderName) {
-                    return 'Please enter Card Holder Name';
-                }
-                if (!this.paymentFormData.cardNumber) {
-                    return 'Please enter Card Number';
-                }
-                if (!this.paymentFormData.cardType) {
-                    return 'Please select Card Type';
-                }
-                break;
-
-            case 'Bank Transfer':
-                if (!this.paymentFormData.bankName) {
-                    return 'Please enter Bank Name';
-                }
-                if (!this.paymentFormData.accountNumber) {
-                    return 'Please enter Account Number';
-                }
-                if (!this.paymentFormData.ifscCode) {
-                    return 'Please enter IFSC Code';
-                }
-                break;
-        }
-
-        return null;
-    }
-
-    /**
-     * Generates a unique transaction ID for digital payment methods
-     * @param {String} paymentMethod - The payment method (UPI, Card, Bank Transfer)
-     * @returns {String} The generated transaction ID
-     */
-    generateTransactionId(paymentMethod) {
-        const prefix = paymentMethod === 'Bank Transfer' ? 'BANK' : paymentMethod.substring(0, 3).toUpperCase();
-        const timestamp = Date.now();
-        const randomPart = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
-        return `${prefix}-${timestamp}-${randomPart}`;
-    }
-
-    handleModalPaymentContentClick(event) {
-        // Prevent closing modal when clicking inside the modal content
-        event.stopPropagation();
-    }
+    // PAYMENT FUNCTIONALITY MOVED TO orderDetailsPage COMPONENT
+    // Removed: handleOpenPaymentModal, handleClosePaymentModal, handleViewPaymentHistory, 
+    // handleToggleTransactionHistory, handleBackFromHistory, resetPaymentForm, loadOrderPayments,
+    // handlePaymentFormChange, handlePaymentMethodSelect, handlePaymentSubmit, validatePaymentForm,
+    // generateTransactionId, handleModalPaymentContentClick
 
     handleViewAllOrders() {
         this.showAllPreviousOrders = true;

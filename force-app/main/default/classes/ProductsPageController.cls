@@ -158,11 +158,11 @@ public with sharing class ProductsPageController {
         if (!productIds.isEmpty()) {
             // Query with aggregation - filter out null Product__c
             List<AggregateResult> stockResults = [
-                SELECT Product__c, SUM(Quantity__c) totalQty
-                FROM Stock__c
-                WHERE Product__c IN :productIds
-                AND Product__c != null
-                GROUP BY Product__c
+                SELECT  AMERP_Product__c, SUM( AMERP_Quantity__c) totalQty
+                FROM    AMERP_Stock__c
+                WHERE   AMERP_Product__c IN :productIds
+                AND     AMERP_Product__c != null
+                GROUP BY    AMERP_Product__c
             ];
 
             System.debug('Aggregated Stock Results Count: ' + stockResults.size());

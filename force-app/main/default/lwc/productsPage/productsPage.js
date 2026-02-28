@@ -161,6 +161,7 @@ closeCartPanel() {
        HELPERS
     ========================== */
 
+
     getInitials(name) {
         if (!name) return '';
         return name
@@ -260,7 +261,21 @@ handleImageThumbnailClick(event) {
     this.selectedImageIndex = index;
 }
 
+get userName() {
+    return this.user?.Name || '';
+}
 
+get hasUserName() {
+    return !!this.user?.Name;
+}
+
+get accountName() {
+    return this.account?.Name || '';
+}
+
+get hasAccountName() {
+    return !!this.account?.Name;
+}
 
     /* =========================
        ADD TO CART

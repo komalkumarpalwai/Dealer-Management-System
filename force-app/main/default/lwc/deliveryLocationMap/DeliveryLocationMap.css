@@ -1,0 +1,74 @@
+.map-wrapper {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    background: #ffffff;
+    font-family: 'Salesforce Sans', Arial, sans-serif;
+}
+
+.map-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: white;
+}
+
+.header-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    flex: 1;
+}
+
+.account-badge {
+    background: rgba(255,255,255,0.15);
+    color: #ffffff;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid rgba(255,255,255,0.25);
+}
+
+.error-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #c23934;
+    color: white;
+    padding: 12px 20px;
+    font-size: 13px;
+}
+
+.loading-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background: #f8f9fa;
+}
+
+.loading-text {
+    margin-top: 16px;
+    color: #706e6b;
+    font-size: 13px;
+}
+
+.address-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #f3f3f3;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 13px;
+    color: #3e3e3c;
+}
+
+.map-container {
+    height: 450px;
+    width: 100%;
+}

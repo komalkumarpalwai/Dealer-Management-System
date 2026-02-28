@@ -1,0 +1,108 @@
+<template>
+    <div class="map-wrapper" style="border-radius:12px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.12); background:#ffffff; font-family:'Salesforce Sans',Arial,sans-serif;">
+
+        <!-- Header -->
+        <div style="display:flex; align-items:center; gap:10px; padding:14px 20px; background:linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color:white;">
+            <lightning-icon icon-name="utility:location" size="small"></lightning-icon>
+            <span style="font-size:16px; font-weight:600; color:#ffffff; flex:1;">Delivery Route</span>
+            <template if:true={accountName}>
+                <span style="background:rgba(255,255,255,0.15); color:#ffffff; padding:3px 12px; border-radius:20px; font-size:12px; font-weight:500; border:1px solid rgba(255,255,255,0.25);">
+                    {accountName}
+                </span>
+            </template>
+        </div>
+
+        <!-- Error State -->
+        <template if:true={errorMessage}>
+            <div style="display:flex; align-items:center; gap:10px; background:#c23934; color:white; padding:12px 20px; font-size:13px;">
+                <lightning-icon icon-name="utility:error" size="x-small" variant="inverse"></lightning-icon>
+                <span>{errorMessage}</span>
+            </div>
+        </template>
+
+        <!-- Loading Spinner -->
+        <template if:true={isLoading}>
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:60px 20px; background:#f8f9fa;">
+                <lightning-spinner alternative-text="Loading map..." size="medium" variant="brand"></lightning-spinner>
+                <p style="margin-top:16px; color:#706e6b; font-size:13px;">Fetching delivery route...</p>
+            </div>
+        </template>
+
+        <!-- Order Not Activated Message -->
+        <template if:false={isOrderActivated}>
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:60px 20px; background:#fff9e6; border:2px solid #ffc107;">
+                <div style="font-size:16px; font-weight:700; color:#ff6b00; margin-bottom:8px;">
+                    ⏳ Order Not Activated Yet
+                </div>
+                <p style="margin:0; color:#666; font-size:14px; text-align:center;">
+                    Order is not Activated yet, Please wait and Check After some moments
+                </p>
+            </div>
+        </template>
+
+        <!-- Order Details Section (only show if activated) -->
+        <template if:true={isOrderActivated}>
+        <!-- Location Legend -->
+        <template if:true={shippingAddress}>
+            <div style="display:flex; flex-wrap:wrap; gap:0; border-bottom:1px solid #e0e0e0;">
+
+                <!-- Billing -->
+                <div style="flex:1; min-width:200px; display:flex; align-items:flex-start; gap:10px; padding:12px 20px; background:#fff8f0; border-right:1px solid #e0e0e0;">
+                    <div style="width:14px; height:14px; border-radius:50%; background:#e85d04; margin-top:3px; flex-shrink:0; border:2px solid #fff; box-shadow:0 0 0 2px #e85d04;"></div>
+                    <div>
+                        <div style="font-size:11px; font-weight:700; color:#e85d04; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">Billing / Origin</div>
+                        <div style="font-size:12px; color:#3e3e3c; line-height:1.4;">{billingAddress}</div>
+                    </div>
+                </div>
+
+                <!-- Shipping -->
+                <div style="flex:1; min-width:200px; display:flex; align-items:flex-start; gap:10px; padding:12px 20px; background:#f0f7ff;">
+                    <div style="width:14px; height:14px; border-radius:50%; background:#1a1a2e; margin-top:3px; flex-shrink:0; border:2px solid #fff; box-shadow:0 0 0 2px #1a1a2e;"></div>
+                    <div>
+                        <div style="font-size:11px; font-weight:700; color:#1a1a2e; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">Shipping / Destination</div>
+                        <div style="font-size:12px; color:#3e3e3c; line-height:1.4;">{shippingAddress}</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Delivery Information Panel -->
+            <template if:true={deliveryInfo}>
+                <div style="display:flex; flex-wrap:wrap; gap:1px; background:#e0e0e0; border-bottom:2px solid #e0e0e0;">
+                    <!-- Column 1: Distance -->
+                    <div style="flex:1; min-width:160px; padding:14px 20px; text-align:center; background:#ffffff;">
+                        <div style="font-size:11px; font-weight:700; color:#999; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Distance</div>
+                        <div style="font-size:20px; font-weight:700; color:#1a1a2e; margin-bottom:4px;">{deliveryInfo.distanceKm} km</div>
+                        <div style="font-size:12px; color:#999;">{deliveryInfo.durationHr}h {deliveryInfo.durationMin}m drive</div>
+                    </div>
+
+                    <!-- Column 2: Transit Days -->
+                    <div style="flex:1; min-width:160px; padding:14px 20px; text-align:center; background:#fff8f0;">
+                        <div style="font-size:11px; font-weight:700; color:#999; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Transit Days</div>
+                        <div style="font-size:20px; font-weight:700; color:#e85d04; margin-bottom:4px;">{deliveryInfo.transitDays} days</div>
+                        <div style="font-size:12px; color:#999;">After dispatch</div>
+                    </div>
+
+                    <!-- Column 3: Expected Delivery -->
+                    <div style="flex:1; min-width:160px; padding:14px 20px; text-align:center; background:#f0fff4;">
+                        <div style="font-size:11px; font-weight:700; color:#999; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Expected Delivery</div>
+                        <div style="font-size:15px; font-weight:700; color:#2d6a4f; margin-bottom:4px;">{deliveryInfo.expectedDate}</div>
+                        <div style="font-size:12px; color:#999;">Dispatched {deliveryInfo.dispatchDate}</div>
+                    </div>
+
+                    <!-- Column 4: Delivery Window -->
+                    <div style="flex:1; min-width:160px; padding:14px 20px; text-align:center; background:#f0f7ff;">
+                        <div style="font-size:11px; font-weight:700; color:#999; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Delivery Window</div>
+                        <div style="font-size:12px; font-weight:600; color:#2d6a4f; margin-bottom:4px;">🟢 Earliest: {deliveryInfo.earliestDate}</div>
+                        <div style="font-size:12px; font-weight:600; color:#c1121f;">🔴 Latest: {deliveryInfo.latestDate}</div>
+                    </div>
+                </div>
+            </template>
+        </template>
+
+        <!-- Map Container -->
+        <div class="map-container" style="height:500px; width:100%; display:block; background:#e8e8e8;"></div>
+        </template>
+
+    </div>
+</template>
