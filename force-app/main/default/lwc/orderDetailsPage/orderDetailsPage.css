@@ -509,6 +509,11 @@
     color: #721c24;
 }
 
+.status-badge-pending {
+    background: linear-gradient(135deg, #e2e3e5 0%, #d3d4d6 100%);
+    color: #383d41;
+}
+
 .status-badge-transit {
     background: linear-gradient(135deg, #e7f3ff 0%, #d1e7ff 100%);
     color: #004085;

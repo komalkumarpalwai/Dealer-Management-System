@@ -596,6 +596,9 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
      * Get delivery status text
      */
     get deliveryStatusText() {
+        if (!this.isOrderActivated) {
+            return 'Delivery Not Initiated Yet';
+        }
         if (this.isDeliveryDelayedFlag) {
             return 'Delayed';
         }
@@ -606,6 +609,9 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
      * Get delivery status badge
      */
     get deliveryStatusBadge() {
+        if (!this.isOrderActivated) {
+            return 'PENDING';
+        }
         if (this.isDeliveryDelayedFlag) {
             return 'DELAYED';
         }
@@ -616,6 +622,9 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
      * Get delivery status badge class
      */
     get deliveryStatusBadgeClass() {
+        if (!this.isOrderActivated) {
+            return 'status-badge status-badge-pending';
+        }
         if (this.isDeliveryDelayedFlag) {
             return 'status-badge status-badge-delayed';
         }
@@ -653,7 +662,13 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
      * Get tracking stage icon class for Delivery
      */
     get trackedDeliveryStageIcon() {
-        return 'tracking-icon tracking-icon-pending';
+        if (!this.isOrderActivated) {
+            return 'tracking-icon tracking-icon-pending';
+        }
+        if (this.isDeliveryDelayedFlag) {
+            return 'tracking-icon tracking-icon-processing';
+        }
+        return 'tracking-icon tracking-icon-completed';
     }
 
     /**
