@@ -163,6 +163,7 @@ export default class DeliveryLocationMap extends LightningElement {
             .then(data => {
                 if (data.code === 'Ok' && data.routes && data.routes.length > 0) {
                     const routeGeoJson = data.routes[0].geometry;
+                    const routeCoordinates = routeGeoJson.coordinates; // Array of [lon, lat] points
 
                     // Draw the route
                     const routeLine = L.geoJSON(routeGeoJson, {
@@ -176,6 +177,33 @@ export default class DeliveryLocationMap extends LightningElement {
 
                     // Fit map to show entire route
                     this.map.fitBounds(routeLine.getBounds(), { padding: [50, 50] });
+
+                    // ── Animated Truck Marker ──
+                    const truckIcon = L.divIcon({
+                        className: 'truck-marker',
+                        html: `<div style="
+                            font-size:32px;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            width:100%;
+                            height:100%;
+                            transform-origin:center center;
+                            transition:transform 0.1s ease-out;">
+                            🚚
+                        </div>`,
+                        iconSize: [40, 40],
+                        iconAnchor: [20, 20],
+                        popupAnchor: [0, -20],
+                        shadowUrl: null
+                    });
+
+                    const truckMarker = L.marker([billLat, billLon], { icon: truckIcon })
+                        .addTo(this.map)
+                        .bindPopup('📦 In Transit', { permanent: false, offset: L.point(0, -30) });
+
+                    // Animate truck along route with better coordinates handling
+                    this.animateTruckAlongRoute(truckMarker, routeCoordinates, 3000); // 3 second loop
 
                     // Show distance and duration
                     const distanceKm = (data.routes[0].distance / 1000).toFixed(1);
@@ -192,24 +220,30 @@ export default class DeliveryLocationMap extends LightningElement {
                     else transitDays = 5;
 
                     // Calculate dates using Order_Activated_Date__c as starting point
-                    let dispatchDate;
+                    let activationDate;
                     if (this.activatedDate) {
-                        dispatchDate = new Date(this.activatedDate);
+                        activationDate = new Date(this.activatedDate);
                     } else {
-                        // Fallback to today + 1 if no activated date provided
                         const today = new Date();
-                        dispatchDate = new Date(today);
-                        dispatchDate.setDate(dispatchDate.getDate() + 1);
+                        activationDate = new Date(today);
                     }
 
-                    const expectedDate = new Date(dispatchDate);
-                    expectedDate.setDate(expectedDate.getDate() + transitDays);
+                    // Stage 1: Processing & Packing = 1 day
+                    const processingDays = 1;
+                    const dispatchDate = new Date(activationDate);
+                    dispatchDate.setDate(dispatchDate.getDate() + processingDays);
 
+                    // Stage 2: Transit = based on distance
+                    // Stage 3: Expected Delivery = Dispatch + Transit + 1 day buffer
+                    const expectedDate = new Date(dispatchDate);
+                    expectedDate.setDate(expectedDate.getDate() + transitDays + 1); // Transit Days + 1 day buffer
+
+                    // Delivery Window
                     const earliestDate = new Date(expectedDate);
-                    earliestDate.setDate(earliestDate.getDate() - 1);
+                    earliestDate.setDate(earliestDate.getDate()); // Same as expected (with buffer already included)
 
                     const latestDate = new Date(expectedDate);
-                    latestDate.setDate(latestDate.getDate() + 1);
+                    latestDate.setDate(latestDate.getDate() + 1); // One more day buffer
 
                     // Store raw expectedDate for delayed check
                     // Store the expected date and dispatch event for parent
@@ -227,7 +261,11 @@ export default class DeliveryLocationMap extends LightningElement {
                         distanceKm,
                         durationHr,
                         durationMin,
+                        processingDays,
                         transitDays,
+                        bufferDays: 1,
+                        totalDays: processingDays + transitDays + 1,
+                        activationDate: dateFormatter(activationDate),
                         dispatchDate: dateFormatter(dispatchDate),
                         expectedDate: dateFormatter(expectedDate),
                         earliestDate: dateFormatter(earliestDate),
@@ -265,5 +303,79 @@ export default class DeliveryLocationMap extends LightningElement {
         ).addTo(this.map);
 
         this.map.fitBounds(line.getBounds(), { padding: [60, 60] });
+    }
+
+    /**
+     * Animate truck marker moving along the route coordinates
+     * @param {L.Marker} truckMarker - The truck marker to animate
+     * @param {Array} routeCoordinates - Array of [lon, lat] coordinates from route
+     * @param {Number} duration - Total animation duration in milliseconds
+     */
+    animateTruckAlongRoute(truckMarker, routeCoordinates, duration) {
+        if (!routeCoordinates || routeCoordinates.length === 0) {
+            console.warn('No route coordinates available for truck animation');
+            return;
+        }
+
+        let currentStep = 0;
+        const totalSteps = routeCoordinates.length;
+        const stepDuration = duration / totalSteps;
+
+        const animateStep = () => {
+            // Get current waypoint
+            const currentCoord = routeCoordinates[currentStep];
+            if (!currentCoord || currentCoord.length < 2) {
+                currentStep++;
+                if (currentStep >= totalSteps) {
+                    currentStep = 0;
+                }
+                setTimeout(animateStep, stepDuration);
+                return;
+            }
+
+            const [lon, lat] = currentCoord;
+
+            // Update truck position on map
+            truckMarker.setLatLng(L.latLng(lat, lon));
+
+            // Calculate next position for rotation
+            const nextStep = (currentStep + 1) % totalSteps;
+            const nextCoord = routeCoordinates[nextStep];
+
+            if (nextCoord && nextCoord.length >= 2) {
+                const [nextLon, nextLat] = nextCoord;
+
+                // Calculate angle for rotation
+                const dLat = nextLat - lat;
+                const dLon = nextLon - lon;
+                const angle = Math.atan2(dLon, dLat) * (180 / Math.PI);
+
+                // Find and update truck icon element with rotation
+                setTimeout(() => {
+                    const iconElements = document.querySelectorAll('.leaflet-marker-icon.truck-marker');
+                    if (iconElements && iconElements.length > 0) {
+                        const truckElement = iconElements[iconElements.length - 1];
+                        if (truckElement) {
+                            const innerDiv = truckElement.querySelector('div');
+                            if (innerDiv) {
+                                innerDiv.style.transform = `rotate(${angle}deg)`;
+                            }
+                        }
+                    }
+                }, 0);
+            }
+
+            currentStep++;
+            if (currentStep >= totalSteps) {
+                currentStep = 0;
+            }
+
+            // Schedule next step
+            setTimeout(animateStep, stepDuration);
+        };
+
+        // Start animation
+        console.log('🚚 Starting truck animation with ' + totalSteps + ' waypoints');
+        animateStep();
     }
 }

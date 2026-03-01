@@ -245,26 +245,48 @@
 
                             <!-- Right Column: Shipping Address -->
                             <div class="logistics-right-column">
-                                <!-- Estimated Delivery Card -->
-                                <div class="estimated-delivery-card">
-                                    <h3 class="estimated-delivery-title">📦 ESTIMATED DELIVERY</h3>
-                                    
-                                    <template if:false={isOrderActivated}>
-                                        <div class="estimated-date">Pending</div>
-                                        <p class="estimated-subtitle">Your order is being processed. Once it's activated, the estimated delivery date will be calculated and displayed here. Please wait for confirmation.</p>
-                                    </template>
-                                    
-                                    <template if:true={isOrderActivated}>
-                                        <template if:true={deliveryDateCalculated}>
-                                            <div class="estimated-date">{deliveryDateCalculated}</div>
-                                            <p class="estimated-subtitle">Your order is currently moving through our network and is expected to arrive within the timeframe.</p>
+                                <!-- Estimated Delivery Card / Delayed Order Card -->
+                                <template if:false={isDeliveryDelayed}>
+                                    <div class="estimated-delivery-card">
+                                        <h3 class="estimated-delivery-title">📦 ESTIMATED DELIVERY</h3>
+                                        
+                                        <template if:false={isOrderActivated}>
+                                            <div class="estimated-date">Pending</div>
+                                            <p class="estimated-subtitle">Your order is being processed. Once it's activated, the estimated delivery date will be calculated and displayed here. Please wait for confirmation.</p>
                                         </template>
-                                        <template if:false={deliveryDateCalculated}>
-                                            <div class="estimated-date">Calculating...</div>
-                                            <p class="estimated-subtitle">Your order has been activated. The delivery date is being calculated based on the shipping route and current logistics.</p>
+                                        
+                                        <template if:true={isOrderActivated}>
+                                            <template if:true={deliveryDateCalculated}>
+                                                <div class="estimated-date">{deliveryDateCalculated}</div>
+                                                <p class="estimated-subtitle">Your order is currently moving through our network and is expected to arrive within the timeframe.</p>
+                                            </template>
+                                            <template if:false={deliveryDateCalculated}>
+                                                <div class="estimated-date">Calculating...</div>
+                                                <p class="estimated-subtitle">Your order has been activated. The delivery date is being calculated based on the shipping route and current logistics.</p>
+                                            </template>
                                         </template>
-                                    </template>
-                                </div>
+                                    </div>
+                                </template>
+
+                                <!-- Delayed Order Card -->
+                                <template if:true={isDeliveryDelayed}>
+                                    <div class="delayed-order-card">
+                                        <div class="delayed-header">
+                                            <div class="delayed-alert-icon">⚠️</div>
+                                            <h3 class="delayed-title">ORDER HAS BEEN DELAYED</h3>
+                                        </div>
+                                        <div class="delayed-content">
+                                            <div class="delayed-expected-date">
+                                                <span class="delayed-label">Expected Date:</span>
+                                                <span class="delayed-value">Pending Update</span>
+                                            </div>
+                                            <p class="delayed-message">We are pushing our limits to delivery it as soon as possible. For more information related to your order, please raise a support ticket.</p>
+                                            <button class="btn-raise-ticket" onclick={handleRaiseTicket}>
+                                                Raise Support Ticket
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
 
                                 <!-- Shipping Address Section -->
                                 <div class="shipping-address-section">

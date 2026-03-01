@@ -72,3 +72,30 @@
     height: 450px;
     width: 100%;
 }
+
+/* ─── Truck Animation Styles ─── */
+:host ::part(leaflet-marker-icon) {
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3)) !important;
+}
+
+.map-container :global(.leaflet-marker-icon) {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+}
+
+.map-container :global(.leaflet-marker-icon.truck-marker) {
+    font-size: 32px;
+    transition: transform 0.1s ease-out;
+    animation: truckPulse 2s infinite;
+}
+
+@keyframes truckPulse {
+    0%, 100% {
+        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+    }
+    50% {
+        filter: drop-shadow(0 3px 10px rgba(232, 93, 4, 0.5));
+    }
+}

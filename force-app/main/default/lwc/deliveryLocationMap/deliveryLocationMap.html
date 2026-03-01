@@ -1,5 +1,4 @@
 <template>
-    <div class="map-wrapper" style="border-radius:12px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.12); background:#ffffff; font-family:'Salesforce Sans',Arial,sans-serif;">
 
         <!-- Header -->
         <div style="display:flex; align-items:center; gap:10px; padding:14px 20px; background:linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color:white;">
@@ -69,6 +68,7 @@
             <!-- Delivery Information Panel -->
             <template if:true={deliveryInfo}>
                 <div style="display:flex; flex-wrap:wrap; gap:1px; background:#e0e0e0; border-bottom:2px solid #e0e0e0;">
+                    
                     <!-- Column 1: Distance -->
                     <div style="flex:1; min-width:160px; padding:14px 20px; text-align:center; background:#ffffff;">
                         <div style="font-size:11px; font-weight:700; color:#999; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Distance</div>
@@ -76,25 +76,28 @@
                         <div style="font-size:12px; color:#999;">{deliveryInfo.durationHr}h {deliveryInfo.durationMin}m drive</div>
                     </div>
 
-                    <!-- Column 2: Transit Days -->
+                    <!-- Column 2: Transit Time -->
                     <div style="flex:1; min-width:160px; padding:14px 20px; text-align:center; background:#fff8f0;">
-                        <div style="font-size:11px; font-weight:700; color:#999; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Transit Days</div>
-                        <div style="font-size:20px; font-weight:700; color:#e85d04; margin-bottom:4px;">{deliveryInfo.transitDays} days</div>
-                        <div style="font-size:12px; color:#999;">After dispatch</div>
+                        <div style="font-size:11px; font-weight:700; color:#999; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Transit Time</div>
+                        <div style="font-size:20px; font-weight:700; color:#e85d04; margin-bottom:4px;">{deliveryInfo.transitDays} Days</div>
+                        <div style="font-size:12px; color:#999;">Standard Shipping</div>
                     </div>
 
                     <!-- Column 3: Expected Delivery -->
                     <div style="flex:1; min-width:160px; padding:14px 20px; text-align:center; background:#f0fff4;">
                         <div style="font-size:11px; font-weight:700; color:#999; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Expected Delivery</div>
                         <div style="font-size:15px; font-weight:700; color:#2d6a4f; margin-bottom:4px;">{deliveryInfo.expectedDate}</div>
-                        <div style="font-size:12px; color:#999;">Dispatched {deliveryInfo.dispatchDate}</div>
+                        <div style="font-size:12px; color:#2d6a4f; font-weight:600;">On Schedule</div>
                     </div>
 
                     <!-- Column 4: Delivery Window -->
                     <div style="flex:1; min-width:160px; padding:14px 20px; text-align:center; background:#f0f7ff;">
                         <div style="font-size:11px; font-weight:700; color:#999; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Delivery Window</div>
-                        <div style="font-size:12px; font-weight:600; color:#2d6a4f; margin-bottom:4px;">🟢 Earliest: {deliveryInfo.earliestDate}</div>
-                        <div style="font-size:12px; font-weight:600; color:#c1121f;">🔴 Latest: {deliveryInfo.latestDate}</div>
+                        <div style="font-size:12px; font-weight:600; color:#999; margin-bottom:6px;">
+                            <div style="margin-bottom:4px;">🟢 Earliest: {deliveryInfo.earliestDate}</div>
+                            <div>🔴 Latest: {deliveryInfo.latestDate}</div>
+                        </div>
+                        
                     </div>
                 </div>
             </template>
