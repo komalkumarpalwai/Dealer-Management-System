@@ -83,19 +83,84 @@
     border: none !important;
     box-shadow: none !important;
     filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+    -webkit-filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
 }
 
 .map-container :global(.leaflet-marker-icon.truck-marker) {
     font-size: 32px;
-    transition: transform 0.1s ease-out;
-    animation: truckPulse 2s infinite;
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), left 0.1s linear, top 0.1s linear;
+    animation: truckPulse 2s ease-in-out infinite, truckGlow 3s ease-in-out infinite;
 }
 
+/* Enhanced Pulse Animation with Glow */
 @keyframes truckPulse {
     0%, 100% {
         filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
     }
-    50% {
-        filter: drop-shadow(0 3px 10px rgba(232, 93, 4, 0.5));
+    25% {
+        filter: drop-shadow(0 3px 10px rgba(232, 93, 4, 0.4));
     }
+    50% {
+        filter: drop-shadow(0 4px 15px rgba(232, 93, 4, 0.6)) drop-shadow(0 0 8px rgba(232, 93, 4, 0.3));
+    }
+    75% {
+        filter: drop-shadow(0 3px 10px rgba(232, 93, 4, 0.4));
+    }
+}
+
+/* Glow Effect */
+@keyframes truckGlow {
+    0%, 100% {
+        text-shadow: 0 0 0px rgba(232, 93, 4, 0);
+    }
+    50% {
+        text-shadow: 0 0 12px rgba(232, 93, 4, 0.5), 0 0 20px rgba(232, 93, 4, 0.3);
+    }
+}
+
+/* Smooth Movement Easing */
+@keyframes truckMove {
+    0% {
+        opacity: 0.8;
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Rotation smoothing */
+@keyframes truckRotate {
+    0% {
+        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+    }
+    100% {
+        filter: drop-shadow(0 4px 12px rgba(232, 93, 4, 0.5));
+    }
+}
+
+/* Trail effect styles */
+.truck-trail {
+    animation: trailFade 1s ease-in-out infinite;
+}
+
+@keyframes trailFade {
+    0% {
+        stroke-dashoffset: 0;
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        stroke-dashoffset: 10;
+        opacity: 0.4;
+    }
+}
+
+/* Trail glow effect */
+.map-container :global(.truck-trail) {
+    filter: drop-shadow(0 0 3px rgba(255, 149, 0, 0.4));
+    -webkit-filter: drop-shadow(0 0 3px rgba(255, 149, 0, 0.4));
 }

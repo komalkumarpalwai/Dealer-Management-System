@@ -202,8 +202,17 @@ export default class DeliveryLocationMap extends LightningElement {
                         .addTo(this.map)
                         .bindPopup('📦 In Transit', { permanent: false, offset: L.point(0, -30) });
 
+                    // Initialize truck trail polyline
+                    const trailPolyline = L.polyline([], {
+                        color: '#ff9500',
+                        weight: 3,
+                        opacity: 0.6,
+                        className: 'truck-trail',
+                        dashArray: '4, 6'
+                    }).addTo(this.map);
+
                     // Animate truck along route with better coordinates handling
-                    this.animateTruckAlongRoute(truckMarker, routeCoordinates, 3000); // 3 second loop
+                    this.animateTruckAlongRoute(truckMarker, routeCoordinates, trailPolyline, 3000); // 3 second loop
 
                     // Show distance and duration
                     const distanceKm = (data.routes[0].distance / 1000).toFixed(1);
@@ -306,76 +315,122 @@ export default class DeliveryLocationMap extends LightningElement {
     }
 
     /**
-     * Animate truck marker moving along the route coordinates
+     * Easing function for smooth animation
+     * @param {Number} t - Progress (0 to 1)
+     * @returns {Number} Eased value
+     */
+    easeInOutQuad(t) {
+        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    }
+
+    /**
+     * Linear interpolation between two coordinates
+     * @param {Array} start - Starting [lon, lat]
+     * @param {Array} end - Ending [lon, lat]
+     * @param {Number} progress - Interpolation factor (0 to 1)
+     * @returns {Array} Interpolated [lon, lat]
+     */
+    interpolateCoordinates(start, end, progress) {
+        const lon = start[0] + (end[0] - start[0]) * progress;
+        const lat = start[1] + (end[1] - start[1]) * progress;
+        return [lon, lat];
+    }
+
+    /**
+     * Animate truck marker moving along the route coordinates with smooth easing
      * @param {L.Marker} truckMarker - The truck marker to animate
      * @param {Array} routeCoordinates - Array of [lon, lat] coordinates from route
+     * @param {L.Polyline} trailPolyline - The trail polyline to update with truck path
      * @param {Number} duration - Total animation duration in milliseconds
      */
-    animateTruckAlongRoute(truckMarker, routeCoordinates, duration) {
+    animateTruckAlongRoute(truckMarker, routeCoordinates, trailPolyline, duration) {
         if (!routeCoordinates || routeCoordinates.length === 0) {
             console.warn('No route coordinates available for truck animation');
             return;
         }
 
-        let currentStep = 0;
+        let currentIndex = 0;
         const totalSteps = routeCoordinates.length;
-        const stepDuration = duration / totalSteps;
+        const segmentDuration = duration / (totalSteps - 1);
+        let segmentStartTime = Date.now();
+        let isAnimating = true;
+        const trailCoordinates = []; // Track visited coordinates for trail
+        const trailUpdateInterval = Math.max(1, Math.floor(totalSteps / 100)); // Update trail every N waypoints
 
-        const animateStep = () => {
-            // Get current waypoint
-            const currentCoord = routeCoordinates[currentStep];
-            if (!currentCoord || currentCoord.length < 2) {
-                currentStep++;
-                if (currentStep >= totalSteps) {
-                    currentStep = 0;
+        const animateSegment = () => {
+            if (!isAnimating) return;
+
+            const currentCoord = routeCoordinates[currentIndex];
+            const nextCoord = routeCoordinates[currentIndex + 1] || routeCoordinates[0];
+
+            if (!currentCoord || !nextCoord || currentCoord.length < 2 || nextCoord.length < 2) {
+                currentIndex++;
+                if (currentIndex >= totalSteps - 1) {
+                    currentIndex = 0;
                 }
-                setTimeout(animateStep, stepDuration);
+                segmentStartTime = Date.now();
+                requestAnimationFrame(animateSegment);
                 return;
             }
 
-            const [lon, lat] = currentCoord;
+            const currentTime = Date.now();
+            const elapsed = currentTime - segmentStartTime;
+            const progress = Math.min(elapsed / segmentDuration, 1);
+            const easedProgress = this.easeInOutQuad(progress);
 
-            // Update truck position on map
-            truckMarker.setLatLng(L.latLng(lat, lon));
+            // Interpolate position between current and next waypoint
+            const [interpLon, interpLat] = this.interpolateCoordinates(currentCoord, nextCoord, easedProgress);
+            truckMarker.setLatLng(L.latLng(interpLat, interpLon));
 
-            // Calculate next position for rotation
-            const nextStep = (currentStep + 1) % totalSteps;
-            const nextCoord = routeCoordinates[nextStep];
+            // Add current position to trail at intervals
+            if (currentIndex % trailUpdateInterval === 0) {
+                trailCoordinates.push([interpLat, interpLon]);
+                // Update trail polyline with fade effect
+                trailPolyline.setLatLngs(trailCoordinates);
+                // Animate trail opacity gradient effect
+                const trailLength = trailCoordinates.length;
+                if (trailLength > 20) {
+                    // Keep trail from getting too long by removing oldest points
+                    trailCoordinates.shift();
+                }
+            }
 
-            if (nextCoord && nextCoord.length >= 2) {
-                const [nextLon, nextLat] = nextCoord;
+            // Calculate and apply rotation based on direction
+            const dLat = nextCoord[1] - currentCoord[1];
+            const dLon = nextCoord[0] - currentCoord[0];
+            const angle = Math.atan2(dLon, dLat) * (180 / Math.PI);
 
-                // Calculate angle for rotation
-                const dLat = nextLat - lat;
-                const dLon = nextLon - lon;
-                const angle = Math.atan2(dLon, dLat) * (180 / Math.PI);
-
-                // Find and update truck icon element with rotation
-                setTimeout(() => {
-                    const iconElements = document.querySelectorAll('.leaflet-marker-icon.truck-marker');
-                    if (iconElements && iconElements.length > 0) {
-                        const truckElement = iconElements[iconElements.length - 1];
-                        if (truckElement) {
-                            const innerDiv = truckElement.querySelector('div');
-                            if (innerDiv) {
-                                innerDiv.style.transform = `rotate(${angle}deg)`;
-                            }
-                        }
+            // Update truck icon with smooth rotation and enhanced effects
+            const iconElements = document.querySelectorAll('.leaflet-marker-icon.truck-marker');
+            if (iconElements && iconElements.length > 0) {
+                const truckElement = iconElements[iconElements.length - 1];
+                if (truckElement) {
+                    const innerDiv = truckElement.querySelector('div');
+                    if (innerDiv) {
+                        // Smooth rotation with scale pulse effect
+                        const scaleEffect = 1 + Math.sin(progress * Math.PI) * 0.05;
+                        innerDiv.style.transform = `rotate(${angle}deg) scale(${scaleEffect})`;
+                        innerDiv.style.transition = 'transform 0.05s cubic-bezier(0.34, 1.56, 0.64, 1)';
                     }
-                }, 0);
+                    // Add hover effect trigger
+                    truckElement.style.filter = `drop-shadow(0 ${3 + Math.sin(progress * Math.PI) * 2}px ${8 + Math.sin(progress * Math.PI) * 3}px rgba(232, 93, 4, ${0.3 + Math.sin(progress * Math.PI) * 0.2}))`;
+                }
             }
 
-            currentStep++;
-            if (currentStep >= totalSteps) {
-                currentStep = 0;
+            // Move to next segment when progress completes
+            if (progress >= 1) {
+                currentIndex++;
+                if (currentIndex >= totalSteps - 1) {
+                    currentIndex = 0;
+                }
+                segmentStartTime = Date.now();
             }
 
-            // Schedule next step
-            setTimeout(animateStep, stepDuration);
+            requestAnimationFrame(animateSegment);
         };
 
-        // Start animation
-        console.log('🚚 Starting truck animation with ' + totalSteps + ' waypoints');
-        animateStep();
+        // Start animation using requestAnimationFrame for better performance
+        console.log('🚚 Starting enhanced truck animation with ' + totalSteps + ' waypoints and trail effect');
+        requestAnimationFrame(animateSegment);
     }
 }
