@@ -287,41 +287,56 @@
                                     </template>
 
                                     <!-- After Case Creation -->
-                                    <template if:true={caseHasBeenCreated}>
-                                        <div class="support-contact-card">
-                                            <div class="support-contact-header">
-                                                <div class="contact-icon">📞</div>
-                                                <h3 class="contact-title">We're Here to Help</h3>
-                                            </div>
-                                            <div class="support-contact-content">
-                                                <p class="contact-message">Thank you for reaching out! Our team will contact you soon regarding your order issue.</p>
-                                                <div class="contact-info">
-                                                    <p class="info-text">We've received your support ticket and our team will prioritize your request.</p>
-                                                </div>
-                                                
-                                                <!-- Related Cases -->
-                                                <template if:true={relatedCases.length}>
-                                                    <div class="related-cases-mini">
-                                                        <h4 class="related-cases-title">Your Support Tickets</h4>
-                                                        <div class="cases-mini-list">
-                                                            <template for:each={relatedCases} for:item="caseItem">
-                                                                <div key={caseItem.Id} class="case-mini-item">
-                                                                    <div class="case-mini-left">
-                                                                        <span class="case-number-badge">{caseItem.CaseNumber}</span>
-                                                                        <span class="case-subject">{caseItem.Subject}</span>
-                                                                    </div>
-                                                                    <div class="case-mini-right">
-                                                                        <span class="case-status-mini" data-status={caseItem.Status}>{caseItem.Status}</span>
-                                                                    </div>
-                                                                </div>
-                                                            </template>
-                                                        </div>
-                                                    </div>
-                                                </template>
-                                            </div>
-                                        </div>
-                                    </template>
-                                </template>
+         <template if:true={caseHasBeenCreated}>
+    <div class="sct-overlay">
+        <div class="sct-popup">
+
+            <!-- Icon -->
+            <div class="sct-popup-icon">✓</div>
+
+            <!-- Title -->
+            <h3 class="sct-popup-title">Case Submitted Successfully!</h3>
+            <p class="sct-popup-message">Thank you for reaching out to our support team.</p>
+
+            <!-- Next Steps -->
+            <div class="sct-next-steps">
+                <h4 class="sct-next-steps-title">📋 What Happens Next?</h4>
+                <div class="sct-step">
+                    <div class="sct-step-icon">1</div>
+                    <div class="sct-step-text">
+                        <span class="sct-step-heading">Agent Assignment</span>
+                        <span class="sct-step-desc">A dedicated support agent will be assigned to your case shortly.</span>
+                    </div>
+                </div>
+                <div class="sct-step">
+                    <div class="sct-step-icon">2</div>
+                    <div class="sct-step-text">
+                        <span class="sct-step-heading">Email Notification</span>
+                        <span class="sct-step-desc">Your agent will reach out to you via your registered email address.</span>
+                    </div>
+                </div>
+                <div class="sct-step">
+                    <div class="sct-step-icon">3</div>
+                    <div class="sct-step-text">
+                        <span class="sct-step-heading">Issue Resolution</span>
+                        <span class="sct-step-desc">Your agent will work with you to fully resolve the issue.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Note -->
+            <div class="sct-popup-note">
+                <span>💡</span>
+                <p>Keep an eye on your registered email inbox for updates from our support team.</p>
+            </div>
+
+            <!-- Close Button -->
+            <button class="sct-popup-close-btn" onclick={handleCloseSupportTicketModal}>✕ Close</button>
+            <p class="sct-popup-countdown">Closing in <strong>{successCountdownSeconds}</strong>s...</p>
+
+        </div>
+    </div>
+</template>             </template>
 
                                 <!-- Shipping Address Section -->
                                 <div class="shipping-address-section">
@@ -435,37 +450,141 @@
     <template if:false={isLoadingCases}>
 
         <!-- Cases Found -->
-        <template if:true={hasCases}>
-            <p class="refresh-help-text">
-                This order has {relatedCases.length} support case(s). Click Refresh to reload the list.
-            </p>
-            <div class="cases-table">
-                <div class="table-header">
-                    <div class="col-case-number">Case Number</div>
-                    <div class="col-subject">Subject</div>
-                    <div class="col-description">Description</div>
-                    <div class="col-status">Status</div>
-                    <div class="col-date">Created Date</div>
+      <template if:true={hasCases}>
+    <p class="refresh-help-text">
+        This order has {relatedCases.length} support case(s). Click Refresh to reload the list.
+    </p>
+
+    <!-- Action Buttons -->
+    <div class="cases-action-bar">
+        <button class="btn-refresh-cases" onclick={handleRefreshCases} disabled={isLoadingCases}>
+            <template if:true={isLoadingCases}>⏳ Loading...</template>
+            <template if:false={isLoadingCases}>🔄 Refresh</template>
+        </button>
+        <button class="btn-whats-next" onclick={handleWhatsNext}>📋 What's Next?</button>
+    </div>
+
+    <!-- Cases Table -->
+    <div class="cases-table">
+        <div class="table-header">
+            <div class="col-case-number">Case Number</div>
+            <div class="col-subject">Subject</div>
+            <div class="col-description">Description</div>
+            <div class="col-status">Status</div>
+            <div class="col-date">Created Date</div>
+        </div>
+        <template for:each={visibleCases} for:item="caseItem">
+            <div key={caseItem.Id} class="table-row">
+                <div class="col-case-number">
+                    <span class="case-badge">{caseItem.CaseNumber}</span>
                 </div>
-                <template for:each={relatedCases} for:item="caseItem">
-                    <div key={caseItem.Id} class="table-row">
-                        <div class="col-case-number">
-                            <span class="case-badge">{caseItem.CaseNumber}</span>
-                        </div>
-                        <div class="col-subject">{caseItem.Subject}</div>
-                        <div class="col-description">
-                            <span class="description-text">{caseItem.Description}</span>
-                        </div>
-                        <div class="col-status">
-                            <span class="status-badge" data-status={caseItem.Status}>
-                                {caseItem.Status}
-                            </span>
-                        </div>
-                        <div class="col-date">{caseItem.CreatedDate}</div>
-                    </div>
-                </template>
+                <div class="col-subject">{caseItem.Subject}</div>
+                <div class="col-description">
+                    <span class="description-text">{caseItem.Description}</span>
+                </div>
+                <div class="col-status">
+                    <span class="status-badge" data-status={caseItem.Status}>
+                        {caseItem.Status}
+                    </span>
+                </div>
+                <div class="col-date">{caseItem.CreatedDate}</div>
             </div>
         </template>
+    </div>
+
+    <!-- View More Button -->
+    <template if:true={hasMoreCases}>
+        <div class="view-more-wrapper">
+            <button class="btn-view-more" onclick={handleViewMoreCases}>
+                ↓ View All {relatedCases.length} Cases
+            </button>
+        </div>
+    </template>
+
+    <!-- Show Less Button -->
+    <template if:true={showingAllCases}>
+        <div class="view-more-wrapper">
+            <button class="btn-view-more btn-view-less" onclick={handleViewLessCases}>
+                ↑ Show Less
+            </button>
+        </div>
+    </template>
+
+</template>
+
+<!-- What's Next Popup -->
+<template if:true={showWhatsNextPopup}>
+    <div class="wn-overlay" onclick={handleCloseWhatsNext}>
+        <div class="wn-popup" onclick={handleWhatsNextPopupClick}>
+
+            <!-- Header -->
+            <div class="wn-header">
+                <div class="wn-header-left">
+                    <span class="wn-header-icon">📋</span>
+                    <span class="wn-header-title">What Happens Next?</span>
+                </div>
+                <button class="wn-close-x" onclick={handleCloseWhatsNext}>✕</button>
+            </div>
+
+            <!-- Steps -->
+            <div class="wn-body">
+
+                <div class="wn-step">
+                    <div class="wn-step-number">1</div>
+                    <div class="wn-step-content">
+                        <span class="wn-step-heading">Agent Assignment</span>
+                        <span class="wn-step-desc">A dedicated support agent will be assigned to your case within 24 hours.</span>
+                    </div>
+                </div>
+
+                <div class="wn-step">
+                    <div class="wn-step-number">2</div>
+                    <div class="wn-step-content">
+                        <span class="wn-step-heading">Email Notification</span>
+                        <span class="wn-step-desc">Your assigned agent will contact you via your registered email address with an update on your case.</span>
+                    </div>
+                </div>
+
+                <div class="wn-step">
+                    <div class="wn-step-number">3</div>
+                    <div class="wn-step-content">
+                        <span class="wn-step-heading">Investigation</span>
+                        <span class="wn-step-desc">Our agent will thoroughly investigate your issue and gather any additional information needed from you.</span>
+                    </div>
+                </div>
+
+                <div class="wn-step">
+                    <div class="wn-step-number">4</div>
+                    <div class="wn-step-content">
+                        <span class="wn-step-heading">Resolution</span>
+                        <span class="wn-step-desc">Your agent will work with you to fully resolve the issue and ensure you are satisfied with the outcome.</span>
+                    </div>
+                </div>
+
+                <div class="wn-step">
+                    <div class="wn-step-number">5</div>
+                    <div class="wn-step-content">
+                        <span class="wn-step-heading">Case Closure</span>
+                        <span class="wn-step-desc">Once the issue is resolved, your case will be marked as closed and a resolution summary will be sent to your email.</span>
+                    </div>
+                </div>
+
+                <!-- Note -->
+                <div class="wn-note">
+                    <span class="wn-note-icon">💡</span>
+                    <p class="wn-note-text">Keep an eye on your registered email inbox for updates. If you don't hear back within 24 hours, you can raise a new ticket referencing this case.</p>
+                </div>
+
+            </div>
+
+            <!-- Close Button -->
+            <div class="wn-footer">
+                <button class="wn-close-btn" onclick={handleCloseWhatsNext}>✕ Close</button>
+            </div>
+
+        </div>
+    </div>
+</template>
 
         <!-- No Cases Found -->
         <template if:false={hasCases}>
@@ -908,32 +1027,40 @@
         <template if:true={showSupportTicketModal}>
             <div class="support-ticket-modal-overlay" onclick={handleCloseSupportTicketModal}>
                 <div class="support-ticket-modal-content" onclick={handleModalContentClick}>
-                    <!-- Modal Header -->
-                    <div class="support-ticket-modal-header">
-                        <h2>🎫 Raise Support Ticket</h2>
-                        <button class="close-btn" onclick={handleCloseSupportTicketModal}>✕</button>
-                    </div>
+                    <!-- Modal Header - Hidden on Success -->
+                    <template if:false={createdCaseNumber}>
+                        <div class="support-ticket-modal-header">
+                            <h2>🎫 Raise Support Ticket</h2>
+                            <button class="close-btn" onclick={handleCloseSupportTicketModal}>✕</button>
+                        </div>
+                    </template>
 
                     <!-- Modal Body -->
-                    <div class="support-ticket-modal-body">
+                    <div class="support-ticket-modal-body" class:success-mode={createdCaseNumber}>
                         <!-- Success State -->
-                        <template if:true={createdCaseNumber}>
-                            <div class="success-container">
+                       <!--  <template if:true={createdCaseNumber}>
+                            <div class="success-container success-popup">
                                 <div class="success-icon-wrapper">
                                     <div class="success-icon">✓</div>
                                 </div>
-                                <h3 class="success-title">Support Ticket Created Successfully!</h3>
+                                <h3 class="success-title">Your Case Has Been Successfully Created!</h3>
                                 <p class="success-message">Thank you for reaching out. Our support team will prioritize your request and contact you soon.</p>
                                 <div class="case-id-display">
                                     <span class="case-id-label">Case Number</span>
                                     <span class="case-id-value">{createdCaseNumber}</span>
                                 </div>
                                 <p class="success-subtitle">You can reference this case number when communicating with our support team.</p>
-                                <button class="btn-close-modal" onclick={handleCloseSupportTicketModal}>
-                                    Closing automatically in 3 seconds...
-                                </button>
+                                <div class="success-actions">
+                                    <button class="btn btn-primary" onclick={handleViewCaseDetails}>
+                                        <span>👁️ View Case Details</span>
+                                    </button>
+                                    <button class="btn btn-secondary" onclick={handleCloseSupportTicketModal}>
+                                        <span>✕ Close</span>
+                                    </button>
+                                </div>
+                                <p class="countdown-text">Closing in <strong>{successCountdownSeconds}</strong>s...</p>
                             </div>
-                        </template>
+                        </template>-->
 
                         <!-- Form State -->
                         <template if:false={createdCaseNumber}>

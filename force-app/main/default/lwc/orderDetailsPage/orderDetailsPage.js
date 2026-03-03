@@ -66,14 +66,18 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
     // Support Ticket Modal State
     showSupportTicketModal = false;
     isSubmittingSupportTicket = false;
-    createdCaseNumber = '';
-    caseHasBeenCreated = false;
+    @track createdCaseNumber = '';
+    @track caseHasBeenCreated = false;
     @track relatedCases = [];
     @track isLoadingCases = false;
+    @track successCountdownSeconds = 0;
+    successCountdownInterval = null;
     supportTicketFormData = {
         subject: '',
         description: ''
     };
+showWhatsNextPopup = false;
+showAllCases = false;
 
     // Formatted payment history
     formattedPaymentHistory = [];
@@ -844,14 +848,54 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
      * Close support ticket modal
      */
     handleCloseSupportTicketModal() {
+        // Clear countdown timer if active
+        if (this.successCountdownInterval) {
+            clearInterval(this.successCountdownInterval);
+            this.successCountdownInterval = null;
+        }
         this.showSupportTicketModal = false;
         this.createdCaseNumber = '';
         this.caseHasBeenCreated = false;
+        this.successCountdownSeconds = 0;
         this.supportTicketFormData = {
             subject: '',
             description: ''
         };
         this.isSubmittingSupportTicket = false;
+    }
+
+    /**
+     * Handle auto-close success screen and scroll to cases
+     */
+    handleAutoCloseSuccess() {
+        this.showSupportTicketModal = false;
+        this.createdCaseNumber = '';
+        this.caseHasBeenCreated = false;
+        this.successCountdownSeconds = 0;
+        this.supportTicketFormData = {
+            subject: '',
+            description: ''
+        };
+        
+        // Scroll to related cases section
+        setTimeout(() => {
+            const relatedCasesSection = this.template.querySelector('.related-cases-section');
+            if (relatedCasesSection) {
+                relatedCasesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 300);
+    }
+
+    /**
+     * Handle view case details button
+     */
+    handleViewCaseDetails() {
+        // Close popup and scroll immediately
+        if (this.successCountdownInterval) {
+            clearInterval(this.successCountdownInterval);
+            this.successCountdownInterval = null;
+        }
+        this.handleAutoCloseSuccess();
     }
 
     /**
@@ -893,26 +937,22 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
             this.caseHasBeenCreated = true;
             this.isSubmittingSupportTicket = false;
             this.loadRelatedCases();
-            this.showToast('success', 'Case Created', `Your support ticket has been successfully created. Our support team will contact you soon.`);
+            // COMMENTED OUT - Using centered popup instead of toast
+            // this.showToast('success', 'Case Created', `Your support ticket has been successfully created. Our support team will contact you soon.`);
             
-            // Auto-close popup and scroll after 3 seconds
+            // Start after a small delay to ensure rendering
             setTimeout(() => {
-                this.showSupportTicketModal = false;
-                this.createdCaseNumber = '';
-                this.caseHasBeenCreated = false;
-                this.supportTicketFormData = {
-                    subject: '',
-                    description: ''
-                };
-                
-                // Scroll to related cases section
-                setTimeout(() => {
-                    const relatedCasesSection = this.template.querySelector('.related-cases-section');
-                    if (relatedCasesSection) {
-                        relatedCasesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Start 5-second countdown
+                this.successCountdownSeconds = 5;
+                this.successCountdownInterval = setInterval(() => {
+                    this.successCountdownSeconds--;
+                    if (this.successCountdownSeconds <= 0) {
+                        clearInterval(this.successCountdownInterval);
+                        this.successCountdownInterval = null;
+                        this.handleAutoCloseSuccess();
                     }
-                }, 300);
-            }, 3000);
+                }, 1000);
+            }, 100);
         })
         .catch(error => {
             this.isSubmittingSupportTicket = false;
@@ -930,23 +970,33 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
     /**
      * Load cases related to the order
      */
-   loadRelatedCases() {
+loadRelatedCases() {
     if (!this.orderId) {
         console.error('[loadRelatedCases] No orderId available, aborting.');
         return;
     }
 
     console.log('[loadRelatedCases] Fetching cases for Order:', this.orderId);
+    console.log('orderId being sent:', this.orderId);
     this.isLoadingCases = true;
 
     getCasesByOrder({ orderId: this.orderId })
         .then(result => {
+            console.log('RAW APEX RESULT:', JSON.stringify(result));
+            console.log('RESULT LENGTH:', result ? result.length : 'null');
+
             if (result && Array.isArray(result)) {
-                this.relatedCases = result.map(caseItem => ({
-                    ...caseItem,
-                    CreatedDate: this.formatDate(caseItem.CreatedDate)
-                }));
-                console.log('[loadRelatedCases] Loaded ' + this.relatedCases.length + ' case(s) for Order:', this.orderId);
+                if (result.length > 0) {
+                    this.relatedCases = result.map(caseItem => ({
+                        ...caseItem,
+                        CreatedDate: this.formatDate(caseItem.CreatedDate)
+                    }));
+                    console.log('[loadRelatedCases] Loaded ' + this.relatedCases.length + ' case(s) for Order:', this.orderId);
+                    console.log('relatedCases after mapping:', JSON.stringify(this.relatedCases));
+                } else {
+                    console.warn('[loadRelatedCases] Apex returned EMPTY array - 0 cases');
+                    this.relatedCases = [];
+                }
             } else {
                 console.warn('[loadRelatedCases] Unexpected response format:', result);
                 this.relatedCases = [];
@@ -959,9 +1009,49 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
         })
         .finally(() => {
             this.isLoadingCases = false;
+            console.log('isLoadingCases set to false');
+            console.log('Final relatedCases length:', this.relatedCases ? this.relatedCases.length : 'null');
+            console.log('hasCases value:', this.hasCases);
         });
 }
+get visibleCases() {
+    if (this.showAllCases) {
+        return this.relatedCases;
+    }
+    return this.relatedCases.slice(0, 3);
+}
+
+get hasMoreCases() {
+    return !this.showAllCases && this.relatedCases.length > 3;
+}
+
+get showingAllCases() {
+    return this.showAllCases && this.relatedCases.length > 3;
+}
+
+// Add these methods
+handleWhatsNext() {
+    this.showWhatsNextPopup = true;
+}
+
+handleCloseWhatsNext() {
+    this.showWhatsNextPopup = false;
+}
+
+handleWhatsNextPopupClick(event) {
+    event.stopPropagation();
+}
+
+handleViewMoreCases() {
+    this.showAllCases = true;
+}
+
+handleViewLessCases() {
+    this.showAllCases = false;
+}
+
 get hasCases() {
+    console.log('hasCases called - relatedCases length:', this.relatedCases ? this.relatedCases.length : 'null');
     return this.relatedCases && this.relatedCases.length > 0;
 }
     /**

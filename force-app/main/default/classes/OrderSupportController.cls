@@ -1,13 +1,5 @@
-public with sharing class OrderSupportController {
+public without sharing class OrderSupportController {
     
-    /**
-     * Creates a Case from an Order with an internal comment
-     * @param orderId The Id of the Order
-     * @param subject The Case subject
-     * @param description The Case description
-     * @param internalComments Internal comments for the Case
-     * @return The Case Number of the newly created Case
-     */
     @AuraEnabled
     public static String createCase(Id orderId, String subject, String description, String internalComments) {
         try {
@@ -58,11 +50,6 @@ public with sharing class OrderSupportController {
         }
     }
 
-    /**
-     * Retrieves Cases linked to a specific Order
-     * @param orderId The Id of the Order
-     * @return List of Case records related to the given Order
-     */
     @AuraEnabled
     public static List<Case> getCasesByOrder(Id orderId) {
         try {
@@ -74,7 +61,6 @@ public with sharing class OrderSupportController {
                 SELECT Id, CaseNumber, Subject, Description, Status, Priority, CreatedDate, Order__c
                 FROM Case
                 WHERE Order__c = :orderId
-                WITH SECURITY_ENFORCED
                 ORDER BY CreatedDate DESC
             ];
             
