@@ -68,8 +68,8 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
     isSubmittingSupportTicket = false;
     createdCaseNumber = '';
     caseHasBeenCreated = false;
-    relatedCases = [];
-    isLoadingCases = false;
+    @track relatedCases = [];
+    @track isLoadingCases = false;
     supportTicketFormData = {
         subject: '',
         description: ''
@@ -930,24 +930,40 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
     /**
      * Load cases related to the order
      */
-    loadRelatedCases() {
-        getCasesByOrder({ orderId: this.orderId })
-        .then(result => {
-            // Format dates for display
-            this.relatedCases = result.map(caseItem => ({
-                ...caseItem,
-                CreatedDate: this.formatDate(caseItem.CreatedDate)
-            }));
-            this.isLoadingCases = false;
-            console.log('✓ Related cases loaded:', this.relatedCases.length + ' cases');
-        })
-        .catch(error => {
-            console.error('✗ Error fetching related cases:', error);
-            this.relatedCases = [];
-            this.isLoadingCases = false;
-        });
+   loadRelatedCases() {
+    if (!this.orderId) {
+        console.error('[loadRelatedCases] No orderId available, aborting.');
+        return;
     }
 
+    console.log('[loadRelatedCases] Fetching cases for Order:', this.orderId);
+    this.isLoadingCases = true;
+
+    getCasesByOrder({ orderId: this.orderId })
+        .then(result => {
+            if (result && Array.isArray(result)) {
+                this.relatedCases = result.map(caseItem => ({
+                    ...caseItem,
+                    CreatedDate: this.formatDate(caseItem.CreatedDate)
+                }));
+                console.log('[loadRelatedCases] Loaded ' + this.relatedCases.length + ' case(s) for Order:', this.orderId);
+            } else {
+                console.warn('[loadRelatedCases] Unexpected response format:', result);
+                this.relatedCases = [];
+            }
+        })
+        .catch(error => {
+            console.error('[loadRelatedCases] Error fetching cases:', error?.body?.message || error?.message || error);
+            this.relatedCases = [];
+            this.showToast('error', 'Error Loading Cases', 'Failed to load support cases.');
+        })
+        .finally(() => {
+            this.isLoadingCases = false;
+        });
+}
+get hasCases() {
+    return this.relatedCases && this.relatedCases.length > 0;
+}
     /**
      * Handle refresh of related cases
      */

@@ -405,55 +405,81 @@
                             </div>
                         </template> -->
 
-                        <!-- Related Cases Section -->
-                        <template if:true={relatedCases.length}>
-                            <div class="related-cases-section">
-                                <div class="related-cases-header">
-                                    <h3 class="section-title">🎫 Related Support Tickets</h3>
-                                    <button class="btn-refresh-cases" onclick={handleRefreshCases} title="Refresh the list if your new case is not showing" disabled={isLoadingCases}>
-                                        <template if:true={isLoadingCases}>
-                                            ⏳ Loading...
-                                        </template>
-                                        <template if:false={isLoadingCases}>
-                                            🔄 Refresh
-                                        </template>
-                                    </button>
-                                </div>
-                                <p class="refresh-help-text">If your new case is not showing, please click the Refresh button to reload the list.</p>
-                                <template if:true={isLoadingCases}>
-                                    <div class="loading-container">
-                                        <div class="spinner"></div>
-                                        <p>Loading latest support tickets...</p>
-                                    </div>
-                                </template>
-                                <template if:false={isLoadingCases}>
-                                    <div class="cases-table">
-                                    <div class="table-header">
-                                        <div class="col-case-number">Case Number</div>
-                                        <div class="col-subject">Subject</div>
-                                        <div class="col-description">Description</div>
-                                        <div class="col-status">Status</div>
-                                        <div class="col-date">Created Date</div>
-                                    </div>
-                                    <template for:each={relatedCases} for:item="caseItem">
-                                        <div key={caseItem.Id} class="table-row">
-                                            <div class="col-case-number">
-                                                <span class="case-badge">{caseItem.CaseNumber}</span>
-                                            </div>
-                                            <div class="col-subject">{caseItem.Subject}</div>
-                                            <div class="col-description">
-                                                <span class="description-text">{caseItem.Description}</span>
-                                            </div>
-                                            <div class="col-status">
-                                                <span class="status-badge" data-status={caseItem.Status}>{caseItem.Status}</span>
-                                            </div>
-                                            <div class="col-date">{caseItem.CreatedDate}</div>
-                                        </div>
-                                    </template>
-                                    </div>
-                                </template>
-                            </div>
-                        </template>
+                        <!-- Related Cases Section - ALWAYS VISIBLE -->
+                   <div class="related-cases-section">
+    <div class="related-cases-header">
+        <h3 class="section-title">🎫 Support Cases for This Order</h3>
+        <button 
+            class="btn-refresh-cases" 
+            onclick={handleRefreshCases} 
+            title="Refresh the list if your new case is not showing" 
+            disabled={isLoadingCases}>
+            <template if:true={isLoadingCases}>
+                ⏳ Loading...
+            </template>
+            <template if:false={isLoadingCases}>
+                🔄 Refresh
+            </template>
+        </button>
+    </div>
+
+    <!-- Loading State -->
+    <template if:true={isLoadingCases}>
+        <div class="loading-container">
+            <div class="spinner"></div>
+            <p>Loading support cases...</p>
+        </div>
+    </template>
+
+    <!-- Loaded State -->
+    <template if:false={isLoadingCases}>
+
+        <!-- Cases Found -->
+        <template if:true={hasCases}>
+            <p class="refresh-help-text">
+                This order has {relatedCases.length} support case(s). Click Refresh to reload the list.
+            </p>
+            <div class="cases-table">
+                <div class="table-header">
+                    <div class="col-case-number">Case Number</div>
+                    <div class="col-subject">Subject</div>
+                    <div class="col-description">Description</div>
+                    <div class="col-status">Status</div>
+                    <div class="col-date">Created Date</div>
+                </div>
+                <template for:each={relatedCases} for:item="caseItem">
+                    <div key={caseItem.Id} class="table-row">
+                        <div class="col-case-number">
+                            <span class="case-badge">{caseItem.CaseNumber}</span>
+                        </div>
+                        <div class="col-subject">{caseItem.Subject}</div>
+                        <div class="col-description">
+                            <span class="description-text">{caseItem.Description}</span>
+                        </div>
+                        <div class="col-status">
+                            <span class="status-badge" data-status={caseItem.Status}>
+                                {caseItem.Status}
+                            </span>
+                        </div>
+                        <div class="col-date">{caseItem.CreatedDate}</div>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <!-- No Cases Found -->
+        <template if:false={hasCases}>
+            <div class="no-cases-message">
+                <p class="no-cases-icon">📋</p>
+                <p class="no-cases-text">No support cases created for this order yet.</p>
+                <p class="no-cases-subtitle">
+                    If you encounter any issues with this order, please click "Raise Support Ticket" above to create a case.
+                </p>
+            </div>
+        </template>
+
+    </template>
+</div>
 
                         <!-- Action Buttons -->
                         <div class="page-actions">

@@ -11,12 +11,10 @@ public with sharing class OrderSupportController {
     @AuraEnabled
     public static String createCase(Id orderId, String subject, String description, String internalComments) {
         try {
-            // Validate inputs
             if (String.isBlank(subject) || String.isBlank(description)) {
                 throw new AuraHandledException('Subject and Description are required');
             }
             
-            // Query the Order record with AccountId
             Order orderRecord = [
                 SELECT Id, AccountId
                 FROM Order
@@ -25,16 +23,12 @@ public with sharing class OrderSupportController {
                 LIMIT 1
             ];
             
-            if (orderRecord == null) {
-                throw new AuraHandledException('Order not found');
-            }
-            
-            // Query for a Contact related to the Account
             Id contactId = null;
             List<Contact> contacts = [
                 SELECT Id
                 FROM Contact
                 WHERE AccountId = :orderRecord.AccountId
+                WITH SECURITY_ENFORCED
                 LIMIT 1
             ];
             
@@ -42,7 +36,6 @@ public with sharing class OrderSupportController {
                 contactId = contacts[0].Id;
             }
             
-            // Create a new Case record
             Case newCase = new Case(
                 AccountId = orderRecord.AccountId,
                 ContactId = contactId,
@@ -61,29 +54,35 @@ public with sharing class OrderSupportController {
         } catch (AuraHandledException e) {
             throw e;
         } catch (Exception e) {
-            System.debug('Error creating case: ' + e.getMessage() + ' | Stack: ' + e.getStackTraceString());
             throw new AuraHandledException('Error creating case: ' + e.getMessage());
         }
     }
 
     /**
-     * Retrieves all Cases related to an Order
+     * Retrieves Cases linked to a specific Order
      * @param orderId The Id of the Order
-     * @return List of Case records related to the Order
+     * @return List of Case records related to the given Order
      */
     @AuraEnabled
     public static List<Case> getCasesByOrder(Id orderId) {
         try {
+            if (orderId == null) {
+                throw new AuraHandledException('Order ID is required');
+            }
+
             List<Case> cases = [
-                SELECT Id, CaseNumber, Subject, Description, Status, Priority, CreatedDate
+                SELECT Id, CaseNumber, Subject, Description, Status, Priority, CreatedDate, Order__c
                 FROM Case
                 WHERE Order__c = :orderId
                 WITH SECURITY_ENFORCED
                 ORDER BY CreatedDate DESC
             ];
+            
             return cases;
+            
+        } catch (AuraHandledException e) {
+            throw e;
         } catch (Exception e) {
-            System.debug('Error fetching cases: ' + e.getMessage());
             throw new AuraHandledException('Error fetching cases: ' + e.getMessage());
         }
     }
