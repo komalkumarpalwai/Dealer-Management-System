@@ -6,6 +6,8 @@ import getPaymentsByOrder from '@salesforce/apex/OrderPayments.getPaymentsByOrde
 import createPayment from '@salesforce/apex/OrderPayments.createPayment';
 import getUserAccount from '@salesforce/apex/OrderPage.getUserAccount';
 import updateShippingAddress from '@salesforce/apex/OrderPage.updateShippingAddress';
+import createCase from '@salesforce/apex/OrderSupportController.createCase';
+import getCasesByOrder from '@salesforce/apex/OrderSupportController.getCasesByOrder';
 
 export default class OrderDetailsPage extends NavigationMixin(LightningElement) {
     
@@ -59,6 +61,18 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
         accountNumber: '',
         ifscCode: '',
         transferReferenceNumber: ''
+    };
+
+    // Support Ticket Modal State
+    showSupportTicketModal = false;
+    isSubmittingSupportTicket = false;
+    createdCaseNumber = '';
+    caseHasBeenCreated = false;
+    relatedCases = [];
+    isLoadingCases = false;
+    supportTicketFormData = {
+        subject: '',
+        description: ''
     };
 
     // Formatted payment history
@@ -142,6 +156,7 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
                     this.orderDetails = result.order;
                     this.lineItems = result.lineItems || [];
                     this.formatOrderData();
+                    this.loadRelatedCases();
                     this.isLoading = false;
                 } else {
                     this.hasError = true;
@@ -212,8 +227,8 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
             return {
                 ...payment,
                 formattedAmount: this.formatCurrency(payment.Amount__c),
-                formattedPaymentDate: payment.CreatedDate ? 
-                    new Date(payment.CreatedDate).toLocaleDateString('en-US', {
+                formattedPaymentDate: payment.Payment_Date__c ? 
+                    new Date(payment.Payment_Date__c).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric'
@@ -816,6 +831,131 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
      * Handle raise support ticket
      */
     handleRaiseTicket() {
-        this.showToast('info', 'Support Ticket', 'Please navigate to the Support section to raise a ticket or contact our support team for more information.');
+        this.showSupportTicketModal = true;
+        this.createdCaseNumber = '';
+        this.caseHasBeenCreated = false;
+        this.supportTicketFormData = {
+            subject: '',
+            description: ''
+        };
+    }
+
+    /**
+     * Close support ticket modal
+     */
+    handleCloseSupportTicketModal() {
+        this.showSupportTicketModal = false;
+        this.createdCaseNumber = '';
+        this.caseHasBeenCreated = false;
+        this.supportTicketFormData = {
+            subject: '',
+            description: ''
+        };
+        this.isSubmittingSupportTicket = false;
+    }
+
+    /**
+     * Handle support ticket form field change
+     */
+    handleSupportTicketFieldChange(event) {
+        const field = event.currentTarget.dataset.field;
+        const value = event.currentTarget.value;
+        this.supportTicketFormData = {
+            ...this.supportTicketFormData,
+            [field]: value
+        };
+    }
+
+    /**
+     * Submit support ticket form
+     */
+    handleSubmitSupportTicket() {
+        // Validation
+        if (!this.supportTicketFormData.subject.trim()) {
+            this.showToast('error', 'Validation Error', 'Subject is required');
+            return;
+        }
+        if (!this.supportTicketFormData.description.trim()) {
+            this.showToast('error', 'Validation Error', 'Description is required');
+            return;
+        }
+
+        this.isSubmittingSupportTicket = true;
+        
+        createCase({
+            orderId: this.orderId,
+            subject: this.supportTicketFormData.subject,
+            description: this.supportTicketFormData.description,
+            internalComments: 'Case created from Order Details Page'
+        })
+        .then(result => {
+            this.createdCaseNumber = result;
+            this.caseHasBeenCreated = true;
+            this.isSubmittingSupportTicket = false;
+            this.loadRelatedCases();
+            this.showToast('success', 'Case Created', `Your support ticket has been successfully created. Our support team will contact you soon.`);
+            
+            // Auto-close popup and scroll after 3 seconds
+            setTimeout(() => {
+                this.showSupportTicketModal = false;
+                this.createdCaseNumber = '';
+                this.caseHasBeenCreated = false;
+                this.supportTicketFormData = {
+                    subject: '',
+                    description: ''
+                };
+                
+                // Scroll to related cases section
+                setTimeout(() => {
+                    const relatedCasesSection = this.template.querySelector('.related-cases-section');
+                    if (relatedCasesSection) {
+                        relatedCasesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 300);
+            }, 3000);
+        })
+        .catch(error => {
+            this.isSubmittingSupportTicket = false;
+            console.error('Error creating case:', error);
+            let errorMessage = 'Unable to create support ticket. Please try again.';
+            if (error.body && error.body.message) {
+                errorMessage = error.body.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            this.showToast('error', 'Error', errorMessage);
+        });
+    }
+
+    /**
+     * Load cases related to the order
+     */
+    loadRelatedCases() {
+        getCasesByOrder({ orderId: this.orderId })
+        .then(result => {
+            // Format dates for display
+            this.relatedCases = result.map(caseItem => ({
+                ...caseItem,
+                CreatedDate: this.formatDate(caseItem.CreatedDate)
+            }));
+            this.isLoadingCases = false;
+            console.log('✓ Related cases loaded:', this.relatedCases.length + ' cases');
+        })
+        .catch(error => {
+            console.error('✗ Error fetching related cases:', error);
+            this.relatedCases = [];
+            this.isLoadingCases = false;
+        });
+    }
+
+    /**
+     * Handle refresh of related cases
+     */
+    handleRefreshCases() {
+        console.log('🔄 Refreshing cases...');
+        this.isLoadingCases = true;
+        this.relatedCases = [];
+        this.loadRelatedCases();
+        this.showToast('info', 'Refreshing', 'Loading the latest support tickets...');
     }
 }

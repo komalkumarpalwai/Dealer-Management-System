@@ -114,7 +114,7 @@ public with sharing class ProductsPageController {
                    Family,
                    Product_Category__c,
                    Brand__c,
-                   Net_Weight__c,
+                   	AMERP_Net_Weight__c,
                    Product_Specification__c,
                    IsActive,
                    CurrencyIsoCode,
@@ -218,7 +218,7 @@ public with sharing class ProductsPageController {
             productMap.put('Family', product.Family);
             productMap.put('Product_Category__c', product.Product_Category__c);
             productMap.put('Brand__c', product.Brand__c);
-            productMap.put('Net_Weight__c', product.Net_Weight__c);
+            productMap.put('Net_Weight__c', product.AMERP_Net_Weight__c);
             productMap.put('Product_Specification__c', product.Product_Specification__c);
             productMap.put('IsActive', product.IsActive);
             productMap.put('CurrencyIsoCode', product.CurrencyIsoCode);

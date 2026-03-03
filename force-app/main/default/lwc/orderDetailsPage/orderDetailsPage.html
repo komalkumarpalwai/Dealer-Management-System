@@ -79,7 +79,17 @@
 
                         <!-- Payment Summary Section -->
                         <div class="payment-summary-section">
-                            <h3 class="section-title">💳 Payment Summary</h3>
+                            <div class="summary-header">
+                                <h3 class="section-title">💳 Payment Summary</h3>
+                                <template if:true={formattedPaymentHistory.length}>
+                                    <button 
+                                        class="btn-payment-history" 
+                                        onclick={handleTogglePaymentHistory}>
+                                        <template if:true={showPaymentHistory}>Hide History</template>
+                                        <template if:false={showPaymentHistory}>Payment History</template>
+                                    </button>
+                                </template>
+                            </div>
                             <div class="payment-summary-grid">
                                 <div class="payment-summary-item">
                                     <span class="payment-label">Total Amount:</span>
@@ -95,36 +105,9 @@
                                 </div>
                             </div>
                             
-                            <!-- Payment Actions -->
-                            <template if:true={shouldShowPaymentButton}>
-                                <button class="btn-payment" onclick={handleOpenPaymentModal}>
-                                    💳 Make Payment
-                                </button>
-                            </template>
-                            <template if:false={shouldShowPaymentButton}>
-                                <template if:true={isOrderFulfilled}>
-                                    <div class="payment-success-message">
-                                        <span class="success-icon">✓</span>
-                                        <span class="success-text">Your payment has been completed for this Order</span>
-                                    </div>
-                                </template>
-                            </template>
-                        </div>
-
-                        <!-- Payment History Section -->
-                        <template if:true={formattedPaymentHistory.length}>
-                            <div class="payment-history-section">
-                                <div class="payment-history-header">
-                                    <h3 class="section-title">📜 Payment History</h3>
-                                    <button 
-                                        class="btn-toggle-history" 
-                                        onclick={handleTogglePaymentHistory}>
-                                        <template if:true={showPaymentHistory}>Hide </template>
-                                        <template if:false={showPaymentHistory}>Show </template>
-                                        Payments
-                                    </button>
-                                </div>
-                                <template if:true={showPaymentHistory}>
+                            <!-- Payment History Table -->
+                            <template if:true={showPaymentHistory}>
+                                <template if:true={formattedPaymentHistory.length}>
                                     <div class="payment-history-table">
                                         <div class="table-header">
                                             <div class="col-date">Payment Date</div>
@@ -142,8 +125,23 @@
                                         </template>
                                     </div>
                                 </template>
-                            </div>
-                        </template>
+                            </template>
+                            
+                            <!-- Payment Actions -->
+                            <template if:true={shouldShowPaymentButton}>
+                                <button class="btn-payment" onclick={handleOpenPaymentModal}>
+                                    💳 Make Payment
+                                </button>
+                            </template>
+                            <template if:false={shouldShowPaymentButton}>
+                                <template if:true={isOrderFulfilled}>
+                                    <div class="payment-success-message">
+                                        <span class="success-icon">✓</span>
+                                        <span class="success-text">Your payment has been completed for this Order</span>
+                                    </div>
+                                </template>
+                            </template>
+                        </div>
 
                         <!-- Line Items Section -->
                         <template if:true={formattedLineItems.length}>
@@ -270,22 +268,59 @@
 
                                 <!-- Delayed Order Card -->
                                 <template if:true={isDeliveryDelayed}>
-                                    <div class="delayed-order-card">
-                                        <div class="delayed-header">
-                                            <div class="delayed-alert-icon">⚠️</div>
-                                            <h3 class="delayed-title">ORDER HAS BEEN DELAYED</h3>
-                                        </div>
-                                        <div class="delayed-content">
-                                            <div class="delayed-expected-date">
-                                                <span class="delayed-label">Expected Date:</span>
-                                                <span class="delayed-value">Pending Update</span>
+                                    <!-- Before Case Creation -->
+                                    <template if:false={caseHasBeenCreated}>
+                                        <div class="delayed-order-card">
+                                            <div class="delayed-header">
+                                                <div class="delayed-alert-icon">⚠️</div>
+                                                <h3 class="delayed-title">ORDER HAS BEEN DELAYED</h3>
                                             </div>
-                                            <p class="delayed-message">We are pushing our limits to delivery it as soon as possible. For more information related to your order, please raise a support ticket.</p>
-                                            <button class="btn-raise-ticket" onclick={handleRaiseTicket}>
-                                                Raise Support Ticket
-                                            </button>
+                                            <div class="delayed-content">
+                                                <p class="delayed-message">We are working diligently to complete your delivery at the earliest possible time.</p>
+                                                <p class="delayed-message">If you have already raised a support case regarding this order, please use your existing Case Number for all further communication with Customer Support.</p>
+                                                <p class="delayed-message">If you have not yet created a case, please click "Raise Support Ticket" to submit a new request so our team can assist you promptly.</p>
+                                                <button class="btn-raise-ticket" onclick={handleRaiseTicket}>
+                                                    Raise Support Ticket
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </template>
+
+                                    <!-- After Case Creation -->
+                                    <template if:true={caseHasBeenCreated}>
+                                        <div class="support-contact-card">
+                                            <div class="support-contact-header">
+                                                <div class="contact-icon">📞</div>
+                                                <h3 class="contact-title">We're Here to Help</h3>
+                                            </div>
+                                            <div class="support-contact-content">
+                                                <p class="contact-message">Thank you for reaching out! Our team will contact you soon regarding your order issue.</p>
+                                                <div class="contact-info">
+                                                    <p class="info-text">We've received your support ticket and our team will prioritize your request.</p>
+                                                </div>
+                                                
+                                                <!-- Related Cases -->
+                                                <template if:true={relatedCases.length}>
+                                                    <div class="related-cases-mini">
+                                                        <h4 class="related-cases-title">Your Support Tickets</h4>
+                                                        <div class="cases-mini-list">
+                                                            <template for:each={relatedCases} for:item="caseItem">
+                                                                <div key={caseItem.Id} class="case-mini-item">
+                                                                    <div class="case-mini-left">
+                                                                        <span class="case-number-badge">{caseItem.CaseNumber}</span>
+                                                                        <span class="case-subject">{caseItem.Subject}</span>
+                                                                    </div>
+                                                                    <div class="case-mini-right">
+                                                                        <span class="case-status-mini" data-status={caseItem.Status}>{caseItem.Status}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </template>
                                 </template>
 
                                 <!-- Shipping Address Section -->
@@ -357,7 +392,7 @@
                         </div>
 
                         <!-- Delayed Delivery Alert (if applicable) -->
-                        <template if:true={isDeliveryDelayed}>
+                    <!-- <template if:true={isDeliveryDelayed}>
                             <div class="delayed-delivery-alert">
                                 <div class="alert-content">
                                     <div class="alert-icon">⚠️</div>
@@ -367,6 +402,56 @@
                                         <div class="alert-action"><a href="javascript:void(0)" onclick={handleRaiseTicket}>Raise a Support Ticket →</a></div>
                                     </div>
                                 </div>
+                            </div>
+                        </template> -->
+
+                        <!-- Related Cases Section -->
+                        <template if:true={relatedCases.length}>
+                            <div class="related-cases-section">
+                                <div class="related-cases-header">
+                                    <h3 class="section-title">🎫 Related Support Tickets</h3>
+                                    <button class="btn-refresh-cases" onclick={handleRefreshCases} title="Refresh the list if your new case is not showing" disabled={isLoadingCases}>
+                                        <template if:true={isLoadingCases}>
+                                            ⏳ Loading...
+                                        </template>
+                                        <template if:false={isLoadingCases}>
+                                            🔄 Refresh
+                                        </template>
+                                    </button>
+                                </div>
+                                <p class="refresh-help-text">If your new case is not showing, please click the Refresh button to reload the list.</p>
+                                <template if:true={isLoadingCases}>
+                                    <div class="loading-container">
+                                        <div class="spinner"></div>
+                                        <p>Loading latest support tickets...</p>
+                                    </div>
+                                </template>
+                                <template if:false={isLoadingCases}>
+                                    <div class="cases-table">
+                                    <div class="table-header">
+                                        <div class="col-case-number">Case Number</div>
+                                        <div class="col-subject">Subject</div>
+                                        <div class="col-description">Description</div>
+                                        <div class="col-status">Status</div>
+                                        <div class="col-date">Created Date</div>
+                                    </div>
+                                    <template for:each={relatedCases} for:item="caseItem">
+                                        <div key={caseItem.Id} class="table-row">
+                                            <div class="col-case-number">
+                                                <span class="case-badge">{caseItem.CaseNumber}</span>
+                                            </div>
+                                            <div class="col-subject">{caseItem.Subject}</div>
+                                            <div class="col-description">
+                                                <span class="description-text">{caseItem.Description}</span>
+                                            </div>
+                                            <div class="col-status">
+                                                <span class="status-badge" data-status={caseItem.Status}>{caseItem.Status}</span>
+                                            </div>
+                                            <div class="col-date">{caseItem.CreatedDate}</div>
+                                        </div>
+                                    </template>
+                                    </div>
+                                </template>
                             </div>
                         </template>
 
@@ -789,6 +874,87 @@
                             </button>
                         </div>
                     </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Support Ticket Modal -->
+        <template if:true={showSupportTicketModal}>
+            <div class="support-ticket-modal-overlay" onclick={handleCloseSupportTicketModal}>
+                <div class="support-ticket-modal-content" onclick={handleModalContentClick}>
+                    <!-- Modal Header -->
+                    <div class="support-ticket-modal-header">
+                        <h2>🎫 Raise Support Ticket</h2>
+                        <button class="close-btn" onclick={handleCloseSupportTicketModal}>✕</button>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="support-ticket-modal-body">
+                        <!-- Success State -->
+                        <template if:true={createdCaseNumber}>
+                            <div class="success-container">
+                                <div class="success-icon-wrapper">
+                                    <div class="success-icon">✓</div>
+                                </div>
+                                <h3 class="success-title">Support Ticket Created Successfully!</h3>
+                                <p class="success-message">Thank you for reaching out. Our support team will prioritize your request and contact you soon.</p>
+                                <div class="case-id-display">
+                                    <span class="case-id-label">Case Number</span>
+                                    <span class="case-id-value">{createdCaseNumber}</span>
+                                </div>
+                                <p class="success-subtitle">You can reference this case number when communicating with our support team.</p>
+                                <button class="btn-close-modal" onclick={handleCloseSupportTicketModal}>
+                                    Closing automatically in 3 seconds...
+                                </button>
+                            </div>
+                        </template>
+
+                        <!-- Form State -->
+                        <template if:false={createdCaseNumber}>
+                            <div class="support-ticket-form">
+                                <div class="form-group">
+                                    <label class="form-label">Subject <span class="required">*</span></label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        placeholder="Enter ticket subject"
+                                        value={supportTicketFormData.subject}
+                                        data-field="subject"
+                                        onchange={handleSupportTicketFieldChange}
+                                        maxlength="255">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Description <span class="required">*</span></label>
+                                    <textarea 
+                                        class="form-control textarea" 
+                                        placeholder="Describe your issue in detail"
+                                        value={supportTicketFormData.description}
+                                        data-field="description"
+                                        onchange={handleSupportTicketFieldChange}
+                                        rows="6"></textarea>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <template if:false={createdCaseNumber}>
+                        <div class="support-ticket-modal-footer">
+                            <button class="btn-cancel" onclick={handleCloseSupportTicketModal} disabled={isSubmittingSupportTicket}>
+                                Cancel
+                            </button>
+                            <button class="btn-submit" onclick={handleSubmitSupportTicket} disabled={isSubmittingSupportTicket}>
+                                <template if:true={isSubmittingSupportTicket}>
+                                    <lightning-spinner alternative-text="Processing"></lightning-spinner>
+                                    Submitting...
+                                </template>
+                                <template if:false={isSubmittingSupportTicket}>
+                                    Submit Ticket
+                                </template>
+                            </button>
+                        </div>
+                    </template>
                 </div>
             </div>
         </template>
