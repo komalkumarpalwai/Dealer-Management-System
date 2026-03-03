@@ -424,18 +424,26 @@
                    <div class="related-cases-section">
     <div class="related-cases-header">
         <h3 class="section-title">🎫 Support Cases for This Order</h3>
-        <button 
-            class="btn-refresh-cases" 
-            onclick={handleRefreshCases} 
-            title="Refresh the list if your new case is not showing" 
-            disabled={isLoadingCases}>
-            <template if:true={isLoadingCases}>
-                ⏳ Loading...
-            </template>
-            <template if:false={isLoadingCases}>
-                🔄 Refresh
-            </template>
-        </button>
+        <div class="header-buttons">
+            <button 
+                class="btn-refresh-cases" 
+                onclick={handleRefreshCases} 
+                title="Refresh the list if your new case is not showing" 
+                disabled={isLoadingCases}>
+                <template if:true={isLoadingCases}>
+                    ⏳ Loading...
+                </template>
+                <template if:false={isLoadingCases}>
+                    🔄 Refresh
+                </template>
+            </button>
+            <button 
+                class="btn-new-support-case" 
+                onclick={handleOpenSupportTicketFromCases}
+                title="Create a new support case">
+                ➕ Raise Support Ticket
+            </button>
+        </div>
     </div>
 
     <!-- Loading State -->

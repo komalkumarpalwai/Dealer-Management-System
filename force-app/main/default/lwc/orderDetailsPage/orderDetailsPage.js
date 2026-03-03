@@ -845,6 +845,20 @@ showAllCases = false;
     }
 
     /**
+     * Handle open support ticket modal from related cases section
+     * Uses the same logic as handleRaiseTicket
+     */
+    handleOpenSupportTicketFromCases() {
+        this.showSupportTicketModal = true;
+        this.createdCaseNumber = '';
+        this.caseHasBeenCreated = false;
+        this.supportTicketFormData = {
+            subject: '',
+            description: ''
+        };
+    }
+
+    /**
      * Close support ticket modal
      */
     handleCloseSupportTicketModal() {
