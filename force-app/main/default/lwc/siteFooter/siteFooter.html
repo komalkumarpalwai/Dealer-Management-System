@@ -1,0 +1,295 @@
+<template>
+    <footer class="am-footer">
+
+        <!-- Decorative top border beam -->
+        <div class="footer-beam"></div>
+
+        <div class="footer-inner">
+
+            <!-- ── ROW 1: Brand + Nav columns ── -->
+            <div class="footer-grid">
+
+                <!-- Brand column -->
+                <div class="footer-brand-col">
+                    <div class="footer-brand">
+                        
+                        <div class="footer-brand-text">
+                            <span class="footer-brand-name">Array Minds</span>
+                            <span class="footer-brand-sub">Private Limited</span>
+                        </div>
+                    </div>
+                    <p class="footer-tagline">
+                        Empowering dealers, distributors, and retailers with a partner-first platform built for speed, transparency, and scale.
+                    </p>
+                    <div class="footer-contact-row">
+                        <a class="footer-contact-pill" href="mailto:info@arrayminds.com">
+                            <lightning-icon icon-name="utility:email" size="xx-small" alternative-text="Email"></lightning-icon>
+                            info@arrayminds.com
+                        </a>
+                        <a class="footer-contact-pill" href="tel:+918000000000">
+                            <lightning-icon icon-name="utility:call" size="xx-small" alternative-text="Phone"></lightning-icon>
+                            +91 80000 00000
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Portal links -->
+                <div class="footer-nav-col">
+                    <div class="footer-col-heading">Partner Portal</div>
+                    <ul class="footer-nav-list">
+                        <li><a class="footer-nav-link" href={homeUrl}>Home</a></li>
+                        <li><a class="footer-nav-link" href={productsUrl}>Products</a></li>
+                        <li><a class="footer-nav-link" href={ordersUrl}>My Orders</a></li>
+                        <li><a class="footer-nav-link" href={registrationUrl}>Become a Partner</a></li>
+                        <li><a class="footer-nav-link" href={loginUrl}>Partner Login</a></li>
+                    </ul>
+                </div>
+
+                <!-- Partner types -->
+                <div class="footer-nav-col">
+                    <div class="footer-col-heading">Partnership Types</div>
+                    <ul class="footer-nav-list">
+                        <li><a class="footer-nav-link" href={registrationUrl}>Distributor</a></li>
+                        <li><a class="footer-nav-link" href={registrationUrl}>Dealer</a></li>
+                        <li><a class="footer-nav-link" href={registrationUrl}>Retailer</a></li>
+                        <li><a class="footer-nav-link" href={registrationUrl}>OEM Partner</a></li>
+                        <li><a class="footer-nav-link" href={registrationUrl}>Customer</a></li>
+                    </ul>
+                </div>
+
+                <!-- Company -->
+                <div class="footer-nav-col">
+                    <div class="footer-col-heading">Company</div>
+                    <ul class="footer-nav-list">
+                        <li>
+                            <a class="footer-nav-link" href="https://www.arrayminds.com" target="_blank" rel="noopener">
+                                About Array Minds
+                                <lightning-icon icon-name="utility:new_window" size="xx-small" alternative-text="External"></lightning-icon>
+                            </a>
+                        </li>
+                        <li><span class="footer-nav-text">Hyderabad, Telangana, India</span></li>
+                        <li>
+                            <a class="footer-nav-link" href="mailto:privacy@arrayminds.com">
+                                privacy@arrayminds.com
+                            </a>
+                        </li>
+                        <li>
+                            <a class="footer-nav-link" href="mailto:support@arrayminds.com">
+                                support@arrayminds.com
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- ── DIVIDER ── -->
+            <div class="footer-divider"></div>
+
+            <!-- ── ROW 2: Stats strip ── -->
+            <div class="footer-stats">
+                <div class="footer-stat">
+                    <span class="footer-stat-num">1,200+</span>
+                    <span class="footer-stat-label">Partners Onboarded</span>
+                </div>
+                <div class="footer-stat-sep"></div>
+                <div class="footer-stat">
+                    <span class="footer-stat-num">2–3 Days</span>
+                    <span class="footer-stat-label">Average Approval Time</span>
+                </div>
+                <div class="footer-stat-sep"></div>
+                <div class="footer-stat">
+                    <span class="footer-stat-num">99.9%</span>
+                    <span class="footer-stat-label">Platform Uptime</span>
+                </div>
+                <div class="footer-stat-sep"></div>
+                <div class="footer-stat">
+                    <span class="footer-stat-num">24 / 7</span>
+                    <span class="footer-stat-label">Partner Support</span>
+                </div>
+            </div>
+
+            <!-- ── DIVIDER ── -->
+            <div class="footer-divider"></div>
+
+            <!-- ── ROW 3: Bottom bar ── -->
+            <div class="footer-bottom">
+                <div class="footer-legal">
+                    <span>© {currentYear} Array Minds Private Limited. All rights reserved.</span>
+                    <span class="footer-dot">·</span>
+                    <span>CIN: U72900TG2023PTC000000</span>
+                    <span class="footer-dot">·</span>
+                    <span>GST: 36AAAAA0000A1Z5</span>
+                </div>
+                <div class="footer-legal-links">
+                    <button class="footer-legal-btn" onclick={handlePrivacyPolicy}>Privacy Policy</button>
+                    <span class="footer-dot">·</span>
+                    <button class="footer-legal-btn" onclick={handleTerms}>Terms &amp; Conditions</button>
+                    <span class="footer-dot">·</span>
+                    <button class="footer-legal-btn" onclick={handleDataPolicy}>Data Usage</button>
+                </div>
+            </div>
+
+            <!-- ── Built-on badge ── -->
+            <div class="footer-platform">
+                <lightning-icon icon-name="utility:shield" size="xx-small" alternative-text="Secure"></lightning-icon>
+                Secured &amp; powered by Salesforce Experience Cloud
+            </div>
+
+        </div>
+
+        <!-- ── POLICY MODAL (reused from registration) ── -->
+        <template if:true={isPolicyOpen}>
+            <div class="modal-backdrop" onclick={handleBackdropClick}>
+                <div class="modal" role="dialog" aria-modal="true" aria-label="Partner Policy">
+
+                    <div class="modal-header">
+                        <div class="modal-header-left">
+                        
+                            <div>
+                                <div class="modal-eyebrow">Array Minds Private Limited</div>
+                                <h2 class="modal-title">Partner Agreement &amp; Policies</h2>
+                            </div>
+                        </div>
+                        <button class="modal-close" onclick={handleClosePolicy} aria-label="Close">
+                            <lightning-icon icon-name="utility:close" size="x-small" alternative-text="Close"></lightning-icon>
+                        </button>
+                    </div>
+
+                    <div class="modal-tabs">
+                        <button class={tab1Class} data-tab="terms"   onclick={handleTabChange}>Terms &amp; Conditions</button>
+                        <button class={tab2Class} data-tab="privacy" onclick={handleTabChange}>Privacy Policy</button>
+                        <button class={tab3Class} data-tab="data"    onclick={handleTabChange}>Data Usage</button>
+                        <button class={tab4Class} data-tab="partner" onclick={handleTabChange}>Partner Obligations</button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <template if:true={isTabTerms}>
+                            <div class="policy-section">
+                                <div class="policy-badge">Effective Date: 1 January 2025</div>
+                                <h3>1. Acceptance of Terms</h3>
+                                <p>By submitting a partner registration application to Array Minds Private Limited ("Array Minds", "we", "us"), you ("Partner", "you") agree to be bound by these Terms and Conditions in full. If you do not agree, do not submit the application.</p>
+                                <h3>2. Partner Eligibility</h3>
+                                <p>To qualify as an Array Minds partner, you must:</p>
+                                <ul>
+                                    <li>Be a legally registered business entity in your jurisdiction.</li>
+                                    <li>Hold a valid GST registration (where applicable under Indian tax law).</li>
+                                    <li>Have no outstanding disputes or litigation against Array Minds or its affiliates.</li>
+                                    <li>Comply with all applicable local, state, and national laws and regulations.</li>
+                                </ul>
+                                <h3>3. Application &amp; Approval</h3>
+                                <p>Submission of an application does not guarantee approval. Array Minds reserves the right, at its sole discretion, to approve, reject, or defer any application without being required to provide a reason.</p>
+                                <h3>4. Partner Conduct</h3>
+                                <p>Partners must not engage in any activity that brings Array Minds into disrepute, misrepresents our products or services, or violates any applicable law.</p>
+                                <h3>5. Pricing &amp; Orders</h3>
+                                <p>Partner-tier pricing is confidential and may not be shared with third parties. Prices are subject to change with reasonable notice. All confirmed orders are binding.</p>
+                                <h3>6. Intellectual Property</h3>
+                                <p>All trademarks, logos, and brand assets of Array Minds remain our exclusive property. Partners are granted a limited, non-exclusive licence to use approved assets solely for promoting our products.</p>
+                                <h3>7. Termination</h3>
+                                <p>Either party may terminate with 30 days' written notice. Array Minds may terminate immediately for material breach, fraud, or conduct detrimental to the brand.</p>
+                                <h3>8. Governing Law</h3>
+                                <p>These Terms are governed by the laws of India. Any disputes shall be subject to the exclusive jurisdiction of the courts in Hyderabad, Telangana.</p>
+                            </div>
+                        </template>
+
+                        <template if:true={isTabPrivacy}>
+                            <div class="policy-section">
+                                <div class="policy-badge">Last Updated: 1 January 2025</div>
+                                <h3>1. Introduction</h3>
+                                <p>Array Minds Private Limited is committed to protecting the privacy of its partners, applicants, and users. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use the Partner Portal.</p>
+                                <h3>2. Information We Collect</h3>
+                                <ul>
+                                    <li><strong>Identity Data:</strong> Business name, brand name, primary contact name, PAN number, GST number.</li>
+                                    <li><strong>Contact Data:</strong> Email address, phone number, business address.</li>
+                                    <li><strong>Financial Data:</strong> Annual revenue, order history, invoice records.</li>
+                                    <li><strong>Usage Data:</strong> Pages visited, features used, session duration, device and browser information.</li>
+                                    <li><strong>Communication Data:</strong> Support tickets and correspondence with Array Minds.</li>
+                                </ul>
+                                <h3>3. Your Rights</h3>
+                                <p>You have the right to access, correct, or request deletion of your personal data at any time. Contact us at <strong>privacy@arrayminds.com</strong>. We will respond within 30 days.</p>
+                                <h3>4. Cookies</h3>
+                                <p>We use cookies to maintain session state and analyse portal usage. You may disable cookies in your browser, but some features may not function correctly.</p>
+                                <h3>5. Third-Party Services</h3>
+                                <p>The Partner Portal is built on Salesforce Experience Cloud. We do not sell your data to any third party.</p>
+                                <h3>6. Data Retention</h3>
+                                <p>We retain personal data for as long as your partner account is active, plus 7 years thereafter for legal and compliance purposes.</p>
+                                <h3>7. Contact</h3>
+                                <p>For privacy queries: <strong>Array Minds Private Limited, Data Privacy Team, Hyderabad, Telangana, India. privacy@arrayminds.com</strong></p>
+                            </div>
+                        </template>
+
+                        <template if:true={isTabData}>
+                            <div class="policy-section">
+                                <div class="policy-badge">How We Use Your Data</div>
+                                <div class="data-use-grid">
+                                    <div class="data-use-card">
+                                        <div class="data-use-icon"><lightning-icon icon-name="utility:user" size="small"></lightning-icon></div>
+                                        <h4>Account Management</h4>
+                                        <p>Your business and contact information is used to create and manage your partner account, assign your pricing tier, and communicate about your account status.</p>
+                                    </div>
+                                    <div class="data-use-card">
+                                        <div class="data-use-icon"><lightning-icon icon-name="utility:orders" size="small"></lightning-icon></div>
+                                        <h4>Order Processing</h4>
+                                        <p>Order details and address are used solely to fulfil and track your orders. Financial data is never shared with unrelated third parties.</p>
+                                    </div>
+                                    <div class="data-use-card">
+                                        <div class="data-use-icon"><lightning-icon icon-name="utility:email" size="small"></lightning-icon></div>
+                                        <h4>Communications</h4>
+                                        <p>We use your email and phone to send application updates, order confirmations, product announcements, and important policy changes.</p>
+                                    </div>
+                                    <div class="data-use-card">
+                                        <div class="data-use-icon"><lightning-icon icon-name="utility:chart" size="small"></lightning-icon></div>
+                                        <h4>Analytics &amp; Improvement</h4>
+                                        <p>Aggregated, anonymised usage data helps us improve the Portal experience and develop new features.</p>
+                                    </div>
+                                    <div class="data-use-card">
+                                        <div class="data-use-icon"><lightning-icon icon-name="utility:shield" size="small"></lightning-icon></div>
+                                        <h4>Legal &amp; Compliance</h4>
+                                        <p>We may retain and disclose data as required by applicable law, regulation, or court order.</p>
+                                    </div>
+                                    <div class="data-use-card">
+                                        <div class="data-use-icon"><lightning-icon icon-name="utility:ban" size="small"></lightning-icon></div>
+                                        <h4>What We Never Do</h4>
+                                        <p>We never sell, rent, or trade your data to third parties for marketing purposes, and we never use it to build advertising profiles.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <template if:true={isTabPartner}>
+                            <div class="policy-section">
+                                <div class="policy-badge">Partner Code of Conduct</div>
+                                <h3>1. Authorised Territory</h3>
+                                <p>Partners are authorised to sell Array Minds products only within their designated geographic territory as agreed at the time of approval.</p>
+                                <h3>2. Brand Representation</h3>
+                                <p>Partners must represent Array Minds products and brand accurately and professionally. Misleading claims or unauthorised modifications to product descriptions are strictly prohibited.</p>
+                                <h3>3. Minimum Purchase Obligations</h3>
+                                <p>Certain partner tiers may carry minimum quarterly or annual purchase obligations. Failure to meet these may result in a tier downgrade.</p>
+                                <h3>4. Pricing Compliance</h3>
+                                <p>Partners must adhere to the Minimum Resale Price (MRP) as indicated on each product. Selling below MRP without prior written approval is not permitted.</p>
+                                <h3>5. Training &amp; Certification</h3>
+                                <p>Array Minds may require partners to complete product training or certification programmes to maintain account standing.</p>
+                                <h3>6. Anti-Bribery &amp; Corruption</h3>
+                                <p>Partners must comply with all applicable anti-bribery and anti-corruption laws. No improper payments may be offered, paid, or accepted in connection with Array Minds business.</p>
+                                <h3>7. Confidentiality</h3>
+                                <p>Partners must keep all pricing, commercial terms, product roadmaps, and business information received from Array Minds strictly confidential.</p>
+                            </div>
+                        </template>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <span class="modal-footer-note">
+                            <lightning-icon icon-name="utility:lock" size="xx-small" alternative-text="Secure"></lightning-icon>
+                            Array Minds Private Limited · Hyderabad, India · privacy@arrayminds.com
+                        </span>
+                        <button class="modal-close-btn" onclick={handleClosePolicy}>Close</button>
+                    </div>
+
+                </div>
+            </div>
+        </template>
+
+    </footer>
+</template>
