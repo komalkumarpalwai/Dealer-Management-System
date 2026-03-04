@@ -1,168 +1,443 @@
 <template>
     <div class="homepage">
-        <!-- HERO (powerful, dark gradient) -->
-        <section class="hero-outer">
-            <div class="hero-grid">
-                <div class="hero-copy">
-                    <div class="eyebrow">Partner Portal</div>
-                    
-                    <!-- Not Logged In -->
-                    <template if:false={isLoggedIn}>
-                        <h1 class="hero-title">Empowering Dealers &amp; Distributors to Grow Faster</h1>
-                        <p class="hero-sub">Seamless onboarding, structured approvals, centralized order management, and real‑time collaboration — everything your channel needs to scale.</p>
 
+        <!-- ══════════════════════════════════════════════
+             NAVBAR
+        ═══════════════════════════════════════════════ -->
+      
+
+        <!-- ══════════════════════════════════════════════
+             GUEST HERO
+        ═══════════════════════════════════════════════ -->
+        <template if:false={isLoggedIn}>
+
+            <section class="hero-outer">
+                <!-- Decorative orbs -->
+                <div class="orb orb-1"></div>
+                <div class="orb orb-2"></div>
+                <div class="orb orb-3"></div>
+                <div class="hero-grid">
+                    <div class="hero-copy fade-up">
+                        <div class="eyebrow-pill">
+                            <span class="pill-dot"></span>
+                            Official Partner Portal
+                        </div>
+                        <h1 class="hero-title">
+                            Grow Your Business<br/>
+                            <span class="title-accent">With Array Minds</span>
+                        </h1>
+                        <p class="hero-sub">
+                            Join a thriving network of Distributors, Dealers, and Retailers.
+                            Get exclusive pricing, real‑time inventory, and a dedicated success team — all in one place.
+                        </p>
                         <div class="hero-ctas">
-                            <button class="btn btn-primary" onclick={handleBecomePartner}>Become a Partner</button>
-                            <button class="btn btn-ghost" onclick={handleLogin}>Partner Login</button>
+                            <button class="btn btn-primary-lg" onclick={handleBecomePartner}>
+                                Become a Partner
+                                <span class="btn-arrow">→</span>
+                            </button>
+                            <button class="btn btn-ghost-lg" onclick={handleLogin}>
+                                Partner Login
+                            </button>
                         </div>
-
-                        <div class="hero-stats">
-                            <div class="stat"><div class="num">1,200+</div><div class="label">Partners onboarded</div></div>
-                            <div class="stat"><div class="num">2–3</div><div class="label">Day review time</div></div>
-                            <div class="stat"><div class="num">99.9%</div><div class="label">Platform uptime</div></div>
-                        </div>
-                    </template>
-
-                    <!-- Logged In -->
-                    <template if:true={isLoggedIn}>
-                        <h1 class="hero-title">Welcome Back, {user.Name}!</h1>
-                        <p class="hero-sub">Access your dashboard and manage your partnership with ease. Quick access to your products, orders, and account information.</p>
-
-                        <div class="hero-ctas">
-                            <button class="btn btn-primary" onclick={handleViewProducts}>View Products</button>
-                            <button class="btn btn-ghost" onclick={handleViewOrders}>My Orders</button>
-                        </div>
-
-                        <div class="logged-in-stats">
-                            <div class="stat"><div class="label">Account Type</div><div class="num">{user.AccountType}</div></div>
-                            <div class="stat"><div class="label">Account Name</div><div class="num">{user.AccountName}</div></div>
-                            <div class="stat"><div class="label">Email</div><div class="num">{user.Email}</div></div>
-                        </div>
-                    </template>
-                </div>
-
-                <!-- Only show partnership categories for non-logged-in users -->
-                <template if:false={isLoggedIn}>
-                    <div class="panel-inner">
-                        <h3>Choose Your Partnership Category</h3>
-                        <div class="categories">
-                            <article class="category-card" data-category="Distributor" onclick={handleApply} tabindex="0" role="button">
-                                <div class="icon-circle orange"><lightning-icon icon-name="standard:partner" size="small" alternative-text="Distributor"></lightning-icon></div>
-                                <div class="cat-title">Distributor</div>
-                                <div class="cat-desc">Manage regional supply operations and bulk distribution.</div>
-                                <a class="apply-btn" href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/partner-registration" data-category="Distributor">Apply Now →</a>
-                            </article>
-
-                            <article class="category-card" data-category="Dealer" onclick={handleApply} tabindex="0" role="button">
-                                <div class="icon-circle orange"><lightning-icon icon-name="standard:store" size="small" alternative-text="Dealer"></lightning-icon></div>
-                                <div class="cat-title">Dealer</div>
-                                <div class="cat-desc">Access inventory, manage orders, and expand your market reach.</div>
-                                <a class="apply-btn" href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/partner-registration" data-category="Dealer">Apply Now →</a>
-                            </article>
-
-                            <article class="category-card" data-category="Retailer" onclick={handleApply} tabindex="0" role="button">
-                                <div class="icon-circle orange"><lightning-icon icon-name="utility:shopping_cart" size="small" alternative-text="Retailer"></lightning-icon></div>
-                                <div class="cat-title">Retailer</div>
-                                <div class="cat-desc">Purchase products and manage billing efficiently.</div>
-                                <a class="apply-btn" href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/partner-registration" data-category="Retailer">Apply Now →</a>
-                            </article>
-
-                            <article class="category-card" data-category="Customer" onclick={handleApply} tabindex="0" role="button">
-                                <div class="icon-circle orange"><lightning-icon icon-name="standard:contact" size="small" alternative-text="Customer"></lightning-icon></div>
-                                <div class="cat-title">Customer</div>
-                                <div class="cat-desc">Track orders, service requests, and support cases.</div>
-                                <a class="apply-btn" href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/partner-registration" data-category="Customer">Apply Now →</a>
-                            </article>
+                        <div class="trust-row">
+                            <div class="trust-item">
+                                <span class="trust-num">1,200+</span>
+                                <span class="trust-label">Partners Onboarded</span>
+                            </div>
+                            <div class="trust-divider"></div>
+                            <div class="trust-item">
+                                <span class="trust-num">2–3 Days</span>
+                                <span class="trust-label">Approval Time</span>
+                            </div>
+                            <div class="trust-divider"></div>
+                            <div class="trust-item">
+                                <span class="trust-num">99.9%</span>
+                                <span class="trust-label">Platform Uptime</span>
+                            </div>
                         </div>
                     </div>
-                </aside>
-                </template>
-            </div>
-        </section>
 
-        <!-- FEATURES (light background) -->
-        <section id="features" class="section section-light">
-            <div class="section-inner">
-                <h2>Why Join Our Network?</h2>
-                <p class="section-lead">Benefit from a partner-first platform built for speed, visibility and support.</p>
+                    <!-- Partner type cards -->
+                    <div class="partner-cards fade-up fade-up-delay">
+                        <div class="partner-cards-label">Choose your partnership type</div>
+                        <div class="pcard-grid">
+                            <article class="pcard" data-category="Distributor" onclick={handleApply} tabindex="0" role="button">
+                                <div class="pcard-icon">
+                                    <lightning-icon icon-name="standard:partner" size="small" alternative-text="Distributor"></lightning-icon>
+                                </div>
+                                <div class="pcard-body">
+                                    <div class="pcard-title">Distributor</div>
+                                    <div class="pcard-desc">Manage regional supply &amp; bulk operations</div>
+                                </div>
+                                <a class="pcard-cta" href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/partner-registration" data-category="Distributor">Apply →</a>
+                            </article>
 
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon"><lightning-icon icon-name="utility:bolt" size="small"></lightning-icon></div>
-                        <h4>Fast Digital Onboarding</h4>
-                        <p>Structured approval process ensures quick and transparent registration.</p>
-                    </div>
+                            <article class="pcard" data-category="Dealer" onclick={handleApply} tabindex="0" role="button">
+                                <div class="pcard-icon">
+                                    <lightning-icon icon-name="standard:store" size="small" alternative-text="Dealer"></lightning-icon>
+                                </div>
+                                <div class="pcard-body">
+                                    <div class="pcard-title">Dealer</div>
+                                    <div class="pcard-desc">Access inventory &amp; expand market reach</div>
+                                </div>
+                                <a class="pcard-cta" href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/partner-registration" data-category="Dealer">Apply →</a>
+                            </article>
 
-                    <div class="feature-card">
-                        <div class="feature-icon"><lightning-icon icon-name="utility:apps" size="small"></lightning-icon></div>
-                        <h4>Centralized Order Management</h4>
-                        <p>Track, manage, and monitor orders from one dashboard.</p>
-                    </div>
+                            <article class="pcard" data-category="Retailer" onclick={handleApply} tabindex="0" role="button">
+                                <div class="pcard-icon">
+                                    <lightning-icon icon-name="utility:shopping_cart" size="small" alternative-text="Retailer"></lightning-icon>
+                                </div>
+                                <div class="pcard-body">
+                                    <div class="pcard-title">Retailer</div>
+                                    <div class="pcard-desc">Purchase products &amp; manage billing</div>
+                                </div>
+                                <a class="pcard-cta" href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/partner-registration" data-category="Retailer">Apply →</a>
+                            </article>
 
-                    <div class="feature-card">
-                        <div class="feature-icon"><lightning-icon icon-name="utility:eye" size="small"></lightning-icon></div>
-                        <h4>Real-Time Visibility</h4>
-                        <p>Get access to inventory updates and fulfillment status instantly.</p>
-                    </div>
-
-                    <div class="feature-card">
-                        <div class="feature-icon"><lightning-icon icon-name="utility:headset" size="small"></lightning-icon></div>
-                        <h4>Dedicated Support</h4>
-                        <p>Our support team ensures smooth partner collaboration.</p>
+                            <article class="pcard" data-category="Customer" onclick={handleApply} tabindex="0" role="button">
+                                <div class="pcard-icon">
+                                    <lightning-icon icon-name="standard:contact" size="small" alternative-text="Customer"></lightning-icon>
+                                </div>
+                                <div class="pcard-body">
+                                    <div class="pcard-title">Customer</div>
+                                    <div class="pcard-desc">Track orders &amp; manage support cases</div>
+                                </div>
+                                <a class="pcard-cta" href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/partner-registration" data-category="Customer">Apply →</a>
+                            </article>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- HOW IT WORKS -->
-        <section id="how" class="section section-light">
-            <div class="section-inner how-grid">
-                <h2>How it works</h2>
-                <div class="how-cards">
-                    <div class="how-card"><div class="step-num">1</div><strong>Submit Application</strong><div class="muted">Fill the short application form</div></div>
-                    <div class="how-card"><div class="step-num">2</div><strong>Admin Review &amp; Approval</strong><div class="muted">Our team verifies and approves</div></div>
-                    <div class="how-card"><div class="step-num">3</div><strong>Get Login &amp; Start Operations</strong><div class="muted">Receive credentials and begin selling</div></div>
+            <!-- ── WHY ARRAY MINDS ──────────────────────────── -->
+            <section id="features" class="section section-white">
+                <div class="section-inner">
+                    <div class="section-label">Why Array Minds</div>
+                    <h2 class="section-heading">Everything Your Channel Needs to Scale</h2>
+                    <p class="section-lead">A partner‑first platform designed for speed, visibility, and long‑term success.</p>
+
+                    <div class="features-grid">
+                        <div class="feat-card feat-card--accent">
+                            <div class="feat-icon">
+                                <lightning-icon icon-name="utility:bolt" size="small"></lightning-icon>
+                            </div>
+                            <h4>Fast Digital Onboarding</h4>
+                            <p>Structured approvals get you operational in 2–3 business days, with full transparency at every step.</p>
+                        </div>
+                        <div class="feat-card">
+                            <div class="feat-icon">
+                                <lightning-icon icon-name="utility:apps" size="small"></lightning-icon>
+                            </div>
+                            <h4>Centralized Order Management</h4>
+                            <p>Place, track, and manage every order from a single unified dashboard — no spreadsheets needed.</p>
+                        </div>
+                        <div class="feat-card">
+                            <div class="feat-icon">
+                                <lightning-icon icon-name="utility:eye" size="small"></lightning-icon>
+                            </div>
+                            <h4>Real‑Time Inventory Visibility</h4>
+                            <p>Live stock levels and fulfillment status so you can promise customers with confidence.</p>
+                        </div>
+                        <div class="feat-card">
+                            <div class="feat-icon">
+                                <lightning-icon icon-name="utility:pricebook" size="small"></lightning-icon>
+                            </div>
+                            <h4>Tier‑Based Pricing</h4>
+                            <p>Exclusive price books auto-applied to your account based on your partnership tier — always competitive.</p>
+                        </div>
+                        <div class="feat-card">
+                            <div class="feat-icon">
+                                <lightning-icon icon-name="utility:headset" size="small"></lightning-icon>
+                            </div>
+                            <h4>Dedicated Partner Support</h4>
+                            <p>A named account manager and 24/7 support ensure every issue is resolved fast.</p>
+                        </div>
+                        <div class="feat-card">
+                            <div class="feat-icon">
+                                <lightning-icon icon-name="utility:shield" size="small"></lightning-icon>
+                            </div>
+                            <h4>Secure &amp; Compliant</h4>
+                            <p>Enterprise-grade security built on Salesforce infrastructure — your data is always protected.</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- TESTIMONIALS & KPIS -->
-        <section id="social" class="section section-light">
-            <div class="section-inner two-col">
-                <div class="testimonials-wrap">
-                    <h3>What partners say</h3>
+            <!-- ── HOW IT WORKS ────────────────────────────── -->
+            <section id="how" class="section section-dark">
+                <div class="section-inner">
+                    <div class="section-label section-label--light">The Process</div>
+                    <h2 class="section-heading section-heading--light">Up and Running in 3 Simple Steps</h2>
+
+                    <div class="steps-row">
+                        <div class="step-card">
+                            <div class="step-line"></div>
+                            <div class="step-num-badge">01</div>
+                            <div class="step-icon">
+                                <lightning-icon icon-name="utility:edit_form" size="medium"></lightning-icon>
+                            </div>
+                            <h4>Submit Application</h4>
+                            <p>Fill our quick online form — choose your category and provide basic business details.</p>
+                        </div>
+                        <div class="step-arrow">→</div>
+                        <div class="step-card">
+                            <div class="step-num-badge">02</div>
+                            <div class="step-icon">
+                                <lightning-icon icon-name="utility:task" size="medium"></lightning-icon>
+                            </div>
+                            <h4>Review &amp; Approval</h4>
+                            <p>Our team verifies your details, sets up your account, and assigns your pricing tier within 2–3 days.</p>
+                        </div>
+                        <div class="step-arrow">→</div>
+                        <div class="step-card">
+                            <div class="step-num-badge">03</div>
+                            <div class="step-icon">
+                                <lightning-icon icon-name="utility:rocket" size="medium"></lightning-icon>
+                            </div>
+                            <h4>Start Operations</h4>
+                            <p>Receive your login credentials, explore the catalogue at your partner price, and start growing.</p>
+                        </div>
+                    </div>
+
+                    <div class="how-cta-row">
+                        <button class="btn btn-primary-lg" onclick={handleBecomePartner}>Apply Now — It's Free</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── WHAT WE OFFER ───────────────────────────── -->
+            <section class="section section-white">
+                <div class="section-inner">
+                    <div class="section-label">Partner Benefits</div>
+                    <h2 class="section-heading">The Array Minds Advantage</h2>
+                    <div class="offer-grid">
+                        <div class="offer-card">
+                            <div class="offer-num">01</div>
+                            <h4>Exclusive Catalogue Access</h4>
+                            <p>Browse our full product range with real-time stock counts and tier-specific pricing visible only to verified partners.</p>
+                        </div>
+                        <div class="offer-card">
+                            <div class="offer-num">02</div>
+                            <h4>Priority Order Fulfilment</h4>
+                            <p>Partners get preferential fulfilment queuing. Your orders move faster — keeping your customers happy.</p>
+                        </div>
+                        <div class="offer-card">
+                            <div class="offer-num">03</div>
+                            <h4>Marketing &amp; Co-Brand Support</h4>
+                            <p>Access brand assets, product collateral, and co-marketing campaigns to grow your local presence.</p>
+                        </div>
+                        <div class="offer-card">
+                            <div class="offer-num">04</div>
+                            <h4>Performance Dashboards</h4>
+                            <p>Track your sales volume, order history, and account health with built-in analytics — no third-party tools needed.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── TESTIMONIALS ────────────────────────────── -->
+            <section id="testimonials" class="section section-tint">
+                <div class="section-inner">
+                    <div class="section-label">Social Proof</div>
+                    <h2 class="section-heading">What Our Partners Say</h2>
+
                     <div class="testimonials-grid">
-                        <figure class="quote-card">
-                            <div class="quote-icon">“</div>
-                            <blockquote>Onboarding was effortless and sales picked up within weeks — support is top-notch.</blockquote>
-                            <figcaption>— R. Sharma, Regional Distributor</figcaption>
+                        <figure class="tcard">
+                            <div class="tcard-stars">★★★★★</div>
+                            <blockquote>"Onboarding was effortless and our sales picked up within weeks. The support team is genuinely top-notch."</blockquote>
+                            <figcaption>
+                                <div class="tcard-avatar">RS</div>
+                                <div>
+                                    <div class="tcard-name">R. Sharma</div>
+                                    <div class="tcard-role">Regional Distributor</div>
+                                </div>
+                            </figcaption>
                         </figure>
 
-                        <figure class="quote-card">
-                            <div class="quote-icon">“</div>
-                            <blockquote>Centralized orders saved us hours every week.</blockquote>
-                            <figcaption>— M. Patel, Dealer</figcaption>
+                        <figure class="tcard tcard--featured">
+                            <div class="tcard-stars">★★★★★</div>
+                            <blockquote>"Centralized order management saved us hours every single week. We can't imagine going back to the old way."</blockquote>
+                            <figcaption>
+                                <div class="tcard-avatar">MP</div>
+                                <div>
+                                    <div class="tcard-name">M. Patel</div>
+                                    <div class="tcard-role">Dealer, Western Region</div>
+                                </div>
+                            </figcaption>
+                        </figure>
+
+                        <figure class="tcard">
+                            <div class="tcard-stars">★★★★★</div>
+                            <blockquote>"The tier pricing is transparent and fair. Knowing exactly what we pay builds real trust with the Array Minds team."</blockquote>
+                            <figcaption>
+                                <div class="tcard-avatar">AK</div>
+                                <div>
+                                    <div class="tcard-name">A. Kumar</div>
+                                    <div class="tcard-role">Retailer Partner</div>
+                                </div>
+                            </figcaption>
                         </figure>
                     </div>
-                </div>
 
-                <aside class="kpi-panel">
-                    <div class="kpi"><div class="kpi-num">98%</div><div class="kpi-label">Partner satisfaction</div></div>
-                    <div class="kpi"><div class="kpi-num">1,200+</div><div class="kpi-label">Active partners</div></div>
-                    <div class="kpi"><div class="kpi-num">24/7</div><div class="kpi-label">Support coverage</div></div>
-                </aside>
-            </div>
-        </section>
-
-        <!-- FINAL CTA (dark) -->
-        <section id="final-cta" class="section final-cta-dark">
-            <div class="final-inner">
-                <h2>Ready to Grow With Us?</h2>
-                <p class="lead">Join our expanding partner ecosystem and unlock new business opportunities today.</p>
-                <div class="final-actions">
-                    <button class="btn btn-primary btn-xl" onclick={handleBecomePartner}>Apply Now</button>
+                    <!-- KPI strip -->
+                    <div class="kpi-strip">
+                        <div class="kpi-item">
+                            <div class="kpi-num">98%</div>
+                            <div class="kpi-label">Partner Satisfaction</div>
+                        </div>
+                        <div class="kpi-sep"></div>
+                        <div class="kpi-item">
+                            <div class="kpi-num">1,200+</div>
+                            <div class="kpi-label">Active Partners</div>
+                        </div>
+                        <div class="kpi-sep"></div>
+                        <div class="kpi-item">
+                            <div class="kpi-num">24 / 7</div>
+                            <div class="kpi-label">Support Coverage</div>
+                        </div>
+                        <div class="kpi-sep"></div>
+                        <div class="kpi-item">
+                            <div class="kpi-num">50+</div>
+                            <div class="kpi-label">Cities Served</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+
+            <!-- ── FINAL CTA ───────────────────────────────── -->
+            <section class="section final-cta-section">
+                <div class="section-inner">
+                    <div class="final-cta-card">
+                        <div class="final-orb final-orb-1"></div>
+                        <div class="final-orb final-orb-2"></div>
+                       
+                        <h2>Ready to Grow With Array Minds?</h2>
+                        <p>Join our expanding partner ecosystem and unlock exclusive pricing, priority support, and new business opportunities — today.</p>
+                        <div class="final-actions">
+                            <button class="btn btn-primary-lg" onclick={handleBecomePartner}>Apply Now — It's Free</button>
+                            <button class="btn btn-ghost-lg" onclick={handleLogin}>Already a Partner? Login</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </template>
+
+        <!-- ══════════════════════════════════════════════
+             LOGGED-IN HERO
+        ═══════════════════════════════════════════════ -->
+        <template if:true={isLoggedIn}>
+
+            <section class="hero-outer hero-loggedin">
+                <div class="orb orb-1"></div>
+                <div class="orb orb-2"></div>
+                <div class="loggedin-inner fade-up">
+
+                    <!-- Welcome block -->
+                    <div class="welcome-block">
+                        <div class="welcome-avatar">{userInitials}</div>
+                        <div class="welcome-text">
+                            <div class="eyebrow-pill"><span class="pill-dot"></span>Partner Portal</div>
+                            <h1 class="welcome-title">Welcome back, {user.Name}!</h1>
+                            <p class="welcome-sub">You're logged in as a <strong>{user.AccountType}</strong> partner under <strong>{user.AccountName}</strong>.</p>
+                        </div>
+                    </div>
+
+                    <!-- Quick action buttons -->
+                    <div class="quick-actions">
+                        <button class="qa-btn qa-btn--primary" onclick={handleViewProducts}>
+                            <div class="qa-icon">
+                                <lightning-icon icon-name="standard:product" size="small"></lightning-icon>
+                            </div>
+                            <div class="qa-body">
+                                <div class="qa-title">Browse Products</div>
+                                <div class="qa-sub">View catalogue &amp; your tier pricing</div>
+                            </div>
+                            <span class="qa-arrow">→</span>
+                        </button>
+
+                        <button class="qa-btn" onclick={handleViewOrders}>
+                            <div class="qa-icon">
+                                <lightning-icon icon-name="standard:orders" size="small"></lightning-icon>
+                            </div>
+                            <div class="qa-body">
+                                <div class="qa-title">My Orders</div>
+                                <div class="qa-sub">Track &amp; manage your orders</div>
+                            </div>
+                            <span class="qa-arrow">→</span>
+                        </button>
+                    </div>
+
+                    <!-- Account info strip -->
+                    <div class="account-strip">
+                        <div class="acc-item">
+                            <div class="acc-label">Account Type</div>
+                            <div class="acc-val">{user.AccountType}</div>
+                        </div>
+                        <div class="acc-sep"></div>
+                        <div class="acc-item">
+                            <div class="acc-label">Account Name</div>
+                            <div class="acc-val">{user.AccountName}</div>
+                        </div>
+                        <div class="acc-sep"></div>
+                        <div class="acc-item">
+                            <div class="acc-label">Email</div>
+                            <div class="acc-val">{user.Email}</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── LOGGED-IN: PRIVILEGES STRIP ──────────────── -->
+            <section class="section section-white">
+                <div class="section-inner">
+                    <div class="section-label">Your Benefits</div>
+                    <h2 class="section-heading">Your Array Minds Partner Privileges</h2>
+                    <p class="section-lead">As a verified <strong>{user.AccountType}</strong> partner you have access to the following exclusive benefits.</p>
+
+                    <div class="priv-grid">
+                        <div class="priv-card">
+                            <div class="priv-icon">
+                                <lightning-icon icon-name="utility:pricebook" size="small"></lightning-icon>
+                            </div>
+                            <div class="priv-title">Exclusive Tier Pricing</div>
+                            <div class="priv-desc">Your personalised price book is automatically applied every time you browse or order.</div>
+                        </div>
+                        <div class="priv-card">
+                            <div class="priv-icon">
+                                <lightning-icon icon-name="utility:fulfillment_order" size="small"></lightning-icon>
+                            </div>
+                            <div class="priv-title">Priority Fulfilment</div>
+                            <div class="priv-desc">Your orders jump the queue — faster shipping, less waiting, happier customers.</div>
+                        </div>
+                        <div class="priv-card">
+                            <div class="priv-icon">
+                                <lightning-icon icon-name="utility:eye" size="small"></lightning-icon>
+                            </div>
+                            <div class="priv-title">Real‑Time Stock Visibility</div>
+                            <div class="priv-desc">See live inventory counts across all products before you place an order.</div>
+                        </div>
+                        <div class="priv-card">
+                            <div class="priv-icon">
+                                <lightning-icon icon-name="utility:headset" size="small"></lightning-icon>
+                            </div>
+                            <div class="priv-title">Dedicated Support</div>
+                            <div class="priv-desc">A named Array Minds account manager is on hand to resolve any issue fast.</div>
+                        </div>
+                    </div>
+
+                    <div class="loggedin-cta-row">
+                        <button class="btn btn-primary-lg" onclick={handleViewProducts}>
+                            Start Ordering Now →
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </template>
+
+     
+       
+
     </div>
 </template>

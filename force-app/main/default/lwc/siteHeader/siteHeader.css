@@ -37,7 +37,9 @@
 .brand-name {
   color: rgba(255,255,255,0.85);
   font-weight: 600;
-  font-size: 14px;
+  font-size: 30px;
+  font-family: 'Poppins', sans-serif;
+  
 }
 
 .main-nav {
@@ -428,4 +430,29 @@
     padding: 10px 12px;
     font-size: 13px;
   }
+}
+
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand img {
+    height: 38px;
+    width: 38px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 3px;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.brand-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
 }

@@ -1,18 +1,45 @@
 <template>
     <div class="container" aria-busy={isLoading}>
         <template if:false={isSubmitted}>
+
+            <!-- Header -->
             <div class="card-header">
-                <lightning-icon icon-name="standard:partner" size="small" alternative-text="Partner"></lightning-icon>
+                <div class="header-icon">
+                    <lightning-icon icon-name="standard:partner" size="small" alternative-text="Partner"></lightning-icon>
+                </div>
                 <div class="title-and-subtitle">
+                    <div class="header-eyebrow">Array Minds Partner Network</div>
                     <h1>Partner Registration</h1>
                     <p class="subtitle">Apply to become an authorized partner — review usually takes 2–3 business days.</p>
                 </div>
             </div>
 
+            <!-- Progress indicator -->
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill"></div>
+                </div>
+                <div class="progress-label">Step 1 of 1 — Fill in your details</div>
+            </div>
+
             <div class="form-card">
+
+                <!-- Section: Business Info -->
+                <div class="form-section-label">
+                    <div class="form-section-dot"></div>
+                    Business Information
+                </div>
+
                 <div class="form-grid">
                     <div class="field-group">
-                        <lightning-input label="Business Name" placeholder="Acme Pvt Ltd" value={businessName} onchange={handleChange} data-field="businessName" required></lightning-input>
+                        <lightning-input
+                            label="Business Name"
+                            placeholder="Acme Pvt Ltd"
+                            value={businessName}
+                            onchange={handleChange}
+                            data-field="businessName"
+                            required>
+                        </lightning-input>
 
                         <lightning-combobox
                             label="Business Type"
@@ -23,28 +50,89 @@
                             required>
                         </lightning-combobox>
 
-                        <lightning-input label="Brand Name" value={brandName} onchange={handleChange} data-field="brandName"></lightning-input>
+                        <lightning-input
+                            label="Brand Name"
+                            value={brandName}
+                            onchange={handleChange}
+                            data-field="brandName">
+                        </lightning-input>
 
-                        <lightning-input label="GST Number" placeholder="22AAAAA0000A1Z5" value={gstNumber} onchange={handleChange} data-field="gstNumber"></lightning-input>
+                        <lightning-input
+                            label="GST Number"
+                            placeholder="22AAAAA0000A1Z5"
+                            value={gstNumber}
+                            onchange={handleChange}
+                            data-field="gstNumber">
+                        </lightning-input>
 
-                        <lightning-input label="PAN Number" placeholder="ABCDE1234F" value={panNumber} onchange={handleChange} data-field="panNumber"></lightning-input>
+                        <lightning-input
+                            label="PAN Number"
+                            placeholder="ABCDE1234F"
+                            value={panNumber}
+                            onchange={handleChange}
+                            data-field="panNumber">
+                        </lightning-input>
 
-                        <lightning-input type="number" label="Annual Revenue" value={annualRevenue} onchange={handleChange} data-field="annualRevenue"></lightning-input>
+                        <lightning-input
+                            type="number"
+                            label="Annual Revenue"
+                            value={annualRevenue}
+                            onchange={handleChange}
+                            data-field="annualRevenue">
+                        </lightning-input>
                     </div>
 
+                    <!-- Section: Contact Info -->
                     <div class="field-group">
-                        <lightning-input label="Primary Contact Name" value={primaryContactName} onchange={handleChange} data-field="primaryContactName" required></lightning-input>
+                        <div class="form-section-label form-section-label--inline">
+                            <div class="form-section-dot"></div>
+                            Contact Details
+                        </div>
 
-                        <lightning-input type="email" label="Email" placeholder="name@company.com" value={email} onchange={handleChange} data-field="email" required></lightning-input>
+                        <lightning-input
+                            label="Primary Contact Name"
+                            value={primaryContactName}
+                            onchange={handleChange}
+                            data-field="primaryContactName"
+                            required>
+                        </lightning-input>
 
-                        <lightning-input type="tel" label="Phone" placeholder="+91 98765 43210" value={phone} onchange={handleChange} data-field="phone" required></lightning-input>
+                        <lightning-input
+                            type="email"
+                            label="Email"
+                            placeholder="name@company.com"
+                            value={email}
+                            onchange={handleChange}
+                            data-field="email"
+                            required>
+                        </lightning-input>
 
-                        <lightning-textarea class="field-full" label="Address" value={address} onchange={handleChange} data-field="address"></lightning-textarea>
+                        <lightning-input
+                            type="tel"
+                            label="Phone"
+                            placeholder="+91 98765 43210"
+                            value={phone}
+                            onchange={handleChange}
+                            data-field="phone"
+                            required>
+                        </lightning-input>
 
-                        <div class="helper">We will send application updates to the email address above.</div>
+                        <lightning-textarea
+                            class="field-full"
+                            label="Address"
+                            value={address}
+                            onchange={handleChange}
+                            data-field="address">
+                        </lightning-textarea>
+
+                        <div class="helper">
+                            <lightning-icon icon-name="utility:info" size="xx-small" alternative-text="Info"></lightning-icon>
+                            Application updates will be sent to the email address above.
+                        </div>
                     </div>
                 </div>
 
+                <!-- Actions + Terms -->
                 <div class="actions">
                     <lightning-button
                         label="Submit Application"
@@ -53,46 +141,286 @@
                         class="submit-btn"
                         disabled={isLoading}>
                     </lightning-button>
+
+                    <div class="terms-line">
+                        <span class="terms-text">By submitting, you agree to Array Minds partner terms.</span>
+                        <button class="policy-trigger" onclick={handleOpenPolicy}>
+                            <lightning-icon icon-name="utility:preview" size="xx-small" alternative-text="View"></lightning-icon>
+                            View Partner Policy
+                        </button>
+                    </div>
                 </div>
             </div>
         </template>
 
+        <!-- ── SUCCESS STATE ── -->
         <template if:true={isSubmitted}>
             <div class="confirmation">
                 <div class="confirmation-inner">
                     <div class="success-visual">
                         <lightning-icon icon-name="utility:check" size="large" alternative-text="Success"></lightning-icon>
                     </div>
+                    <div class="success-eyebrow">Application Received</div>
+                    <h2>You're on your way to becoming a partner!</h2>
+                    <p class="lead">Thank you — your application has been received and is under review.</p>
 
-                    <h2>Application submitted successfully</h2>
-                    <p class="lead">Thank you — your application has been received.</p>
-                    <p>Next steps: our team will review your application and you'll receive an email with further instructions.</p>
-
-                    <ol class="steps">
-                        <li><strong>We review your application</strong><div class="muted">(usually 2–3 business days)</div></li>
-                        <li><strong>You receive an email</strong><div class="muted">with next steps and any requests for documents</div></li>
-                        <li><strong>Complete verification</strong><div class="muted">follow the instructions in the email</div></li>
-                    </ol>
+                    <div class="steps-wrap">
+                        <ol class="steps">
+                            <li>
+                                <div class="step-num">01</div>
+                                <div class="step-content">
+                                    <strong>We review your application</strong>
+                                    <div class="muted">Usually within 2–3 business days</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="step-num">02</div>
+                                <div class="step-content">
+                                    <strong>You receive an email</strong>
+                                    <div class="muted">With next steps and any document requests</div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="step-num">03</div>
+                                <div class="step-content">
+                                    <strong>Complete verification</strong>
+                                    <div class="muted">Follow the instructions in the email to go live</div>
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
 
                     <div class="actions confirmation-actions">
-                        <lightning-button label="Create another application" onclick={handleCreateAnother} variant="neutral"></lightning-button>
+                        <lightning-button
+                            label="Submit Another Application"
+                            onclick={handleCreateAnother}
+                            variant="neutral">
+                        </lightning-button>
                     </div>
                 </div>
             </div>
         </template>
 
+        <!-- ── SPINNER ── -->
         <template if:true={isLoading}>
             <div class="spinner-overlay" role="status" aria-live="polite">
                 <lightning-spinner alternative-text="Saving" size="large"></lightning-spinner>
             </div>
         </template>
 
+        <!-- ── ERROR ── -->
         <template if:true={errorMessage}>
-            <div class="error" role="alert" aria-live="assertive">{errorMessage}</div>
+            <div class="error" role="alert" aria-live="assertive">
+                <lightning-icon icon-name="utility:error" size="xx-small" alternative-text="Error"></lightning-icon>
+                {errorMessage}
+            </div>
         </template>
 
-        <template if:true={errorMessage}>
-            <div class="error" role="alert" aria-live="assertive">{errorMessage}</div>
-        </template>
     </div>
+
+    <!-- ══════════════════════════════════════════════
+         POLICY MODAL
+    ═══════════════════════════════════════════════ -->
+    <template if:true={isPolicyOpen}>
+        <div class="modal-backdrop" onclick={handleBackdropClick}>
+            <div class="modal" role="dialog" aria-modal="true" aria-label="Partner Policy">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <div class="modal-header-left">
+                        <div class="modal-logo">
+                            <img src="https://appexchange.salesforce.com/image_host/79a3e3e8-a91d-4e91-a133-4feffa8c9d08.jpg"
+                                 alt="Array Minds" />
+                        </div>
+                        <div>
+                            <div class="modal-eyebrow">Array Minds Private Limited</div>
+                            <h2 class="modal-title">Partner Agreement &amp; Policies</h2>
+                        </div>
+                    </div>
+                    <button class="modal-close" onclick={handleClosePolicy} aria-label="Close">
+                        <lightning-icon icon-name="utility:close" size="x-small" alternative-text="Close"></lightning-icon>
+                    </button>
+                </div>
+
+                <!-- Tab bar -->
+                <div class="modal-tabs">
+                    <button class={tab1Class} data-tab="terms"   onclick={handleTabChange}>Terms &amp; Conditions</button>
+                    <button class={tab2Class} data-tab="privacy" onclick={handleTabChange}>Privacy Policy</button>
+                    <button class={tab3Class} data-tab="data"    onclick={handleTabChange}>Data Usage</button>
+                    <button class={tab4Class} data-tab="partner" onclick={handleTabChange}>Partner Obligations</button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+
+                    <!-- TAB: Terms & Conditions -->
+                    <template if:true={isTabTerms}>
+                        <div class="policy-section">
+                            <div class="policy-badge">Effective Date: 1 January 2025</div>
+                            <h3>1. Acceptance of Terms</h3>
+                            <p>By submitting a partner registration application to Array Minds Private Limited ("Array Minds", "we", "us"), you ("Partner", "you") agree to be bound by these Terms and Conditions in full. If you do not agree, do not submit the application.</p>
+
+                            <h3>2. Partner Eligibility</h3>
+                            <p>To qualify as an Array Minds partner, you must:</p>
+                            <ul>
+                                <li>Be a legally registered business entity in your jurisdiction.</li>
+                                <li>Hold a valid GST registration (where applicable under Indian tax law).</li>
+                                <li>Have no outstanding disputes, litigation, or legal proceedings against Array Minds or its affiliates.</li>
+                                <li>Comply with all applicable local, state, and national laws and regulations.</li>
+                            </ul>
+
+                            <h3>3. Application &amp; Approval</h3>
+                            <p>Submission of an application does not guarantee approval. Array Minds reserves the right, at its sole discretion, to approve, reject, or defer any partner application without being required to provide a reason. Approved partners will receive confirmation via email along with access credentials to the Partner Portal.</p>
+
+                            <h3>4. Partner Conduct</h3>
+                            <p>Partners must not engage in any activity that brings Array Minds into disrepute, misrepresents Array Minds products or services, or violates any applicable law. Array Minds may suspend or terminate a partner account without notice if these standards are breached.</p>
+
+                            <h3>5. Pricing &amp; Orders</h3>
+                            <p>Partner-tier pricing is confidential and may not be shared with third parties. Prices are subject to change with reasonable notice. All orders placed through the Partner Portal are binding upon confirmation.</p>
+
+                            <h3>6. Intellectual Property</h3>
+                            <p>All trademarks, logos, and brand assets of Array Minds remain the exclusive property of Array Minds Private Limited. Partners are granted a limited, non-exclusive, non-transferable licence to use approved brand assets solely for the purpose of promoting Array Minds products in their designated territory.</p>
+
+                            <h3>7. Termination</h3>
+                            <p>Either party may terminate the partner relationship with 30 days' written notice. Array Minds may terminate immediately for material breach, fraud, or conduct detrimental to the brand.</p>
+
+                            <h3>8. Governing Law</h3>
+                            <p>These Terms are governed by the laws of India. Any disputes shall be subject to the exclusive jurisdiction of the courts in Hyderabad, Telangana.</p>
+                        </div>
+                    </template>
+
+                    <!-- TAB: Privacy Policy -->
+                    <template if:true={isTabPrivacy}>
+                        <div class="policy-section">
+                            <div class="policy-badge">Last Updated: 1 January 2025</div>
+                            <h3>1. Introduction</h3>
+                            <p>Array Minds Private Limited is committed to protecting the privacy of its partners, applicants, and users. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use the Array Minds Partner Portal.</p>
+
+                            <h3>2. Information We Collect</h3>
+                            <p>We may collect the following categories of personal and business information:</p>
+                            <ul>
+                                <li><strong>Identity Data:</strong> Business name, brand name, primary contact name, PAN number, GST number.</li>
+                                <li><strong>Contact Data:</strong> Email address, phone number, business address.</li>
+                                <li><strong>Financial Data:</strong> Annual revenue, order history, invoice records.</li>
+                                <li><strong>Usage Data:</strong> Pages visited, features used, session duration, device and browser information.</li>
+                                <li><strong>Communication Data:</strong> Support tickets, messages, and correspondence with Array Minds.</li>
+                            </ul>
+
+                            <h3>3. How We Collect Information</h3>
+                            <p>Information is collected through: direct submission via the Partner Registration form; your ongoing use of the Partner Portal; automated technologies such as cookies and server logs; and communications you send to us.</p>
+
+                            <h3>4. Your Rights</h3>
+                            <p>You have the right to access, correct, or request deletion of your personal data at any time. To exercise these rights, contact us at <strong>privacy@arrayminds.com</strong>. We will respond within 30 days.</p>
+
+                            <h3>5. Cookies</h3>
+                            <p>We use cookies to maintain session state, remember preferences, and analyse portal usage. You may disable cookies in your browser settings; however, some portal features may not function correctly without them.</p>
+
+                            <h3>6. Third-Party Services</h3>
+                            <p>The Partner Portal is built on Salesforce Experience Cloud. Salesforce's privacy practices are governed by their own policy, available at salesforce.com/privacy. We do not sell your data to any third party.</p>
+
+                            <h3>7. Data Retention</h3>
+                            <p>We retain personal data for as long as your partner account is active, plus 7 years thereafter for legal and compliance purposes, unless a shorter retention period is required by law.</p>
+
+                            <h3>8. Contact</h3>
+                            <p>For privacy-related queries, write to: <strong>Array Minds Private Limited, Data Privacy Team, Hyderabad, Telangana, India.</strong></p>
+                        </div>
+                    </template>
+
+                    <!-- TAB: Data Usage -->
+                    <template if:true={isTabData}>
+                        <div class="policy-section">
+                            <div class="policy-badge">How We Use Your Data</div>
+
+                            <div class="data-use-grid">
+                                <div class="data-use-card">
+                                    <div class="data-use-icon">
+                                        <lightning-icon icon-name="utility:user" size="small"></lightning-icon>
+                                    </div>
+                                    <h4>Account Management</h4>
+                                    <p>Your business and contact information is used to create and manage your partner account, assign your pricing tier, and communicate with you about your account status.</p>
+                                </div>
+                                <div class="data-use-card">
+                                    <div class="data-use-icon">
+                                        <lightning-icon icon-name="utility:orders" size="small"></lightning-icon>
+                                    </div>
+                                    <h4>Order Processing</h4>
+                                    <p>Order details, address, and payment information are used solely to fulfil and track your orders. Financial data is never shared with unrelated third parties.</p>
+                                </div>
+                                <div class="data-use-card">
+                                    <div class="data-use-icon">
+                                        <lightning-icon icon-name="utility:email" size="small"></lightning-icon>
+                                    </div>
+                                    <h4>Communications</h4>
+                                    <p>We use your email and phone number to send application updates, order confirmations, product announcements, and important policy changes. You may opt out of marketing communications at any time.</p>
+                                </div>
+                                <div class="data-use-card">
+                                    <div class="data-use-icon">
+                                        <lightning-icon icon-name="utility:chart" size="small"></lightning-icon>
+                                    </div>
+                                    <h4>Analytics &amp; Improvement</h4>
+                                    <p>Aggregated, anonymised usage data helps us improve the Portal experience, identify issues, and develop new features. No individually identifiable data is used for analytics without consent.</p>
+                                </div>
+                                <div class="data-use-card">
+                                    <div class="data-use-icon">
+                                        <lightning-icon icon-name="utility:shield" size="small"></lightning-icon>
+                                    </div>
+                                    <h4>Legal &amp; Compliance</h4>
+                                    <p>We may retain and disclose data as required by applicable law, regulation, court order, or to enforce our partner agreements and protect the rights of Array Minds.</p>
+                                </div>
+                                <div class="data-use-card">
+                                    <div class="data-use-icon">
+                                        <lightning-icon icon-name="utility:ban" size="small"></lightning-icon>
+                                    </div>
+                                    <h4>What We Never Do</h4>
+                                    <p>We never sell, rent, or trade your personal or business data to third parties for marketing purposes. We do not use your data to build advertising profiles or share it with social media platforms.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- TAB: Partner Obligations -->
+                    <template if:true={isTabPartner}>
+                        <div class="policy-section">
+                            <div class="policy-badge">Partner Code of Conduct</div>
+                            <h3>1. Authorised Territory</h3>
+                            <p>Partners are authorised to sell Array Minds products only within their designated geographic territory as agreed upon at the time of approval. Selling outside this territory without written consent is a breach of this agreement.</p>
+
+                            <h3>2. Brand Representation</h3>
+                            <p>Partners must represent Array Minds products and brand accurately and professionally. Use of outdated brand assets, misleading claims, or unauthorised modifications to product descriptions is strictly prohibited.</p>
+
+                            <h3>3. Minimum Purchase Obligations</h3>
+                            <p>Certain partner tiers may carry minimum quarterly or annual purchase obligations. These will be communicated in your partner agreement. Failure to meet these obligations may result in a tier downgrade.</p>
+
+                            <h3>4. Pricing Compliance</h3>
+                            <p>Partners must adhere to the Minimum Resale Price (MRP) as indicated on each product. Selling below MRP without prior written approval from Array Minds is not permitted and may result in account suspension.</p>
+
+                            <h3>5. Training &amp; Certification</h3>
+                            <p>Array Minds may require partners to complete product training or certification programmes. Participation ensures partners can represent and support Array Minds products to the highest standard.</p>
+
+                            <h3>6. Reporting</h3>
+                            <p>Partners may be requested to share monthly or quarterly sell-through reports. This data helps Array Minds plan inventory, support, and marketing activities in your region.</p>
+
+                            <h3>7. Anti-Bribery &amp; Corruption</h3>
+                            <p>Partners must comply with all applicable anti-bribery and anti-corruption laws. No partner may offer, pay, or accept bribes or improper payments in connection with Array Minds business.</p>
+
+                            <h3>8. Confidentiality</h3>
+                            <p>Partners must keep all pricing, commercial terms, product roadmaps, and business information received from Array Minds strictly confidential and may not disclose such information to any third party without prior written consent.</p>
+                        </div>
+                    </template>
+
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <span class="modal-footer-note">
+                        <lightning-icon icon-name="utility:lock" size="xx-small" alternative-text="Secure"></lightning-icon>
+                        Array Minds Private Limited · Hyderabad, India · privacy@arrayminds.com
+                    </span>
+                    <button class="modal-close-btn" onclick={handleClosePolicy}>Close</button>
+                </div>
+
+            </div>
+        </div>
+    </template>
+
 </template>

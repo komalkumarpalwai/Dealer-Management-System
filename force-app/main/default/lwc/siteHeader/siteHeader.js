@@ -2,6 +2,7 @@ import { LightningElement, wire } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
 import getCurrentUserInfo from '@salesforce/apex/ProductsPageController.getCurrentUserInfo';
 
+
 export default class SiteHeader extends LightningElement {
     user = {};
     isLoggedIn = false;
@@ -14,6 +15,7 @@ export default class SiteHeader extends LightningElement {
     isAboutPage = false;
     isPortalPage = false;
     isOrderPage = false;
+     
 
     get displayAccountType() {
         return this.user.AccountType && this.user.AccountType.trim() ? this.user.AccountType : 'N/A';
@@ -155,7 +157,7 @@ export default class SiteHeader extends LightningElement {
         // Clear any stored data
         sessionStorage.clear();
         // Redirect to logout
-        window.location.assign('/logout');
+        window.location.assign('https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/');
     }
 
     handleApply() {

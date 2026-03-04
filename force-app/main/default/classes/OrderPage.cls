@@ -40,201 +40,331 @@ public with sharing class OrderPage {
      * @return OrderResponse with order creation status
      */
     @AuraEnabled
-    public static OrderResponse createOrderWithLineItems(CreateOrderRequest orderRequest) {
+   public static OrderResponse createOrderWithLineItems(CreateOrderRequest orderRequest) {
+    
+    OrderResponse response = new OrderResponse();
+    
+    try {
         
-        OrderResponse response = new OrderResponse();
-        
-        try {
-            
-            // Validate required fields
-            if (String.isBlank(orderRequest.accountId)) {
-                response.success = false;
-                response.message = 'Account ID is required to create an order';
-                return response;
-            }
-            
-            if (String.isBlank(orderRequest.pricebookId)) {
-                response.success = false;
-                response.message = 'Pricebook ID is required to create an order';
-                return response;
-            }
-            
-            if (orderRequest.orderItems == null || orderRequest.orderItems.isEmpty()) {
-                response.success = false;
-                response.message = 'At least one order item is required';
-                return response;
-            }
-            
-            // Get product IDs FIRST to query pricebook entries and their currency
-            Set<String> productIds = new Set<String>();
-            for (OrderItemRequest itemRequest : orderRequest.orderItems) {
-                if (String.isNotBlank(itemRequest.productId)) {
-                    productIds.add(itemRequest.productId);
-                }
-            }
-            
-            // Query the Pricebook2 to get its default currency
-            Pricebook2 pb = [
-                SELECT Id, CurrencyIsoCode
-                FROM Pricebook2
-                WHERE Id = :orderRequest.pricebookId
-                LIMIT 1
-            ];
-            
-            String orderCurrency = pb.CurrencyIsoCode;
-            System.debug('Pricebook Currency: ' + orderCurrency);
-            
-            // Query PricebookEntries with the SAME currency as the pricebook
-            Map<String, String> productToPricebookEntryMap = new Map<String, String>();
-            
-            if (!productIds.isEmpty()) {
-                List<PricebookEntry> pricebookEntries = [
-                    SELECT Id, Product2Id, CurrencyIsoCode
-                    FROM PricebookEntry
-                    WHERE Pricebook2Id = :orderRequest.pricebookId
-                    AND Product2Id IN :productIds
-                    AND CurrencyIsoCode = :orderCurrency
-                    AND IsActive = true
-                ];
-                
-                System.debug('Pricebook Entries found with matching currency: ' + pricebookEntries.size());
-                
-                for (PricebookEntry entry : pricebookEntries) {
-                    productToPricebookEntryMap.put(entry.Product2Id, entry.Id);
-                }
-            }
-            
-            if (productToPricebookEntryMap.isEmpty()) {
-                response.success = false;
-                response.message = 'No valid order items found in the pricebook with currency ' + orderCurrency + '. Please ensure all products are available in this currency.';
-                return response;
-            }
-            
-            // Now create the Order with the CORRECT currency from Pricebook
-            Order newOrder = new Order();
-            newOrder.AccountId = orderRequest.accountId;
-            newOrder.Pricebook2Id = orderRequest.pricebookId;
-            newOrder.CurrencyIsoCode = orderCurrency;
-            newOrder.Status = String.isBlank(orderRequest.status) ? 'Draft' : orderRequest.status;
-            newOrder.EffectiveDate = orderRequest.effectiveDate != null ? orderRequest.effectiveDate : Date.today();
-            newOrder.Name = String.isBlank(orderRequest.orderName) ? 'New Order - ' + Datetime.now().format() : orderRequest.orderName;
-            newOrder.Description = orderRequest.description;
-            
-            insert newOrder;
-            
-            response.orderId = newOrder.Id;
-            response.orderNumber = newOrder.OrderNumber;
-            
-            // Create OrderLineItems using the already-fetched pricebook entries
-            List<OrderItem> orderLineItems = new List<OrderItem>();
-            
-            System.debug('=== Order Creation Debug ===');
-            System.debug('Order Currency: ' + orderCurrency);
-            System.debug('Product IDs to process: ' + productIds.size());
-            
-            for (OrderItemRequest itemRequest : orderRequest.orderItems) {
-                
-                if (itemRequest.quantity == null || itemRequest.quantity <= 0) {
-                    System.debug('Skipping item - invalid quantity: ' + itemRequest.quantity);
-                    continue; // Skip invalid quantities
-                }
-                
-                // Get the PricebookEntry ID - must be from the matched currency entries
-                String pricebookEntryId = itemRequest.priceBookEntryId;
-                if (String.isBlank(pricebookEntryId) && productToPricebookEntryMap.containsKey(itemRequest.productId)) {
-                    pricebookEntryId = productToPricebookEntryMap.get(itemRequest.productId);
-                }
-                
-                if (String.isBlank(pricebookEntryId)) {
-                    // Skip this item if no pricebook entry found with matching currency
-                    System.debug('Skipping item - no pricebook entry found for product: ' + itemRequest.productId + ' with currency: ' + orderCurrency);
-                    continue;
-                }
-                
-                System.debug('Creating OrderItem - Product: ' + itemRequest.productId + ', Qty: ' + itemRequest.quantity);
-                
-                OrderItem lineItem = new OrderItem();
-                lineItem.OrderId = newOrder.Id;
-                lineItem.PricebookEntryId = pricebookEntryId;
-                lineItem.UnitPrice = itemRequest.unitPrice;
-                lineItem.Quantity = itemRequest.quantity;
-                
-                orderLineItems.add(lineItem);
-            }
-            
-            System.debug('Total OrderItems to insert: ' + orderLineItems.size());
-            
-            if (!orderLineItems.isEmpty()) {
-                insert orderLineItems;
-                response.success = true;
-                response.message = 'Order created successfully with ' + orderLineItems.size() + ' line item(s)';
-            } else {
-                response.success = false;
-                response.message = 'No valid order items to add. Please ensure all products are available in the pricebook with currency ' + orderCurrency + '.';
-                // Delete the order if no items were created
-                delete newOrder;
-            }
-            
-            return response;
-            
-        } catch (DmlException e) {
+        // Validate required fields
+        if (String.isBlank(orderRequest.accountId)) {
             response.success = false;
-            String errorMsg = 'Error creating order: ';
-            for (Integer i = 0; i < e.getNumDml(); i++) {
-                errorMsg += e.getDmlMessage(i) + ' | ';
-            }
-            response.message = errorMsg.removeEnd(' | ');
-            return response;
-        } catch (QueryException e) {
-            response.success = false;
-            response.message = 'Error querying data: ' + e.getMessage();
-            return response;
-        } catch (Exception e) {
-            response.success = false;
-            response.message = 'Unexpected error: ' + e.getMessage() + ' (Line: ' + e.getLineNumber() + ')';
+            response.message = 'Account ID is required to create an order';
             return response;
         }
-    }
-
-    /**
-     * Gets the user's account details for order creation
-     * @return Map containing user and account information
-     */
-    @AuraEnabled(cacheable=true)
-    public static Map<String, Object> getUserAccountDetails() {
         
-        Map<String, Object> result = new Map<String, Object>();
+        if (String.isBlank(orderRequest.pricebookId)) {
+            response.success = false;
+            response.message = 'Pricebook ID is required to create an order';
+            return response;
+        }
         
+        if (orderRequest.orderItems == null || orderRequest.orderItems.isEmpty()) {
+            response.success = false;
+            response.message = 'At least one order item is required';
+            return response;
+        }
+        
+        // Get product IDs FIRST to query pricebook entries and their currency
+        Set<String> productIds = new Set<String>();
+        for (OrderItemRequest itemRequest : orderRequest.orderItems) {
+            if (String.isNotBlank(itemRequest.productId)) {
+                productIds.add(itemRequest.productId);
+            }
+        }
+        
+        // Query the Pricebook2 to get its default currency
+        Pricebook2 pb = [
+            SELECT Id, CurrencyIsoCode
+            FROM Pricebook2
+            WHERE Id = :orderRequest.pricebookId
+            LIMIT 1
+        ];
+        
+        String orderCurrency = pb.CurrencyIsoCode;
+        System.debug('Pricebook Currency: ' + orderCurrency);
+        
+        // Query PricebookEntries with the SAME currency as the pricebook
+        Map<String, String> productToPricebookEntryMap = new Map<String, String>();
+        
+        if (!productIds.isEmpty()) {
+            List<PricebookEntry> pricebookEntries = [
+                SELECT Id, Product2Id, CurrencyIsoCode
+                FROM PricebookEntry
+                WHERE Pricebook2Id = :orderRequest.pricebookId
+                AND Product2Id IN :productIds
+                AND CurrencyIsoCode = :orderCurrency
+                AND IsActive = true
+            ];
+            
+            System.debug('Pricebook Entries found with matching currency: ' + pricebookEntries.size());
+            
+            for (PricebookEntry entry : pricebookEntries) {
+                productToPricebookEntryMap.put(entry.Product2Id, entry.Id);
+            }
+        }
+        
+        if (productToPricebookEntryMap.isEmpty()) {
+            response.success = false;
+            response.message = 'No valid order items found in the pricebook with currency ' + orderCurrency + '. Please ensure all products are available in this currency.';
+            return response;
+        }
+        
+        // Now create the Order with the CORRECT currency from Pricebook
+        Order newOrder = new Order();
+        newOrder.AccountId = orderRequest.accountId;
+        newOrder.Pricebook2Id = orderRequest.pricebookId;
+        newOrder.CurrencyIsoCode = orderCurrency;
+        newOrder.Status = String.isBlank(orderRequest.status) ? 'Draft' : orderRequest.status;
+        newOrder.EffectiveDate = orderRequest.effectiveDate != null ? orderRequest.effectiveDate : Date.today();
+        newOrder.Name = String.isBlank(orderRequest.orderName) ? 'New Order - ' + Datetime.now().format() : orderRequest.orderName;
+        newOrder.Description = orderRequest.description;
+        
+        // ===== FIXED LOGIC: Assign RecordType based on Logged-in User's Account Type =====
         try {
+            // Get Account_Type__c from the logged-in user's linked Contact → Account
             User currentUser = [
                 SELECT Id,
-                       Name,
-                       Email,
                        Contact.AccountId,
-                       Contact.Account.Name,
                        Contact.Account.Account_Type__c
                 FROM User
                 WHERE Id = :UserInfo.getUserId()
                 LIMIT 1
             ];
             
-            if (currentUser.Contact != null && currentUser.Contact.AccountId != null) {
-                result.put('accountId', currentUser.Contact.AccountId);
-                result.put('accountName', currentUser.Contact.Account.Name);
-                result.put('accountType', currentUser.Contact.Account.Account_Type__c);
-                result.put('success', true);
+            String accountType = null;
+            
+            if (currentUser.Contact != null && currentUser.Contact.Account != null) {
+                accountType = currentUser.Contact.Account.Account_Type__c;
+                
+                if (String.isNotBlank(accountType)) {
+                    accountType = accountType.trim();
+                }
+                
+                System.debug('=== RecordType Assignment Debug ===');
+                System.debug('Step 1 - Logged-in User Account_Type__c (raw): [' + currentUser.Contact.Account.Account_Type__c + ']');
+                System.debug('Step 1 - Logged-in User Account_Type__c (trimmed): [' + accountType + ']');
+                System.debug('Step 1 - Logged-in User Contact AccountId: ' + currentUser.Contact.AccountId);
             } else {
-                result.put('success', false);
-                result.put('message', 'User is not associated with an account');
+                System.debug('Step 1 - WARNING: Logged-in user has no linked Contact or Account. Cannot determine Account Type.');
             }
             
-        } catch (Exception e) {
-            result.put('success', false);
-            result.put('message', e.getMessage());
+            // Get all available Order RecordTypes by DeveloperName
+            Map<String, Schema.RecordTypeInfo> recordTypeMap = Schema.SObjectType.Order.getRecordTypeInfosByDeveloperName();
+            System.debug('Step 2 - Available Order RecordTypes (count): ' + recordTypeMap.size());
+            for (String rtName : recordTypeMap.keySet()) {
+                System.debug('  - RecordType DeveloperName: [' + rtName + '] | ID: ' + recordTypeMap.get(rtName).getRecordTypeId());
+            }
+            
+            Id recordTypeId = null;
+            
+            if (String.isNotBlank(accountType)) {
+                System.debug('Step 3 - Looking for exact match: [' + accountType + ']');
+                
+                // Step 1: Exact match against DeveloperName
+                if (recordTypeMap.containsKey(accountType)) {
+                    recordTypeId = recordTypeMap.get(accountType).getRecordTypeId();
+                    System.debug('Step 3 - ✓ Exact match found: [' + accountType + '] -> RecordTypeId: ' + recordTypeId);
+                } else {
+                    System.debug('Step 3 - ✗ No exact match for: [' + accountType + ']');
+                    
+                    // Step 2: Case-insensitive fallback
+                    System.debug('Step 4 - Trying case-insensitive match...');
+                    for (String rtName : recordTypeMap.keySet()) {
+                        System.debug('  Comparing [' + accountType + '] with [' + rtName + ']');
+                        if (rtName.equalsIgnoreCase(accountType)) {
+                            recordTypeId = recordTypeMap.get(rtName).getRecordTypeId();
+                            System.debug('Step 4 - ✓ Case-insensitive match found: [' + rtName + '] -> RecordTypeId: ' + recordTypeId);
+                            break;
+                        }
+                    }
+                    
+                    // Step 3: Normalize spaces to underscores as last resort
+                    // e.g. "Direct Customer" → "Direct_Customer"
+                    if (recordTypeId == null) {
+                        String normalizedAccountType = accountType.replaceAll('\\s+', '_');
+                        System.debug('Step 5 - Trying normalized match (spaces→underscores): [' + normalizedAccountType + ']');
+                        for (String rtName : recordTypeMap.keySet()) {
+                            if (rtName.equalsIgnoreCase(normalizedAccountType)) {
+                                recordTypeId = recordTypeMap.get(rtName).getRecordTypeId();
+                                System.debug('Step 5 - ✓ Normalized match found: [' + rtName + '] -> RecordTypeId: ' + recordTypeId);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Assign RecordTypeId if a match was found
+            System.debug('Step 6 - RecordTypeId before assignment: ' + newOrder.RecordTypeId);
+            if (recordTypeId != null) {
+                newOrder.RecordTypeId = recordTypeId;
+                System.debug('Step 6 - ✓ RecordTypeId successfully set to: ' + newOrder.RecordTypeId);
+                System.debug('Step 6 - Account_Type__c [' + accountType + '] mapped to RecordTypeId: ' + recordTypeId);
+            } else {
+                System.debug('Step 6 - ✗ No matching RecordType found for Account_Type__c: [' + accountType + ']. Order will use default RecordType.');
+                System.debug('Step 6 - Available RecordType DeveloperNames: ' + recordTypeMap.keySet());
+            }
+            
+        } catch (Exception recordTypeException) {
+            // Log but continue — order creation should not fail due to RecordType lookup
+            System.debug('=== EXCEPTION in RecordType Assignment ===');
+            System.debug('Exception Message: ' + recordTypeException.getMessage());
+            System.debug('Stack Trace: ' + recordTypeException.getStackTraceString());
+        }
+        // ===== END FIXED LOGIC =====
+        
+        System.debug('Step 7 - About to insert Order with RecordTypeId: ' + newOrder.RecordTypeId);
+        insert newOrder;
+        System.debug('Step 8 - Order inserted successfully. Final RecordTypeId: ' + newOrder.RecordTypeId);
+        
+        response.orderId = newOrder.Id;
+        response.orderNumber = newOrder.OrderNumber;
+        
+        // Create OrderLineItems using the already-fetched pricebook entries
+        List<OrderItem> orderLineItems = new List<OrderItem>();
+        
+        System.debug('=== Order Line Items Debug ===');
+        System.debug('Order Currency: ' + orderCurrency);
+        System.debug('Product IDs to process: ' + productIds.size());
+        
+        for (OrderItemRequest itemRequest : orderRequest.orderItems) {
+            
+            if (itemRequest.quantity == null || itemRequest.quantity <= 0) {
+                System.debug('Skipping item - invalid quantity: ' + itemRequest.quantity);
+                continue; // Skip invalid quantities
+            }
+            
+            // Get the PricebookEntry ID - must be from the matched currency entries
+            String pricebookEntryId = itemRequest.priceBookEntryId;
+            if (String.isBlank(pricebookEntryId) && productToPricebookEntryMap.containsKey(itemRequest.productId)) {
+                pricebookEntryId = productToPricebookEntryMap.get(itemRequest.productId);
+            }
+            
+            if (String.isBlank(pricebookEntryId)) {
+                System.debug('Skipping item - no pricebook entry found for product: ' + itemRequest.productId + ' with currency: ' + orderCurrency);
+                continue;
+            }
+            
+            System.debug('Creating OrderItem - Product: ' + itemRequest.productId + ', Qty: ' + itemRequest.quantity);
+            
+            OrderItem lineItem = new OrderItem();
+            lineItem.OrderId = newOrder.Id;
+            lineItem.PricebookEntryId = pricebookEntryId;
+            lineItem.UnitPrice = itemRequest.unitPrice;
+            lineItem.Quantity = itemRequest.quantity;
+            
+            orderLineItems.add(lineItem);
         }
         
-        return result;
+        System.debug('Total OrderItems to insert: ' + orderLineItems.size());
+        
+        if (!orderLineItems.isEmpty()) {
+            insert orderLineItems;
+            response.success = true;
+            response.message = 'Order created successfully with ' + orderLineItems.size() + ' line item(s)';
+        } else {
+            response.success = false;
+            response.message = 'No valid order items to add. Please ensure all products are available in the pricebook with currency ' + orderCurrency + '.';
+            // Delete the order if no items were created
+            delete newOrder;
+        }
+        
+        return response;
+        
+    } catch (DmlException e) {
+        response.success = false;
+        String errorMsg = 'Error creating order: ';
+        for (Integer i = 0; i < e.getNumDml(); i++) {
+            errorMsg += e.getDmlMessage(i) + ' | ';
+        }
+        response.message = errorMsg.removeEnd(' | ');
+        return response;
+    } catch (QueryException e) {
+        response.success = false;
+        response.message = 'Error querying data: ' + e.getMessage();
+        return response;
+    } catch (Exception e) {
+        response.success = false;
+        response.message = 'Unexpected error: ' + e.getMessage() + ' (Line: ' + e.getLineNumber() + ')';
+        return response;
     }
+}
+
+    /**
+     * Gets the user's account details for order creation
+     * @return Map containing user and account information
+     */
+ 
+    public static Map<String, Object> getUserAccountDetails() {
+    
+    Map<String, Object> result = new Map<String, Object>();
+    
+    try {
+        System.debug('=== getUserAccountDetails Debug ===');
+        System.debug('Step 1 - Fetching details for UserId: ' + UserInfo.getUserId());
+        
+        User currentUser = [
+            SELECT Id,
+                   Name,
+                   Email,
+                   Contact.AccountId,
+                   Contact.Account.Name,
+                   Contact.Account.Account_Type__c
+            FROM User
+            WHERE Id = :UserInfo.getUserId()
+            LIMIT 1
+        ];
+        
+        System.debug('Step 2 - User fetched: ' + currentUser.Name + ' | Email: ' + currentUser.Email);
+        System.debug('Step 2 - Contact: ' + currentUser.Contact);
+        System.debug('Step 2 - Contact.AccountId: ' + (currentUser.Contact != null ? currentUser.Contact.AccountId : 'NULL - No Contact linked'));
+        
+        if (currentUser.Contact != null && currentUser.Contact.AccountId != null) {
+            
+            String accountId   = currentUser.Contact.AccountId;
+            String accountName = currentUser.Contact.Account.Name;
+            String accountType = currentUser.Contact.Account.Account_Type__c;
+            
+            System.debug('Step 3 - Account ID: ' + accountId);
+            System.debug('Step 3 - Account Name: ' + accountName);
+            System.debug('Step 3 - Account_Type__c (raw): [' + accountType + ']');
+            
+            // Trim whitespace to be safe — same normalization used in createOrderWithLineItems
+            if (String.isNotBlank(accountType)) {
+                accountType = accountType.trim();
+            }
+            
+            System.debug('Step 3 - Account_Type__c (trimmed): [' + accountType + ']');
+            
+            result.put('accountId',   accountId);
+            result.put('accountName', accountName);
+            result.put('accountType', accountType);
+            result.put('success',     true);
+            
+            System.debug('Step 4 - ✓ Result map populated successfully.');
+            
+        } else {
+            System.debug('Step 3 - ✗ User is not linked to a Contact or Account.');
+            System.debug('Step 3 - Contact is null: ' + (currentUser.Contact == null));
+            System.debug('Step 3 - Contact.AccountId is null: ' + (currentUser.Contact != null && currentUser.Contact.AccountId == null));
+            
+            result.put('success', false);
+            result.put('message', 'User is not associated with an account. Please ensure this user has a linked Contact with an Account.');
+        }
+        
+    } catch (Exception e) {
+        System.debug('=== EXCEPTION in getUserAccountDetails ===');
+        System.debug('Exception Message: ' + e.getMessage());
+        System.debug('Stack Trace: ' + e.getStackTraceString());
+        
+        result.put('success', false);
+        result.put('message', 'Error fetching user account details: ' + e.getMessage());
+    }
+    
+    System.debug('Step 5 - Final result map: ' + result);
+    return result;
+}
 
     /**
      * Gets available price book entries for products
