@@ -1,15 +1,16 @@
 <template>
     <header class="site-header">
         <div class="header-inner">
-           <div class="brand">
-    
-    <div class="brand-name">Array Minds Portal</div>
-</div>
+            <div class="brand">
+                <div class="brand-name">Array Minds Portal</div>
+            </div>
+
             <nav class="main-nav" role="navigation" aria-label="Primary navigation">
-                <a class="nav-link" class:active={isHomePage} href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/" onclick={handleNavClick}>Home</a>
-              
-                <a class="nav-link" class:active={isAboutPage} href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/about-us" onclick={handleNavClick}>About Us</a>
-                
+
+                <a class={homeNavClass} href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/" onclick={handleNavClick}>Home</a>
+
+                <a class={aboutNavClass} href="https://orgfarm-eee69b4d17-dev-ed.develop.my.site.com/PartnerCommunity/s/about-us" onclick={handleNavClick}>About Us</a>
+
                 <!-- Not Logged In -->
                 <template if:false={isLoggedIn}>
                     <button class="nav-login" onclick={handleLogin} aria-label="Login">Login</button>
@@ -19,11 +20,13 @@
                 <template if:true={isLoggedIn}>
                     <button class={portalBtnClass} onclick={handlePortal} aria-label="View Portal">📊 View Products</button>
                     <button class={orderPageBtnClass} onclick={handleOrderPage} aria-label="View Order Page">🛒 My Orders</button>
+
                     <div class="profile-menu">
                         <button class="profile-btn" onclick={toggleProfileDropdown} aria-label="Profile Menu" title={user.Name}>
                             <span class="profile-avatar">{userInitials}</span>
                             <span class="profile-name">{user.Name}</span>
                         </button>
+
                         <template if:true={showProfileDropdown}>
                             <div class="profile-dropdown">
                                 <div class="dropdown-header">
@@ -40,6 +43,7 @@
                         </template>
                     </div>
                 </template>
+
             </nav>
         </div>
     </header>

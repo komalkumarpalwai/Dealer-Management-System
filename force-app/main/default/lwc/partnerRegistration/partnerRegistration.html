@@ -134,13 +134,15 @@
 
                 <!-- Actions + Terms -->
                 <div class="actions">
-                    <lightning-button
+
+                   <button type="button" class="submit-btn" onclick="{handleSubmit}">Submit Application</button>
+                  <!--   <lightning-button
                         label="Submit Application"
                         variant="brand"
                         onclick={handleSubmit}
                         class="submit-btn"
                         disabled={isLoading}>
-                    </lightning-button>
+                    </lightning-button>-->
 
                     <div class="terms-line">
                         <span class="terms-text">By submitting, you agree to Array Minds partner terms.</span>

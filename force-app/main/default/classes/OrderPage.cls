@@ -295,7 +295,7 @@ public with sharing class OrderPage {
      * Gets the user's account details for order creation
      * @return Map containing user and account information
      */
- 
+ @AuraEnabled(cacheable=true)
     public static Map<String, Object> getUserAccountDetails() {
     
     Map<String, Object> result = new Map<String, Object>();
