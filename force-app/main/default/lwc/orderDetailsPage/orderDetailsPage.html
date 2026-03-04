@@ -286,57 +286,7 @@
                                         </div>
                                     </template>
 
-                                    <!-- After Case Creation -->
-         <template if:true={caseHasBeenCreated}>
-    <div class="sct-overlay">
-        <div class="sct-popup">
-
-            <!-- Icon -->
-            <div class="sct-popup-icon">✓</div>
-
-            <!-- Title -->
-            <h3 class="sct-popup-title">Case Submitted Successfully!</h3>
-            <p class="sct-popup-message">Thank you for reaching out to our support team.</p>
-
-            <!-- Next Steps -->
-            <div class="sct-next-steps">
-                <h4 class="sct-next-steps-title">📋 What Happens Next?</h4>
-                <div class="sct-step">
-                    <div class="sct-step-icon">1</div>
-                    <div class="sct-step-text">
-                        <span class="sct-step-heading">Agent Assignment</span>
-                        <span class="sct-step-desc">A dedicated support agent will be assigned to your case shortly.</span>
-                    </div>
-                </div>
-                <div class="sct-step">
-                    <div class="sct-step-icon">2</div>
-                    <div class="sct-step-text">
-                        <span class="sct-step-heading">Email Notification</span>
-                        <span class="sct-step-desc">Your agent will reach out to you via your registered email address.</span>
-                    </div>
-                </div>
-                <div class="sct-step">
-                    <div class="sct-step-icon">3</div>
-                    <div class="sct-step-text">
-                        <span class="sct-step-heading">Issue Resolution</span>
-                        <span class="sct-step-desc">Your agent will work with you to fully resolve the issue.</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Note -->
-            <div class="sct-popup-note">
-                <span>💡</span>
-                <p>Keep an eye on your registered email inbox for updates from our support team.</p>
-            </div>
-
-            <!-- Close Button -->
-            <button class="sct-popup-close-btn" onclick={handleCloseSupportTicketModal}>✕ Close</button>
-            <p class="sct-popup-countdown">Closing in <strong>{successCountdownSeconds}</strong>s...</p>
-
-        </div>
-    </div>
-</template>             </template>
+                                </template>
 
                                 <!-- Shipping Address Section -->
                                 <div class="shipping-address-section">
@@ -405,6 +355,58 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Success Message Modal (Shows when case is created) -->
+                        <template if:true={caseHasBeenCreated}>
+                            <div class="sct-overlay">
+                                <div class="sct-popup">
+
+                                    <!-- Icon -->
+                                    <div class="sct-popup-icon">✓</div>
+
+                                    <!-- Title -->
+                                    <h3 class="sct-popup-title">Case Submitted Successfully!</h3>
+                                    <p class="sct-popup-message">Thank you for reaching out to our support team.</p>
+
+                                    <!-- Next Steps -->
+                                    <div class="sct-next-steps">
+                                        <h4 class="sct-next-steps-title">📋 What Happens Next?</h4>
+                                        <div class="sct-step">
+                                            <div class="sct-step-icon">1</div>
+                                            <div class="sct-step-text">
+                                                <span class="sct-step-heading">Agent Assignment</span>
+                                                <span class="sct-step-desc">A dedicated support agent will be assigned to your case shortly.</span>
+                                            </div>
+                                        </div>
+                                        <div class="sct-step">
+                                            <div class="sct-step-icon">2</div>
+                                            <div class="sct-step-text">
+                                                <span class="sct-step-heading">Email Notification</span>
+                                                <span class="sct-step-desc">Your agent will reach out to you via your registered email address.</span>
+                                            </div>
+                                        </div>
+                                        <div class="sct-step">
+                                            <div class="sct-step-icon">3</div>
+                                            <div class="sct-step-text">
+                                                <span class="sct-step-heading">Issue Resolution</span>
+                                                <span class="sct-step-desc">Your agent will work with you to fully resolve the issue.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Note -->
+                                    <div class="sct-popup-note">
+                                        <span>💡</span>
+                                        <p>Keep an eye on your registered email inbox for updates from our support team.</p>
+                                    </div>
+
+                                    <!-- Close Button -->
+                                    <button class="sct-popup-close-btn" onclick={handleCloseSupportTicketModal}>✕ Close</button>
+                                    <p class="sct-popup-countdown">Closing in <strong>{successCountdownSeconds}</strong>s...</p>
+
+                                </div>
+                            </div>
+                        </template>
 
                         <!-- Delayed Delivery Alert (if applicable) -->
                     <!-- <template if:true={isDeliveryDelayed}>
