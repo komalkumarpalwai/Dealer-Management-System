@@ -78,7 +78,7 @@
                         </div>
 
                         <!-- Payment Summary Section -->
-                        <div class="payment-summary-section">
+                     <div class="payment-summary-section">
                             <div class="summary-header">
                                 <h3 class="section-title">💳 Payment Summary</h3>
                                 <template if:true={formattedPaymentHistory.length}>
@@ -96,8 +96,13 @@
                                     <span class="payment-value">{formattedOrderTotal}</span>
                                 </div>
                                 <div class="payment-summary-item">
-                                    <span class="payment-label">Amount Paid:</span>
-                                    <span class="payment-value">{formattedAmountPaid}</span>
+                                    <div class="payment-summary-content">
+                                        <div>
+                                            <span class="payment-label">Amount Paid:</span>
+                                            <span class="payment-value">{formattedAmountPaid}</span>
+                                        </div>
+                                        <!-- Removed stray invoice button here — payment.Id is not available outside the loop -->
+                                    </div>
                                 </div>
                                 <div class="payment-summary-item">
                                     <span class="payment-label">Outstanding:</span>
@@ -114,6 +119,7 @@
                                             <div class="col-method">Method</div>
                                             <div class="col-amount">Amount</div>
                                             <div class="col-status">Status</div>
+                                            <div class="col-invoice">Invoice</div>
                                         </div>
                                         <template for:each={formattedPaymentHistory} for:item="payment">
                                             <div key={payment.Id} class="table-row">
@@ -121,6 +127,15 @@
                                                 <div class="col-method">{payment.Payment_Mode__c}</div>
                                                 <div class="col-amount">{payment.formattedAmount}</div>
                                                 <div class="col-status">{payment.Payment_Status__c}</div>
+                                                <div class="col-invoice">
+                                                    <!-- data-id passes this payment's Id to the handler -->
+                                                    <button class="btn-view-invoice"
+                                                            data-id={payment.Id}
+                                                            onclick={handleViewInvoice}
+                                                            title="View Receipt">
+                                                        📄 View Invoice
+                                                    </button>
+                                                </div>
                                             </div>
                                         </template>
                                     </div>

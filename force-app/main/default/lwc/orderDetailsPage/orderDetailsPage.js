@@ -289,6 +289,21 @@ showAllCases = false;
     }
 
     /**
+     * Handle view invoice button click
+     */
+  handleViewInvoice(event) {
+    const paymentId = event.currentTarget.dataset.id;
+    
+    if (this.orderId && paymentId) {
+        const baseUrl = window.location.origin;
+        const communityPath = '/PartnerCommunity';
+        const vfPageUrl = `${baseUrl}${communityPath}/apex/PaymentReceiptPage?orderId=${this.orderId}&paymentId=${paymentId}`;
+        window.open(vfPageUrl, '_blank');
+    } else {
+        this.showToast('error', 'Error', 'Unable to open receipt. Payment ID not found.');
+    }
+}
+    /**
      * Open payment modal
      */
     handleOpenPaymentModal() {
