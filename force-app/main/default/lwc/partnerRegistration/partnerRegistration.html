@@ -2,7 +2,7 @@
     <div class="container" aria-busy={isLoading}>
         <template if:false={isSubmitted}>
 
-            <!-- Header -->
+            <!-- ── HEADER ── -->
             <div class="card-header">
                 <div class="header-icon">
                     <lightning-icon icon-name="standard:partner" size="small" alternative-text="Partner"></lightning-icon>
@@ -14,413 +14,514 @@
                 </div>
             </div>
 
-            <!-- Progress indicator -->
-            <div class="progress-bar-wrap">
-                <div class="progress-bar-track">
-                    <div class="progress-bar-fill"></div>
+            <!-- ── STEPPER ── -->
+            <div class="stepper-wrap">
+                <div class="stepper">
+                    <template for:each={steps} for:item="s">
+                        <div key={s.id} class={s.cls} data-step={s.id} onclick={handleStepClick}>
+                            <div class="step-bubble">
+                                <template if:true={s.done}>
+                                    <lightning-icon icon-name="utility:check" size="xx-small" alternative-text="done"></lightning-icon>
+                                </template>
+                                <template if:false={s.done}>
+                                    <span>{s.num}</span>
+                                </template>
+                            </div>
+                            <div class="step-label">{s.label}</div>
+                        </div>
+                    </template>
                 </div>
-                <div class="progress-label">Step 1 of 1 — Fill in your details</div>
+                <div class="stepper-progress-track">
+                    <div class="stepper-progress-fill" style={progressStyle}></div>
+                </div>
             </div>
 
             <div class="form-card">
 
-                <!-- ══════════════════════════════════════
-                     SECTION 1: Business Information
-                ══════════════════════════════════════ -->
-                <div class="form-section-label">
-                    <div class="form-section-dot"></div>
-                    Business Information
-                </div>
-
-                <div class="form-grid">
-                    <div class="field-group">
-                        <lightning-input
-                            label="Business Name"
-                            placeholder="Acme Pvt Ltd"
-                            value={businessName}
-                            onchange={handleChange}
-                            data-field="businessName"
-                            required>
-                        </lightning-input>
-
-                        <lightning-combobox
-                            label="Business Type"
-                            value={businessType}
-                            options={businessTypeOptions}
-                            onchange={handleChange}
-                            data-field="businessType"
-                            required>
-                        </lightning-combobox>
-
-                        <lightning-input
-                            label="Brand Name"
-                            value={brandName}
-                            onchange={handleChange}
-                            data-field="brandName">
-                        </lightning-input>
-
-                        <lightning-input
-                            label="Business Registration Number"
-                            placeholder="e.g. U74999TG2020PTC123456"
-                            value={businessRegistrationNumber}
-                            onchange={handleChange}
-                            data-field="businessRegistrationNumber">
-                        </lightning-input>
-                    </div>
-
-                    <div class="field-group">
-                        <lightning-input
-                            type="number"
-                            label="Year Started"
-                            placeholder="e.g. 2010"
-                            value={yearStarted}
-                            onchange={handleChange}
-                            data-field="yearStarted"
-                            min="1900"
-                            max="2099">
-                        </lightning-input>
-
-                        <lightning-input
-                            type="number"
-                            label="Years in Business"
-                            placeholder="e.g. 5"
-                            value={yearsInBusiness}
-                            onchange={handleChange}
-                            data-field="yearsInBusiness"
-                            min="0">
-                        </lightning-input>
-
-                        <lightning-input
-                            label="Shop License Number"
-                            placeholder="e.g. SL/2020/12345"
-                            value={shopLicenseNumber}
-                            onchange={handleChange}
-                            data-field="shopLicenseNumber">
-                        </lightning-input>
-                    </div>
-                </div>
-
-                <!-- ══════════════════════════════════════
-                     SECTION 2: Tax Information
-                ══════════════════════════════════════ -->
-                <div class="form-section-label">
-                    <div class="form-section-dot"></div>
-                    Tax Information
-                </div>
-
-                <div class="form-grid">
-                    <div class="field-group">
-                        <lightning-input
-                            label="GST Number"
-                            placeholder="22AAAAA0000A1Z5"
-                            value={gstNumber}
-                            onchange={handleChange}
-                            data-field="gstNumber">
-                        </lightning-input>
-
-                        <lightning-input
-                            label="PAN Number"
-                            placeholder="ABCDE1234F"
-                            value={panNumber}
-                            onchange={handleChange}
-                            data-field="panNumber">
-                        </lightning-input>
-
-                        <lightning-input
-                            label="TAN Number"
-                            placeholder="MUMC12345A"
-                            value={tanNumber}
-                            onchange={handleChange}
-                            data-field="tanNumber">
-                        </lightning-input>
-                    </div>
-
-                    <!-- Financial Information (inline in same grid row) -->
-                    <div class="field-group">
-                        <div class="form-section-label form-section-label--inline">
-                            <div class="form-section-dot"></div>
-                            Financial Information
+                <!-- ══ STEP 1: Business Information ══ -->
+                <template if:true={isStep1}>
+                    <div class="step-panel">
+                        <div class="step-panel-header">
+                            <div class="step-panel-icon">
+                                <lightning-icon icon-name="standard:business_hours" size="small" alternative-text="Business"></lightning-icon>
+                            </div>
+                            <div>
+                                <div class="step-panel-eyebrow">Step 1 of 7</div>
+                                <h2 class="step-panel-title">Business Information</h2>
+                            </div>
                         </div>
 
-                        <lightning-input
-                            type="number"
-                            label="Annual Revenue"
-                            placeholder="0.00"
-                            value={annualRevenue}
-                            onchange={handleChange}
-                            data-field="annualRevenue"
-                            min="0">
-                        </lightning-input>
+                        <div class="form-grid">
+                            <div class="field-group">
+                                <lightning-input
+                                    label="Business Name"
+                                    placeholder="Acme Pvt Ltd"
+                                    value={businessName}
+                                    onchange={handleChange}
+                                    data-field="businessName"
+                                    required>
+                                </lightning-input>
 
-                        <lightning-input
-                            type="number"
-                            label="Monthly Sales Target"
-                            placeholder="0.00"
-                            value={monthlySalesTarget}
-                            onchange={handleChange}
-                            data-field="monthlySalesTarget"
-                            min="0">
-                        </lightning-input>
+                                <lightning-combobox
+                                    label="Business Type"
+                                    value={businessType}
+                                    options={businessTypeOptions}
+                                    onchange={handleChange}
+                                    data-field="businessType"
+                                    required>
+                                </lightning-combobox>
 
-                        <lightning-input
-                            type="number"
-                            label="Expected Monthly Sales"
-                            placeholder="0.00"
-                            value={expectedMonthlySales}
-                            onchange={handleChange}
-                            data-field="expectedMonthlySales"
-                            min="0">
-                        </lightning-input>
+                                <lightning-input
+                                    label="Brand Name"
+                                    value={brandName}
+                                    onchange={handleChange}
+                                    data-field="brandName">
+                                </lightning-input>
 
-                        <lightning-input
-                            type="number"
-                            label="Credit Limit Requested"
-                            placeholder="0.00"
-                            value={creditLimitRequested}
-                            onchange={handleChange}
-                            data-field="creditLimitRequested"
-                            min="0">
-                        </lightning-input>
-                    </div>
-                </div>
+                                <lightning-input
+                                    label="Business Registration Number"
+                                    placeholder="e.g. U74999TG2020PTC123456"
+                                    value={businessRegistrationNumber}
+                                    onchange={handleChange}
+                                    data-field="businessRegistrationNumber">
+                                </lightning-input>
+                            </div>
 
-                <!-- ══════════════════════════════════════
-                     SECTION 3: Contact Information
-                ══════════════════════════════════════ -->
-                <div class="form-section-label">
-                    <div class="form-section-dot"></div>
-                    Contact Details
-                </div>
+                            <div class="field-group">
+                                <lightning-input
+                                    type="number"
+                                    label="Year Started"
+                                    placeholder="e.g. 2010"
+                                    value={yearStarted}
+                                    onchange={handleChange}
+                                    data-field="yearStarted"
+                                    min="1900"
+                                    max="2099">
+                                </lightning-input>
 
-                <div class="form-grid">
-                    <div class="field-group">
-                        <lightning-input
-                            label="Primary Contact Name"
-                            value={primaryContactName}
-                            onchange={handleChange}
-                            data-field="primaryContactName"
-                            required>
-                        </lightning-input>
+                                <lightning-input
+                                    type="number"
+                                    label="Years in Business"
+                                    placeholder="e.g. 5"
+                                    value={yearsInBusiness}
+                                    onchange={handleChange}
+                                    data-field="yearsInBusiness"
+                                    min="0">
+                                </lightning-input>
 
-                        <lightning-input
-                            type="email"
-                            label="Email"
-                            placeholder="name@company.com"
-                            value={email}
-                            onchange={handleChange}
-                            data-field="email"
-                            required>
-                        </lightning-input>
-
-                        <lightning-input
-                            type="tel"
-                            label="Phone"
-                            placeholder="+91 98765 43210"
-                            value={phone}
-                            onchange={handleChange}
-                            data-field="phone"
-                            required>
-                        </lightning-input>
-                    </div>
-
-                    <div class="field-group">
-                        <lightning-input
-                            label="Account Holder Name"
-                            placeholder="As per bank records"
-                            value={accountHolderName}
-                            onchange={handleChange}
-                            data-field="accountHolderName">
-                        </lightning-input>
-
-                        <div class="helper">
-                            <lightning-icon icon-name="utility:info" size="xx-small" alternative-text="Info"></lightning-icon>
-                            Application updates will be sent to the email address above.
+                                <lightning-input
+                                    label="Shop License Number"
+                                    placeholder="e.g. SL/2020/12345"
+                                    value={shopLicenseNumber}
+                                    onchange={handleChange}
+                                    data-field="shopLicenseNumber">
+                                </lightning-input>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </template>
 
-                <!-- ══════════════════════════════════════
-                     SECTION 4: Address Information
-                ══════════════════════════════════════ -->
-                <div class="form-section-label">
-                    <div class="form-section-dot"></div>
-                    Address Information
-                </div>
+                <!-- ══ STEP 2: Tax Information ══ -->
+                <template if:true={isStep2}>
+                    <div class="step-panel">
+                        <div class="step-panel-header">
+                            <div class="step-panel-icon">
+                                <lightning-icon icon-name="standard:document" size="small" alternative-text="Tax"></lightning-icon>
+                            </div>
+                            <div>
+                                <div class="step-panel-eyebrow">Step 2 of 7</div>
+                                <h2 class="step-panel-title">Tax Information</h2>
+                            </div>
+                        </div>
 
-                <div class="form-grid">
-                    <div class="field-group">
-                        <lightning-textarea
-                            label="Billing Address"
-                            placeholder="Street, Area"
-                            value={billingAddress}
-                            onchange={handleChange}
-                            data-field="billingAddress">
-                        </lightning-textarea>
+                        <div class="form-grid">
+                            <div class="field-group">
+                                <lightning-input
+                                    label="GST Number"
+                                    placeholder="22AAAAA0000A1Z5"
+                                    value={gstNumber}
+                                    onchange={handleChange}
+                                    data-field="gstNumber">
+                                </lightning-input>
 
-                        <lightning-textarea
-                            label="Warehouse Address"
-                            placeholder="Street, Area"
-                            value={warehouseAddress}
-                            onchange={handleChange}
-                            data-field="warehouseAddress">
-                        </lightning-textarea>
+                                <lightning-input
+                                    label="PAN Number"
+                                    placeholder="ABCDE1234F"
+                                    value={panNumber}
+                                    onchange={handleChange}
+                                    data-field="panNumber">
+                                </lightning-input>
+                            </div>
+
+                            <div class="field-group">
+                                <lightning-input
+                                    label="TAN Number"
+                                    placeholder="MUMC12345A"
+                                    value={tanNumber}
+                                    onchange={handleChange}
+                                    data-field="tanNumber">
+                                </lightning-input>
+
+                                <div class="info-card">
+                                    <lightning-icon icon-name="utility:info" size="xx-small" alternative-text="Info"></lightning-icon>
+                                    <div>
+                                        <strong>Why we need this</strong>
+                                        <p>Tax details are required for compliance verification and invoice generation per Indian tax law.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- ══ STEP 3: Financial Information ══ -->
+                <template if:true={isStep3}>
+                    <div class="step-panel">
+                        <div class="step-panel-header">
+                            <div class="step-panel-icon">
+                                <lightning-icon icon-name="standard:opportunity" size="small" alternative-text="Financial"></lightning-icon>
+                            </div>
+                            <div>
+                                <div class="step-panel-eyebrow">Step 3 of 7</div>
+                                <h2 class="step-panel-title">Financial Information</h2>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="field-group">
+                                <lightning-input
+                                    type="number"
+                                    label="Annual Revenue (₹)"
+                                    placeholder="0.00"
+                                    value={annualRevenue}
+                                    onchange={handleChange}
+                                    data-field="annualRevenue"
+                                    min="0">
+                                </lightning-input>
+
+                                <lightning-input
+                                    type="number"
+                                    label="Monthly Sales Target (₹)"
+                                    placeholder="0.00"
+                                    value={monthlySalesTarget}
+                                    onchange={handleChange}
+                                    data-field="monthlySalesTarget"
+                                    min="0">
+                                </lightning-input>
+                            </div>
+
+                            <div class="field-group">
+                                <lightning-input
+                                    type="number"
+                                    label="Expected Monthly Sales (₹)"
+                                    placeholder="0.00"
+                                    value={expectedMonthlySales}
+                                    onchange={handleChange}
+                                    data-field="expectedMonthlySales"
+                                    min="0">
+                                </lightning-input>
+
+                                <lightning-input
+                                    type="number"
+                                    label="Credit Limit Requested (₹)"
+                                    placeholder="0.00"
+                                    value={creditLimitRequested}
+                                    onchange={handleChange}
+                                    data-field="creditLimitRequested"
+                                    min="0">
+                                </lightning-input>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- ══ STEP 4: Contact Details ══ -->
+                <template if:true={isStep4}>
+                    <div class="step-panel">
+                        <div class="step-panel-header">
+                            <div class="step-panel-icon">
+                                <lightning-icon icon-name="standard:contact" size="small" alternative-text="Contact"></lightning-icon>
+                            </div>
+                            <div>
+                                <div class="step-panel-eyebrow">Step 4 of 7</div>
+                                <h2 class="step-panel-title">Contact Details</h2>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="field-group">
+                                <lightning-input
+                                    label="Primary Contact Name"
+                                    value={primaryContactName}
+                                    onchange={handleChange}
+                                    data-field="primaryContactName"
+                                    required>
+                                </lightning-input>
+
+                                <lightning-input
+                                    type="email"
+                                    label="Email"
+                                    placeholder="name@company.com"
+                                    value={email}
+                                    onchange={handleChange}
+                                    data-field="email"
+                                    required>
+                                </lightning-input>
+                            </div>
+
+                            <div class="field-group">
+                                <lightning-input
+                                    type="tel"
+                                    label="Phone"
+                                    placeholder="+91 98765 43210"
+                                    value={phone}
+                                    onchange={handleChange}
+                                    data-field="phone"
+                                    required>
+                                </lightning-input>
+
+                                <lightning-input
+                                    label="Account Holder Name"
+                                    placeholder="As per bank records"
+                                    value={accountHolderName}
+                                    onchange={handleChange}
+                                    data-field="accountHolderName">
+                                </lightning-input>
+
+                                <div class="helper">
+                                    <lightning-icon icon-name="utility:info" size="xx-small" alternative-text="Info"></lightning-icon>
+                                    Application updates will be sent to the email address above.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- ══ STEP 5: Address Information ══ -->
+                <template if:true={isStep5}>
+                    <div class="step-panel">
+                        <div class="step-panel-header">
+                            <div class="step-panel-icon">
+                                <lightning-icon icon-name="standard:address" size="small" alternative-text="Address"></lightning-icon>
+                            </div>
+                            <div>
+                                <div class="step-panel-eyebrow">Step 5 of 7</div>
+                                <h2 class="step-panel-title">Address Information</h2>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="field-group">
+                                <lightning-textarea
+                                    label="Billing Address"
+                                    placeholder="Street, Area"
+                                    value={billingAddress}
+                                    onchange={handleChange}
+                                    data-field="billingAddress">
+                                </lightning-textarea>
+
+                                <lightning-textarea
+                                    label="Warehouse Address"
+                                    placeholder="Street, Area"
+                                    value={warehouseAddress}
+                                    onchange={handleChange}
+                                    data-field="warehouseAddress">
+                                </lightning-textarea>
+                            </div>
+
+                            <div class="field-group">
+                                <lightning-input
+                                    label="City"
+                                    placeholder="Hyderabad"
+                                    value={city}
+                                    onchange={handleChange}
+                                    data-field="city">
+                                </lightning-input>
+
+                                <lightning-input
+                                    label="District"
+                                    placeholder="Rangareddy"
+                                    value={district}
+                                    onchange={handleChange}
+                                    data-field="district">
+                                </lightning-input>
+
+                                <lightning-input
+                                    label="State"
+                                    placeholder="Telangana"
+                                    value={state}
+                                    onchange={handleChange}
+                                    data-field="state">
+                                </lightning-input>
+
+                                <lightning-input
+                                    label="Country"
+                                    placeholder="India"
+                                    value={country}
+                                    onchange={handleChange}
+                                    data-field="country">
+                                </lightning-input>
+
+                                <lightning-input
+                                    label="Pincode"
+                                    placeholder="500001"
+                                    value={pincode}
+                                    onchange={handleChange}
+                                    data-field="pincode"
+                                    maxlength="10">
+                                </lightning-input>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- ══ STEP 6: Bank Information ══ -->
+                <template if:true={isStep6}>
+                    <div class="step-panel">
+                        <div class="step-panel-header">
+                            <div class="step-panel-icon">
+                                <lightning-icon icon-name="standard:financial_account" size="small" alternative-text="Bank"></lightning-icon>
+                            </div>
+                            <div>
+                                <div class="step-panel-eyebrow">Step 6 of 7</div>
+                                <h2 class="step-panel-title">Bank Information</h2>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="field-group">
+                                <lightning-input
+                                    label="Bank Name"
+                                    placeholder="State Bank of India"
+                                    value={bankName}
+                                    onchange={handleChange}
+                                    data-field="bankName">
+                                </lightning-input>
+
+                                <lightning-input
+                                    label="Bank Branch"
+                                    placeholder="Banjara Hills Branch"
+                                    value={bankBranch}
+                                    onchange={handleChange}
+                                    data-field="bankBranch">
+                                </lightning-input>
+
+                                <lightning-input
+                                    label="Bank Account Number"
+                                    placeholder="00000000000000"
+                                    value={bankAccountNumber}
+                                    onchange={handleChange}
+                                    data-field="bankAccountNumber"
+                                    maxlength="20">
+                                </lightning-input>
+                            </div>
+
+                            <div class="field-group">
+                                <lightning-input
+                                    label="IFSC Code"
+                                    placeholder="SBIN0001234"
+                                    value={ifscCode}
+                                    onchange={handleChange}
+                                    data-field="ifscCode"
+                                    maxlength="20">
+                                </lightning-input>
+
+                                <lightning-input
+                                    label="UPI ID"
+                                    placeholder="business@upi"
+                                    value={upiId}
+                                    onchange={handleChange}
+                                    data-field="upiId">
+                                </lightning-input>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- ══ STEP 7: Operational Information ══ -->
+                <template if:true={isStep7}>
+                    <div class="step-panel">
+                        <div class="step-panel-header">
+                            <div class="step-panel-icon">
+                                <lightning-icon icon-name="standard:work_capacity_usage" size="small" alternative-text="Operations"></lightning-icon>
+                            </div>
+                            <div>
+                                <div class="step-panel-eyebrow">Step 7 of 7</div>
+                                <h2 class="step-panel-title">Operational Information</h2>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="field-group">
+                                <lightning-input
+                                    type="number"
+                                    label="Delivery Vehicles Available"
+                                    placeholder="e.g. 3"
+                                    value={deliveryVehicles}
+                                    onchange={handleChange}
+                                    data-field="deliveryVehicles"
+                                    min="0">
+                                </lightning-input>
+
+                                <lightning-input
+                                    label="Number of Sales Staff"
+                                    placeholder="e.g. 10"
+                                    value={numberOfSalesStaff}
+                                    onchange={handleChange}
+                                    data-field="numberOfSalesStaff"
+                                    maxlength="3">
+                                </lightning-input>
+                            </div>
+
+                            <div class="field-group">
+                                <lightning-input
+                                    type="number"
+                                    label="Warehouse Size (sq ft)"
+                                    placeholder="e.g. 2500"
+                                    value={warehouseSize}
+                                    onchange={handleChange}
+                                    data-field="warehouseSize"
+                                    min="0">
+                                </lightning-input>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- ── NAV BUTTONS ── -->
+                <div class="step-actions">
+                    <div class="step-actions-left">
+                        <template if:true={canGoBack}>
+                            <button type="button" class="btn-back" onclick={handleBack}>
+                                <lightning-icon icon-name="utility:chevronleft" size="xx-small" alternative-text="Back"></lightning-icon>
+                                Back
+                            </button>
+                        </template>
                     </div>
 
-                    <div class="field-group">
-                        <lightning-input
-                            label="City"
-                            placeholder="Hyderabad"
-                            value={city}
-                            onchange={handleChange}
-                            data-field="city">
-                        </lightning-input>
+                    <div class="step-actions-right">
+                        <template if:false={isLastStep}>
+                            <button type="button" class="btn-next" onclick={handleNext}>
+                                Next
+                                <lightning-icon icon-name="utility:chevronright" size="xx-small" alternative-text="Next"></lightning-icon>
+                            </button>
+                        </template>
 
-                        <lightning-input
-                            label="District"
-                            placeholder="Rangareddy"
-                            value={district}
-                            onchange={handleChange}
-                            data-field="district">
-                        </lightning-input>
-
-                        <lightning-input
-                            label="State"
-                            placeholder="Telangana"
-                            value={state}
-                            onchange={handleChange}
-                            data-field="state">
-                        </lightning-input>
-
-                        <lightning-input
-                            label="Country"
-                            placeholder="India"
-                            value={country}
-                            onchange={handleChange}
-                            data-field="country">
-                        </lightning-input>
-
-                        <lightning-input
-                            label="Pincode"
-                            placeholder="500001"
-                            value={pincode}
-                            onchange={handleChange}
-                            data-field="pincode"
-                            maxlength="10">
-                        </lightning-input>
+                        <template if:true={isLastStep}>
+                            <div class="terms-line">
+                                <span class="terms-text">By submitting, you agree to Array Minds partner terms.</span>
+                                <button class="policy-trigger" onclick={handleOpenPolicy}>
+                                    <lightning-icon icon-name="utility:preview" size="xx-small" alternative-text="View"></lightning-icon>
+                                    View Partner Policy
+                                </button>
+                            </div>
+                            <button type="button" class="submit-btn" onclick={handleSubmit}>
+                                Submit Application
+                            </button>
+                        </template>
                     </div>
                 </div>
 
-                <!-- ══════════════════════════════════════
-                     SECTION 5: Bank Information
-                ══════════════════════════════════════ -->
-                <div class="form-section-label">
-                    <div class="form-section-dot"></div>
-                    Bank Information
-                </div>
-
-                <div class="form-grid">
-                    <div class="field-group">
-                        <lightning-input
-                            label="Bank Name"
-                            placeholder="State Bank of India"
-                            value={bankName}
-                            onchange={handleChange}
-                            data-field="bankName">
-                        </lightning-input>
-
-                        <lightning-input
-                            label="Bank Branch"
-                            placeholder="Banjara Hills Branch"
-                            value={bankBranch}
-                            onchange={handleChange}
-                            data-field="bankBranch">
-                        </lightning-input>
-
-                        <lightning-input
-                            label="Bank Account Number"
-                            placeholder="00000000000000"
-                            value={bankAccountNumber}
-                            onchange={handleChange}
-                            data-field="bankAccountNumber"
-                            maxlength="20">
-                        </lightning-input>
-                    </div>
-
-                    <div class="field-group">
-                        <lightning-input
-                            label="IFSC Code"
-                            placeholder="SBIN0001234"
-                            value={ifscCode}
-                            onchange={handleChange}
-                            data-field="ifscCode"
-                            maxlength="20">
-                        </lightning-input>
-
-                        <lightning-input
-                            label="UPI ID"
-                            placeholder="business@upi"
-                            value={upiId}
-                            onchange={handleChange}
-                            data-field="upiId">
-                        </lightning-input>
-                    </div>
-                </div>
-
-                <!-- ══════════════════════════════════════
-                     SECTION 6: Operational Information
-                ══════════════════════════════════════ -->
-                <div class="form-section-label">
-                    <div class="form-section-dot"></div>
-                    Operational Information
-                </div>
-
-                <div class="form-grid">
-                    <div class="field-group">
-                        <lightning-input
-                            type="number"
-                            label="Delivery Vehicles Available"
-                            placeholder="e.g. 3"
-                            value={deliveryVehicles}
-                            onchange={handleChange}
-                            data-field="deliveryVehicles"
-                            min="0">
-                        </lightning-input>
-
-                        <lightning-input
-                            label="Number of Sales Staff"
-                            placeholder="e.g. 10"
-                            value={numberOfSalesStaff}
-                            onchange={handleChange}
-                            data-field="numberOfSalesStaff"
-                            maxlength="3">
-                        </lightning-input>
-                    </div>
-
-                    <div class="field-group">
-                        <lightning-input
-                            type="number"
-                            label="Warehouse Size (sq ft)"
-                            placeholder="e.g. 2500"
-                            value={warehouseSize}
-                            onchange={handleChange}
-                            data-field="warehouseSize"
-                            min="0">
-                        </lightning-input>
-                    </div>
-                </div>
-
-                <!-- Actions + Terms -->
-                <div class="actions">
-                    <button type="button" class="submit-btn" onclick={handleSubmit}>Submit Application</button>
-
-                    <div class="terms-line">
-                        <span class="terms-text">By submitting, you agree to Array Minds partner terms.</span>
-                        <button class="policy-trigger" onclick={handleOpenPolicy}>
-                            <lightning-icon icon-name="utility:preview" size="xx-small" alternative-text="View"></lightning-icon>
-                            View Partner Policy
-                        </button>
-                    </div>
-                </div>
             </div>
         </template>
 
@@ -496,7 +597,6 @@
         <div class="modal-backdrop" onclick={handleBackdropClick}>
             <div class="modal" role="dialog" aria-modal="true" aria-label="Partner Policy">
 
-                <!-- Modal Header -->
                 <div class="modal-header">
                     <div class="modal-header-left">
                         <div>
@@ -509,7 +609,6 @@
                     </button>
                 </div>
 
-                <!-- Tab bar -->
                 <div class="modal-tabs">
                     <button class={tab1Class} data-tab="terms"   onclick={handleTabChange}>Terms &amp; Conditions</button>
                     <button class={tab2Class} data-tab="privacy" onclick={handleTabChange}>Privacy Policy</button>
@@ -517,34 +616,32 @@
                     <button class={tab4Class} data-tab="partner" onclick={handleTabChange}>Partner Obligations</button>
                 </div>
 
-                <!-- Modal Body -->
                 <div class="modal-body">
 
                     <template if:true={isTabTerms}>
                         <div class="policy-section">
                             <div class="policy-badge">Effective Date: 1 January 2025</div>
                             <h3>1. Acceptance of Terms</h3>
-                            <p>By submitting a partner registration application to Array Minds Private Limited ("Array Minds", "we", "us"), you ("Partner", "you") agree to be bound by these Terms and Conditions in full. If you do not agree, do not submit the application.</p>
+                            <p>By submitting a partner registration application to Array Minds Private Limited ("Array Minds", "we", "us"), you ("Partner", "you") agree to be bound by these Terms and Conditions in full.</p>
                             <h3>2. Partner Eligibility</h3>
-                            <p>To qualify as an Array Minds partner, you must:</p>
                             <ul>
                                 <li>Be a legally registered business entity in your jurisdiction.</li>
                                 <li>Hold a valid GST registration (where applicable under Indian tax law).</li>
-                                <li>Have no outstanding disputes, litigation, or legal proceedings against Array Minds or its affiliates.</li>
-                                <li>Comply with all applicable local, state, and national laws and regulations.</li>
+                                <li>Have no outstanding disputes or legal proceedings against Array Minds.</li>
+                                <li>Comply with all applicable local, state, and national laws.</li>
                             </ul>
                             <h3>3. Application &amp; Approval</h3>
-                            <p>Submission of an application does not guarantee approval. Array Minds reserves the right, at its sole discretion, to approve, reject, or defer any partner application without being required to provide a reason.</p>
+                            <p>Submission of an application does not guarantee approval. Array Minds reserves the right to approve, reject, or defer any partner application.</p>
                             <h3>4. Partner Conduct</h3>
-                            <p>Partners must not engage in any activity that brings Array Minds into disrepute, misrepresents Array Minds products or services, or violates any applicable law.</p>
+                            <p>Partners must not engage in any activity that brings Array Minds into disrepute or violates any applicable law.</p>
                             <h3>5. Pricing &amp; Orders</h3>
-                            <p>Partner-tier pricing is confidential and may not be shared with third parties. Prices are subject to change with reasonable notice.</p>
+                            <p>Partner-tier pricing is confidential and may not be shared with third parties.</p>
                             <h3>6. Intellectual Property</h3>
-                            <p>All trademarks, logos, and brand assets of Array Minds remain the exclusive property of Array Minds Private Limited.</p>
+                            <p>All trademarks and brand assets of Array Minds remain exclusive property of Array Minds Private Limited.</p>
                             <h3>7. Termination</h3>
-                            <p>Either party may terminate the partner relationship with 30 days' written notice. Array Minds may terminate immediately for material breach, fraud, or conduct detrimental to the brand.</p>
+                            <p>Either party may terminate the partner relationship with 30 days' written notice.</p>
                             <h3>8. Governing Law</h3>
-                            <p>These Terms are governed by the laws of India. Any disputes shall be subject to the exclusive jurisdiction of the courts in Hyderabad, Telangana.</p>
+                            <p>These Terms are governed by the laws of India. Disputes shall be subject to courts in Hyderabad, Telangana.</p>
                         </div>
                     </template>
 
@@ -555,17 +652,17 @@
                             <p>Array Minds Private Limited is committed to protecting the privacy of its partners, applicants, and users.</p>
                             <h3>2. Information We Collect</h3>
                             <ul>
-                                <li><strong>Identity Data:</strong> Business name, brand name, primary contact name, PAN number, GST number.</li>
-                                <li><strong>Contact Data:</strong> Email address, phone number, business address.</li>
+                                <li><strong>Identity Data:</strong> Business name, brand name, contact name, PAN, GST.</li>
+                                <li><strong>Contact Data:</strong> Email, phone, business address.</li>
                                 <li><strong>Financial Data:</strong> Annual revenue, order history, invoice records.</li>
-                                <li><strong>Usage Data:</strong> Pages visited, features used, session duration, device and browser information.</li>
+                                <li><strong>Usage Data:</strong> Pages visited, session duration, device info.</li>
                             </ul>
                             <h3>3. Your Rights</h3>
-                            <p>You have the right to access, correct, or request deletion of your personal data. Contact us at <strong>privacy@arrayminds.com</strong>.</p>
+                            <p>You have the right to access, correct, or request deletion of your personal data. Contact <strong>privacy@arrayminds.com</strong>.</p>
                             <h3>4. Data Retention</h3>
-                            <p>We retain personal data for as long as your partner account is active, plus 7 years thereafter for legal and compliance purposes.</p>
+                            <p>We retain personal data for as long as your partner account is active, plus 7 years for legal compliance.</p>
                             <h3>5. Contact</h3>
-                            <p>For privacy-related queries: <strong>Array Minds Private Limited, Data Privacy Team, Hyderabad, Telangana, India.</strong></p>
+                            <p><strong>Array Minds Private Limited, Data Privacy Team, Hyderabad, Telangana, India.</strong></p>
                         </div>
                     </template>
 
@@ -581,7 +678,7 @@
                                 <div class="data-use-card">
                                     <div class="data-use-icon"><lightning-icon icon-name="utility:orders" size="small"></lightning-icon></div>
                                     <h4>Order Processing</h4>
-                                    <p>Order details and payment information are used solely to fulfil and track your orders. Financial data is never shared with unrelated third parties.</p>
+                                    <p>Order details are used solely to fulfil and track your orders. Financial data is never shared with unrelated third parties.</p>
                                 </div>
                                 <div class="data-use-card">
                                     <div class="data-use-icon"><lightning-icon icon-name="utility:email" size="small"></lightning-icon></div>
@@ -591,7 +688,7 @@
                                 <div class="data-use-card">
                                     <div class="data-use-icon"><lightning-icon icon-name="utility:chart" size="small"></lightning-icon></div>
                                     <h4>Analytics &amp; Improvement</h4>
-                                    <p>Aggregated, anonymised usage data helps us improve the Portal experience and develop new features.</p>
+                                    <p>Aggregated, anonymised usage data helps us improve the Portal and develop new features.</p>
                                 </div>
                                 <div class="data-use-card">
                                     <div class="data-use-icon"><lightning-icon icon-name="utility:shield" size="small"></lightning-icon></div>
@@ -611,13 +708,13 @@
                         <div class="policy-section">
                             <div class="policy-badge">Partner Code of Conduct</div>
                             <h3>1. Authorised Territory</h3>
-                            <p>Partners are authorised to sell Array Minds products only within their designated geographic territory. Selling outside this territory without written consent is a breach of this agreement.</p>
+                            <p>Partners are authorised to sell Array Minds products only within their designated territory. Selling outside this territory without consent is a breach of this agreement.</p>
                             <h3>2. Brand Representation</h3>
-                            <p>Partners must represent Array Minds products and brand accurately and professionally. Unauthorised modifications to product descriptions are strictly prohibited.</p>
+                            <p>Partners must represent Array Minds products and brand accurately and professionally.</p>
                             <h3>3. Minimum Purchase Obligations</h3>
-                            <p>Certain partner tiers may carry minimum quarterly or annual purchase obligations as communicated in your partner agreement.</p>
+                            <p>Certain partner tiers may carry minimum quarterly or annual purchase obligations.</p>
                             <h3>4. Pricing Compliance</h3>
-                            <p>Partners must adhere to the Minimum Resale Price (MRP) on each product. Selling below MRP without prior written approval is not permitted.</p>
+                            <p>Partners must adhere to the Minimum Resale Price (MRP) on each product.</p>
                             <h3>5. Training &amp; Certification</h3>
                             <p>Array Minds may require partners to complete product training or certification programmes.</p>
                             <h3>6. Anti-Bribery &amp; Corruption</h3>
@@ -629,7 +726,6 @@
 
                 </div>
 
-                <!-- Modal Footer -->
                 <div class="modal-footer">
                     <span class="modal-footer-note">
                         <lightning-icon icon-name="utility:lock" size="xx-small" alternative-text="Secure"></lightning-icon>
