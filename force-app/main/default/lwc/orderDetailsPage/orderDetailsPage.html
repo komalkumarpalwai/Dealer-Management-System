@@ -854,7 +854,8 @@
                                         data-field="amount"
                                         onchange={handlePaymentFormChange}
                                         step="0.01"
-                                        min="0">
+                                        min="0"
+                                        max={maxPaymentAmount}>
                                 </div>
 
                                 <!-- Cash Payment Fields -->
@@ -1048,7 +1049,56 @@
             </div>
         </template>
 
+        <!-- Payment Success Modal -->
+        <template if:true={showPaymentSuccessModal}>
+            <div class="payment-success-modal-overlay" onclick={handleClosePaymentSuccessModal}>
+                <div class="payment-success-modal-content" onclick={handleModalContentClick}>
+                    <!-- Success Icon -->
+                    <div class="payment-success-icon-wrapper">
+                        <div class="payment-success-check">✓</div>
+                    </div>
+
+                    <!-- Success Title -->
+                    <h2 class="payment-success-title">Payment Successful</h2>
+                    <p class="payment-success-subtitle">Your transaction has been processed.</p>
+
+                    <!-- Amount Display -->
+                    <div class="payment-success-amount">{paymentSuccessData.amount}</div>
+
+                    <!-- Payment Details Box -->
+                    <div class="payment-details-box">
+                        <div class="payment-detail-row">
+                            <span class="detail-label">DATE</span>
+                            <span class="detail-value">{paymentSuccessData.date}</span>
+                        </div>
+                        <div class="payment-detail-row">
+                            <span class="detail-label">TRANSACTION ID</span>
+                            <span class="detail-value">{paymentSuccessData.transactionId}</span>
+                        </div>
+                        <div class="payment-detail-row">
+                            <span class="detail-label">PAYMENT METHOD</span>
+                            <span class="detail-value">{paymentSuccessData.paymentMethod}</span>
+                        </div>
+                    </div>
+
+                    <!-- Countdown Timer -->
+                    <p class="payment-success-countdown">Closing in <strong>{paymentSuccessCountdownSeconds}</strong> seconds</p>
+
+                    <!-- Action Buttons -->
+                    <div class="payment-success-actions">
+                        <button class="btn-view-history" onclick={handleViewPaymentHistoryFromSuccess}>
+                            View Payment History
+                        </button>
+                        <button class="btn-close" onclick={handleClosePaymentSuccessModal}>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </template>
+
         <!-- Support Ticket Modal -->
+
         <template if:true={showSupportTicketModal}>
             <div class="support-ticket-modal-overlay" onclick={handleCloseSupportTicketModal}>
                 <div class="support-ticket-modal-content" onclick={handleModalContentClick}>

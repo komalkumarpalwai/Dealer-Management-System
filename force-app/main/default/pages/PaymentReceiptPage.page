@@ -97,7 +97,7 @@ ERROR: {!errorMessage}
 </apex:outputPanel>
 </td>
 <td style="padding:10px;border-left:1px solid #d0daea" width="33%">
-<div class="label">RECEIPT DATE</div>
+<div class="label">RECEIPT  DATE</div>
 <apex:outputPanel rendered="{!NOT(ISNULL(latestPayment.Payment_Date__c))}">
 <div style="font-size:11px;font-weight:bold">
 <apex:outputText value="{0,date,dd MMM yyyy}">
@@ -133,7 +133,10 @@ ERROR: {!errorMessage}
 </apex:outputPanel>
 </td>
 </tr>
-<tr><td style="padding:3px 0;color:#555">Currency</td><td style="padding:3px 0">INR (&#8377;)</td></tr>
+<tr>
+<td style="padding:3px 0;color:#555">Currency</td>
+<td style="padding:3px 0">INR ₹</td>
+</tr>
 <tr>
 <td style="padding:3px 0;color:#555">Order Total</td>
 <td style="padding:3px 0">
@@ -160,9 +163,12 @@ ERROR: {!errorMessage}
 <div class="section-header">CUSTOMER DETAILS</div>
 <table style="margin-top:4px;font-size:9px">
 <tr><td style="padding:3px 0;font-size:12px;font-weight:bold">{!customerName}</td></tr>
-<tr><td style="padding:2px 0;color:#555">{!billingStreet}</td></tr>
-<tr><td style="padding:2px 0;color:#555">{!billingCity}, {!billingPostalCode}, {!billingCountry}</td></tr>
-<tr><td style="padding:2px 0;color:#555">{!customerPhone}</td></tr>
+
+<tr><td style="padding:2px 0;color:#000000 , font-size:9px">{!billingStreet}</td></tr>
+<tr><td style="padding:2px 0;color:#000000 ,font-size:9px ">{!billingCity}, </td></tr>
+<tr><td style="padding:2px 0;color:#000000 ,font-size:9px "> {!billingPostalCode}, {!billingCountry}</td></tr>
+
+<tr><td style="padding:2px 0;color:#090000 ,font-size:9px">{!customerPhone}</td></tr>
 </table>
 </td>
 

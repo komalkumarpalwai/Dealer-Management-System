@@ -13,6 +13,7 @@ public without sharing class PaymentReceiptController {
     public Date deliveryDate {get;set;}
 
     public String customerName {get;set;}
+    public String customerEmail {get;set;}
     public String customerPhone {get;set;}
     public String billingStreet {get;set;}
     public String billingCity {get;set;}
@@ -61,9 +62,7 @@ public without sharing class PaymentReceiptController {
             if(order.AccountId != null){
 
                 Account acc = [
-                    SELECT Name, Phone,
-                           BillingStreet, BillingCity,
-                           BillingPostalCode, BillingCountry
+                    SELECT Name, Phone, Email__c, BillingStreet, BillingCity, BillingPostalCode, BillingCountry
                     FROM Account
                     WHERE Id = :order.AccountId
                     LIMIT 1
@@ -71,6 +70,7 @@ public without sharing class PaymentReceiptController {
 
                 customerName = acc.Name;
                 customerPhone = acc.Phone;
+                customerEmail = acc.Email__c;
                 billingStreet = acc.BillingStreet;
                 billingCity = acc.BillingCity;
                 billingPostalCode = acc.BillingPostalCode;

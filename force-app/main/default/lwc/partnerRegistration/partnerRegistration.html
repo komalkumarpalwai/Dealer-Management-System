@@ -24,7 +24,9 @@
 
             <div class="form-card">
 
-                <!-- Section: Business Info -->
+                <!-- ══════════════════════════════════════
+                     SECTION 1: Business Information
+                ══════════════════════════════════════ -->
                 <div class="form-section-label">
                     <div class="form-section-dot"></div>
                     Business Information
@@ -58,6 +60,57 @@
                         </lightning-input>
 
                         <lightning-input
+                            label="Business Registration Number"
+                            placeholder="e.g. U74999TG2020PTC123456"
+                            value={businessRegistrationNumber}
+                            onchange={handleChange}
+                            data-field="businessRegistrationNumber">
+                        </lightning-input>
+                    </div>
+
+                    <div class="field-group">
+                        <lightning-input
+                            type="number"
+                            label="Year Started"
+                            placeholder="e.g. 2010"
+                            value={yearStarted}
+                            onchange={handleChange}
+                            data-field="yearStarted"
+                            min="1900"
+                            max="2099">
+                        </lightning-input>
+
+                        <lightning-input
+                            type="number"
+                            label="Years in Business"
+                            placeholder="e.g. 5"
+                            value={yearsInBusiness}
+                            onchange={handleChange}
+                            data-field="yearsInBusiness"
+                            min="0">
+                        </lightning-input>
+
+                        <lightning-input
+                            label="Shop License Number"
+                            placeholder="e.g. SL/2020/12345"
+                            value={shopLicenseNumber}
+                            onchange={handleChange}
+                            data-field="shopLicenseNumber">
+                        </lightning-input>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════
+                     SECTION 2: Tax Information
+                ══════════════════════════════════════ -->
+                <div class="form-section-label">
+                    <div class="form-section-dot"></div>
+                    Tax Information
+                </div>
+
+                <div class="form-grid">
+                    <div class="field-group">
+                        <lightning-input
                             label="GST Number"
                             placeholder="22AAAAA0000A1Z5"
                             value={gstNumber}
@@ -74,21 +127,73 @@
                         </lightning-input>
 
                         <lightning-input
-                            type="number"
-                            label="Annual Revenue"
-                            value={annualRevenue}
+                            label="TAN Number"
+                            placeholder="MUMC12345A"
+                            value={tanNumber}
                             onchange={handleChange}
-                            data-field="annualRevenue">
+                            data-field="tanNumber">
                         </lightning-input>
                     </div>
 
-                    <!-- Section: Contact Info -->
+                    <!-- Financial Information (inline in same grid row) -->
                     <div class="field-group">
                         <div class="form-section-label form-section-label--inline">
                             <div class="form-section-dot"></div>
-                            Contact Details
+                            Financial Information
                         </div>
 
+                        <lightning-input
+                            type="number"
+                            label="Annual Revenue"
+                            placeholder="0.00"
+                            value={annualRevenue}
+                            onchange={handleChange}
+                            data-field="annualRevenue"
+                            min="0">
+                        </lightning-input>
+
+                        <lightning-input
+                            type="number"
+                            label="Monthly Sales Target"
+                            placeholder="0.00"
+                            value={monthlySalesTarget}
+                            onchange={handleChange}
+                            data-field="monthlySalesTarget"
+                            min="0">
+                        </lightning-input>
+
+                        <lightning-input
+                            type="number"
+                            label="Expected Monthly Sales"
+                            placeholder="0.00"
+                            value={expectedMonthlySales}
+                            onchange={handleChange}
+                            data-field="expectedMonthlySales"
+                            min="0">
+                        </lightning-input>
+
+                        <lightning-input
+                            type="number"
+                            label="Credit Limit Requested"
+                            placeholder="0.00"
+                            value={creditLimitRequested}
+                            onchange={handleChange}
+                            data-field="creditLimitRequested"
+                            min="0">
+                        </lightning-input>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════
+                     SECTION 3: Contact Information
+                ══════════════════════════════════════ -->
+                <div class="form-section-label">
+                    <div class="form-section-dot"></div>
+                    Contact Details
+                </div>
+
+                <div class="form-grid">
+                    <div class="field-group">
                         <lightning-input
                             label="Primary Contact Name"
                             value={primaryContactName}
@@ -116,14 +221,16 @@
                             data-field="phone"
                             required>
                         </lightning-input>
+                    </div>
 
-                        <lightning-textarea
-                            class="field-full"
-                            label="Address"
-                            value={address}
+                    <div class="field-group">
+                        <lightning-input
+                            label="Account Holder Name"
+                            placeholder="As per bank records"
+                            value={accountHolderName}
                             onchange={handleChange}
-                            data-field="address">
-                        </lightning-textarea>
+                            data-field="accountHolderName">
+                        </lightning-input>
 
                         <div class="helper">
                             <lightning-icon icon-name="utility:info" size="xx-small" alternative-text="Info"></lightning-icon>
@@ -132,17 +239,179 @@
                     </div>
                 </div>
 
+                <!-- ══════════════════════════════════════
+                     SECTION 4: Address Information
+                ══════════════════════════════════════ -->
+                <div class="form-section-label">
+                    <div class="form-section-dot"></div>
+                    Address Information
+                </div>
+
+                <div class="form-grid">
+                    <div class="field-group">
+                        <lightning-textarea
+                            label="Billing Address"
+                            placeholder="Street, Area"
+                            value={billingAddress}
+                            onchange={handleChange}
+                            data-field="billingAddress">
+                        </lightning-textarea>
+
+                        <lightning-textarea
+                            label="Warehouse Address"
+                            placeholder="Street, Area"
+                            value={warehouseAddress}
+                            onchange={handleChange}
+                            data-field="warehouseAddress">
+                        </lightning-textarea>
+                    </div>
+
+                    <div class="field-group">
+                        <lightning-input
+                            label="City"
+                            placeholder="Hyderabad"
+                            value={city}
+                            onchange={handleChange}
+                            data-field="city">
+                        </lightning-input>
+
+                        <lightning-input
+                            label="District"
+                            placeholder="Rangareddy"
+                            value={district}
+                            onchange={handleChange}
+                            data-field="district">
+                        </lightning-input>
+
+                        <lightning-input
+                            label="State"
+                            placeholder="Telangana"
+                            value={state}
+                            onchange={handleChange}
+                            data-field="state">
+                        </lightning-input>
+
+                        <lightning-input
+                            label="Country"
+                            placeholder="India"
+                            value={country}
+                            onchange={handleChange}
+                            data-field="country">
+                        </lightning-input>
+
+                        <lightning-input
+                            label="Pincode"
+                            placeholder="500001"
+                            value={pincode}
+                            onchange={handleChange}
+                            data-field="pincode"
+                            maxlength="10">
+                        </lightning-input>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════
+                     SECTION 5: Bank Information
+                ══════════════════════════════════════ -->
+                <div class="form-section-label">
+                    <div class="form-section-dot"></div>
+                    Bank Information
+                </div>
+
+                <div class="form-grid">
+                    <div class="field-group">
+                        <lightning-input
+                            label="Bank Name"
+                            placeholder="State Bank of India"
+                            value={bankName}
+                            onchange={handleChange}
+                            data-field="bankName">
+                        </lightning-input>
+
+                        <lightning-input
+                            label="Bank Branch"
+                            placeholder="Banjara Hills Branch"
+                            value={bankBranch}
+                            onchange={handleChange}
+                            data-field="bankBranch">
+                        </lightning-input>
+
+                        <lightning-input
+                            label="Bank Account Number"
+                            placeholder="00000000000000"
+                            value={bankAccountNumber}
+                            onchange={handleChange}
+                            data-field="bankAccountNumber"
+                            maxlength="20">
+                        </lightning-input>
+                    </div>
+
+                    <div class="field-group">
+                        <lightning-input
+                            label="IFSC Code"
+                            placeholder="SBIN0001234"
+                            value={ifscCode}
+                            onchange={handleChange}
+                            data-field="ifscCode"
+                            maxlength="20">
+                        </lightning-input>
+
+                        <lightning-input
+                            label="UPI ID"
+                            placeholder="business@upi"
+                            value={upiId}
+                            onchange={handleChange}
+                            data-field="upiId">
+                        </lightning-input>
+                    </div>
+                </div>
+
+                <!-- ══════════════════════════════════════
+                     SECTION 6: Operational Information
+                ══════════════════════════════════════ -->
+                <div class="form-section-label">
+                    <div class="form-section-dot"></div>
+                    Operational Information
+                </div>
+
+                <div class="form-grid">
+                    <div class="field-group">
+                        <lightning-input
+                            type="number"
+                            label="Delivery Vehicles Available"
+                            placeholder="e.g. 3"
+                            value={deliveryVehicles}
+                            onchange={handleChange}
+                            data-field="deliveryVehicles"
+                            min="0">
+                        </lightning-input>
+
+                        <lightning-input
+                            label="Number of Sales Staff"
+                            placeholder="e.g. 10"
+                            value={numberOfSalesStaff}
+                            onchange={handleChange}
+                            data-field="numberOfSalesStaff"
+                            maxlength="3">
+                        </lightning-input>
+                    </div>
+
+                    <div class="field-group">
+                        <lightning-input
+                            type="number"
+                            label="Warehouse Size (sq ft)"
+                            placeholder="e.g. 2500"
+                            value={warehouseSize}
+                            onchange={handleChange}
+                            data-field="warehouseSize"
+                            min="0">
+                        </lightning-input>
+                    </div>
+                </div>
+
                 <!-- Actions + Terms -->
                 <div class="actions">
-
-                   <button type="button" class="submit-btn" onclick="{handleSubmit}">Submit Application</button>
-                  <!--   <lightning-button
-                        label="Submit Application"
-                        variant="brand"
-                        onclick={handleSubmit}
-                        class="submit-btn"
-                        disabled={isLoading}>
-                    </lightning-button>-->
+                    <button type="button" class="submit-btn" onclick={handleSubmit}>Submit Application</button>
 
                     <div class="terms-line">
                         <span class="terms-text">By submitting, you agree to Array Minds partner terms.</span>
@@ -230,7 +499,6 @@
                 <!-- Modal Header -->
                 <div class="modal-header">
                     <div class="modal-header-left">
-                       
                         <div>
                             <div class="modal-eyebrow">Array Minds Private Limited</div>
                             <h2 class="modal-title">Partner Agreement &amp; Policies</h2>
@@ -252,13 +520,11 @@
                 <!-- Modal Body -->
                 <div class="modal-body">
 
-                    <!-- TAB: Terms & Conditions -->
                     <template if:true={isTabTerms}>
                         <div class="policy-section">
                             <div class="policy-badge">Effective Date: 1 January 2025</div>
                             <h3>1. Acceptance of Terms</h3>
                             <p>By submitting a partner registration application to Array Minds Private Limited ("Array Minds", "we", "us"), you ("Partner", "you") agree to be bound by these Terms and Conditions in full. If you do not agree, do not submit the application.</p>
-
                             <h3>2. Partner Eligibility</h3>
                             <p>To qualify as an Array Minds partner, you must:</p>
                             <ul>
@@ -267,143 +533,97 @@
                                 <li>Have no outstanding disputes, litigation, or legal proceedings against Array Minds or its affiliates.</li>
                                 <li>Comply with all applicable local, state, and national laws and regulations.</li>
                             </ul>
-
                             <h3>3. Application &amp; Approval</h3>
-                            <p>Submission of an application does not guarantee approval. Array Minds reserves the right, at its sole discretion, to approve, reject, or defer any partner application without being required to provide a reason. Approved partners will receive confirmation via email along with access credentials to the Partner Portal.</p>
-
+                            <p>Submission of an application does not guarantee approval. Array Minds reserves the right, at its sole discretion, to approve, reject, or defer any partner application without being required to provide a reason.</p>
                             <h3>4. Partner Conduct</h3>
-                            <p>Partners must not engage in any activity that brings Array Minds into disrepute, misrepresents Array Minds products or services, or violates any applicable law. Array Minds may suspend or terminate a partner account without notice if these standards are breached.</p>
-
+                            <p>Partners must not engage in any activity that brings Array Minds into disrepute, misrepresents Array Minds products or services, or violates any applicable law.</p>
                             <h3>5. Pricing &amp; Orders</h3>
-                            <p>Partner-tier pricing is confidential and may not be shared with third parties. Prices are subject to change with reasonable notice. All orders placed through the Partner Portal are binding upon confirmation.</p>
-
+                            <p>Partner-tier pricing is confidential and may not be shared with third parties. Prices are subject to change with reasonable notice.</p>
                             <h3>6. Intellectual Property</h3>
-                            <p>All trademarks, logos, and brand assets of Array Minds remain the exclusive property of Array Minds Private Limited. Partners are granted a limited, non-exclusive, non-transferable licence to use approved brand assets solely for the purpose of promoting Array Minds products in their designated territory.</p>
-
+                            <p>All trademarks, logos, and brand assets of Array Minds remain the exclusive property of Array Minds Private Limited.</p>
                             <h3>7. Termination</h3>
                             <p>Either party may terminate the partner relationship with 30 days' written notice. Array Minds may terminate immediately for material breach, fraud, or conduct detrimental to the brand.</p>
-
                             <h3>8. Governing Law</h3>
                             <p>These Terms are governed by the laws of India. Any disputes shall be subject to the exclusive jurisdiction of the courts in Hyderabad, Telangana.</p>
                         </div>
                     </template>
 
-                    <!-- TAB: Privacy Policy -->
                     <template if:true={isTabPrivacy}>
                         <div class="policy-section">
                             <div class="policy-badge">Last Updated: 1 January 2025</div>
                             <h3>1. Introduction</h3>
-                            <p>Array Minds Private Limited is committed to protecting the privacy of its partners, applicants, and users. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use the Array Minds Partner Portal.</p>
-
+                            <p>Array Minds Private Limited is committed to protecting the privacy of its partners, applicants, and users.</p>
                             <h3>2. Information We Collect</h3>
-                            <p>We may collect the following categories of personal and business information:</p>
                             <ul>
                                 <li><strong>Identity Data:</strong> Business name, brand name, primary contact name, PAN number, GST number.</li>
                                 <li><strong>Contact Data:</strong> Email address, phone number, business address.</li>
                                 <li><strong>Financial Data:</strong> Annual revenue, order history, invoice records.</li>
                                 <li><strong>Usage Data:</strong> Pages visited, features used, session duration, device and browser information.</li>
-                                <li><strong>Communication Data:</strong> Support tickets, messages, and correspondence with Array Minds.</li>
                             </ul>
-
-                            <h3>3. How We Collect Information</h3>
-                            <p>Information is collected through: direct submission via the Partner Registration form; your ongoing use of the Partner Portal; automated technologies such as cookies and server logs; and communications you send to us.</p>
-
-                            <h3>4. Your Rights</h3>
-                            <p>You have the right to access, correct, or request deletion of your personal data at any time. To exercise these rights, contact us at <strong>privacy@arrayminds.com</strong>. We will respond within 30 days.</p>
-
-                            <h3>5. Cookies</h3>
-                            <p>We use cookies to maintain session state, remember preferences, and analyse portal usage. You may disable cookies in your browser settings; however, some portal features may not function correctly without them.</p>
-
-                            <h3>6. Third-Party Services</h3>
-                            <p>The Partner Portal is built on Salesforce Experience Cloud. Salesforce's privacy practices are governed by their own policy, available at salesforce.com/privacy. We do not sell your data to any third party.</p>
-
-                            <h3>7. Data Retention</h3>
-                            <p>We retain personal data for as long as your partner account is active, plus 7 years thereafter for legal and compliance purposes, unless a shorter retention period is required by law.</p>
-
-                            <h3>8. Contact</h3>
-                            <p>For privacy-related queries, write to: <strong>Array Minds Private Limited, Data Privacy Team, Hyderabad, Telangana, India.</strong></p>
+                            <h3>3. Your Rights</h3>
+                            <p>You have the right to access, correct, or request deletion of your personal data. Contact us at <strong>privacy@arrayminds.com</strong>.</p>
+                            <h3>4. Data Retention</h3>
+                            <p>We retain personal data for as long as your partner account is active, plus 7 years thereafter for legal and compliance purposes.</p>
+                            <h3>5. Contact</h3>
+                            <p>For privacy-related queries: <strong>Array Minds Private Limited, Data Privacy Team, Hyderabad, Telangana, India.</strong></p>
                         </div>
                     </template>
 
-                    <!-- TAB: Data Usage -->
                     <template if:true={isTabData}>
                         <div class="policy-section">
                             <div class="policy-badge">How We Use Your Data</div>
-
                             <div class="data-use-grid">
                                 <div class="data-use-card">
-                                    <div class="data-use-icon">
-                                        <lightning-icon icon-name="utility:user" size="small"></lightning-icon>
-                                    </div>
+                                    <div class="data-use-icon"><lightning-icon icon-name="utility:user" size="small"></lightning-icon></div>
                                     <h4>Account Management</h4>
-                                    <p>Your business and contact information is used to create and manage your partner account, assign your pricing tier, and communicate with you about your account status.</p>
+                                    <p>Your business and contact information is used to create and manage your partner account and assign your pricing tier.</p>
                                 </div>
                                 <div class="data-use-card">
-                                    <div class="data-use-icon">
-                                        <lightning-icon icon-name="utility:orders" size="small"></lightning-icon>
-                                    </div>
+                                    <div class="data-use-icon"><lightning-icon icon-name="utility:orders" size="small"></lightning-icon></div>
                                     <h4>Order Processing</h4>
-                                    <p>Order details, address, and payment information are used solely to fulfil and track your orders. Financial data is never shared with unrelated third parties.</p>
+                                    <p>Order details and payment information are used solely to fulfil and track your orders. Financial data is never shared with unrelated third parties.</p>
                                 </div>
                                 <div class="data-use-card">
-                                    <div class="data-use-icon">
-                                        <lightning-icon icon-name="utility:email" size="small"></lightning-icon>
-                                    </div>
+                                    <div class="data-use-icon"><lightning-icon icon-name="utility:email" size="small"></lightning-icon></div>
                                     <h4>Communications</h4>
-                                    <p>We use your email and phone number to send application updates, order confirmations, product announcements, and important policy changes. You may opt out of marketing communications at any time.</p>
+                                    <p>We use your email and phone to send application updates, order confirmations, and important policy changes.</p>
                                 </div>
                                 <div class="data-use-card">
-                                    <div class="data-use-icon">
-                                        <lightning-icon icon-name="utility:chart" size="small"></lightning-icon>
-                                    </div>
+                                    <div class="data-use-icon"><lightning-icon icon-name="utility:chart" size="small"></lightning-icon></div>
                                     <h4>Analytics &amp; Improvement</h4>
-                                    <p>Aggregated, anonymised usage data helps us improve the Portal experience, identify issues, and develop new features. No individually identifiable data is used for analytics without consent.</p>
+                                    <p>Aggregated, anonymised usage data helps us improve the Portal experience and develop new features.</p>
                                 </div>
                                 <div class="data-use-card">
-                                    <div class="data-use-icon">
-                                        <lightning-icon icon-name="utility:shield" size="small"></lightning-icon>
-                                    </div>
+                                    <div class="data-use-icon"><lightning-icon icon-name="utility:shield" size="small"></lightning-icon></div>
                                     <h4>Legal &amp; Compliance</h4>
-                                    <p>We may retain and disclose data as required by applicable law, regulation, court order, or to enforce our partner agreements and protect the rights of Array Minds.</p>
+                                    <p>We may retain and disclose data as required by applicable law or to enforce our partner agreements.</p>
                                 </div>
                                 <div class="data-use-card">
-                                    <div class="data-use-icon">
-                                        <lightning-icon icon-name="utility:ban" size="small"></lightning-icon>
-                                    </div>
+                                    <div class="data-use-icon"><lightning-icon icon-name="utility:ban" size="small"></lightning-icon></div>
                                     <h4>What We Never Do</h4>
-                                    <p>We never sell, rent, or trade your personal or business data to third parties for marketing purposes. We do not use your data to build advertising profiles or share it with social media platforms.</p>
+                                    <p>We never sell, rent, or trade your personal or business data to third parties for marketing purposes.</p>
                                 </div>
                             </div>
                         </div>
                     </template>
 
-                    <!-- TAB: Partner Obligations -->
                     <template if:true={isTabPartner}>
                         <div class="policy-section">
                             <div class="policy-badge">Partner Code of Conduct</div>
                             <h3>1. Authorised Territory</h3>
-                            <p>Partners are authorised to sell Array Minds products only within their designated geographic territory as agreed upon at the time of approval. Selling outside this territory without written consent is a breach of this agreement.</p>
-
+                            <p>Partners are authorised to sell Array Minds products only within their designated geographic territory. Selling outside this territory without written consent is a breach of this agreement.</p>
                             <h3>2. Brand Representation</h3>
-                            <p>Partners must represent Array Minds products and brand accurately and professionally. Use of outdated brand assets, misleading claims, or unauthorised modifications to product descriptions is strictly prohibited.</p>
-
+                            <p>Partners must represent Array Minds products and brand accurately and professionally. Unauthorised modifications to product descriptions are strictly prohibited.</p>
                             <h3>3. Minimum Purchase Obligations</h3>
-                            <p>Certain partner tiers may carry minimum quarterly or annual purchase obligations. These will be communicated in your partner agreement. Failure to meet these obligations may result in a tier downgrade.</p>
-
+                            <p>Certain partner tiers may carry minimum quarterly or annual purchase obligations as communicated in your partner agreement.</p>
                             <h3>4. Pricing Compliance</h3>
-                            <p>Partners must adhere to the Minimum Resale Price (MRP) as indicated on each product. Selling below MRP without prior written approval from Array Minds is not permitted and may result in account suspension.</p>
-
+                            <p>Partners must adhere to the Minimum Resale Price (MRP) on each product. Selling below MRP without prior written approval is not permitted.</p>
                             <h3>5. Training &amp; Certification</h3>
-                            <p>Array Minds may require partners to complete product training or certification programmes. Participation ensures partners can represent and support Array Minds products to the highest standard.</p>
-
-                            <h3>6. Reporting</h3>
-                            <p>Partners may be requested to share monthly or quarterly sell-through reports. This data helps Array Minds plan inventory, support, and marketing activities in your region.</p>
-
-                            <h3>7. Anti-Bribery &amp; Corruption</h3>
-                            <p>Partners must comply with all applicable anti-bribery and anti-corruption laws. No partner may offer, pay, or accept bribes or improper payments in connection with Array Minds business.</p>
-
-                            <h3>8. Confidentiality</h3>
-                            <p>Partners must keep all pricing, commercial terms, product roadmaps, and business information received from Array Minds strictly confidential and may not disclose such information to any third party without prior written consent.</p>
+                            <p>Array Minds may require partners to complete product training or certification programmes.</p>
+                            <h3>6. Anti-Bribery &amp; Corruption</h3>
+                            <p>Partners must comply with all applicable anti-bribery and anti-corruption laws.</p>
+                            <h3>7. Confidentiality</h3>
+                            <p>Partners must keep all pricing, commercial terms, and product roadmaps received from Array Minds strictly confidential.</p>
                         </div>
                     </template>
 

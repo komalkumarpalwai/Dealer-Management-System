@@ -63,6 +63,17 @@ export default class OrderDetailsPage extends NavigationMixin(LightningElement) 
         transferReferenceNumber: ''
     };
 
+    // Payment Success Modal State
+    @track showPaymentSuccessModal = false;
+    @track paymentSuccessData = {
+        amount: '',
+        date: '',
+        transactionId: '',
+        paymentMethod: ''
+    };
+    @track paymentSuccessCountdownSeconds = 0;
+    paymentSuccessCountdownInterval = null;
+
     // Support Ticket Modal State
     showSupportTicketModal = false;
     isSubmittingSupportTicket = false;
@@ -412,6 +423,14 @@ showAllCases = false;
      */
     handlePaymentMethodSelect(event) {
         this.selectedPaymentMethod = event.currentTarget.dataset.method;
+        
+        // Scroll to Payment Details section after method is selected
+        setTimeout(() => {
+            const paymentFormSection = this.template.querySelector('.payment-form-section');
+            if (paymentFormSection) {
+                paymentFormSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
     }
 
     /**
@@ -432,6 +451,13 @@ showAllCases = false;
     validatePaymentForm() {
         if (!this.paymentFormData.amount || this.paymentFormData.amount <= 0) {
             return 'Please enter a valid amount';
+        }
+
+        // Check if amount exceeds outstanding amount
+        const outstandingAmount = this.orderDetails?.Outstanding_Amount__c || 0;
+        const enteredAmount = parseFloat(this.paymentFormData.amount);
+        if (enteredAmount > outstandingAmount) {
+            return `Payment amount cannot exceed the outstanding amount of ${this.formatCurrency(outstandingAmount)}`;
         }
 
         switch (this.selectedPaymentMethod) {
@@ -525,14 +551,38 @@ showAllCases = false;
             .then(result => {
                 this.isSubmittingPayment = false;
                 if (result.success) {
-                    this.showToast('success', 'Payment Recorded', `Payment of ${this.formatCurrency(paymentData.amount)} via ${this.selectedPaymentMethod} has been recorded successfully`);
+                    // Show payment success modal
+                    this.paymentSuccessData = {
+                        amount: this.formatCurrency(paymentData.amount),
+                        date: new Date().toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: '2-digit'
+                        }),
+                        transactionId: this.paymentFormData.transactionId || 'N/A',
+                        paymentMethod: this.selectedPaymentMethod
+                    };
+                    
+                    // Close payment modal first
+                    this.handleClosePaymentModal();
+                    
+                    // Show success modal after a small delay
+                    setTimeout(() => {
+                        this.showPaymentSuccessModal = true;
+                        this.paymentSuccessCountdownSeconds = 5;
+                        this.paymentSuccessCountdownInterval = setInterval(() => {
+                            this.paymentSuccessCountdownSeconds--;
+                            if (this.paymentSuccessCountdownSeconds <= 0) {
+                                clearInterval(this.paymentSuccessCountdownInterval);
+                                this.paymentSuccessCountdownInterval = null;
+                                this.handleClosePaymentSuccessModal();
+                            }
+                        }, 1000);
+                    }, 300);
                     
                     // Reload order details and payments
                     this.loadOrderDetails();
                     this.loadPaymentHistory();
-                    
-                    // Close modal
-                    this.handleClosePaymentModal();
                 } else {
                     this.showToast('error', 'Payment Error', result.message || 'An error occurred while recording the payment');
                 }
@@ -543,6 +593,37 @@ showAllCases = false;
                 const errorMsg = error.body?.message || 'An error occurred while recording the payment';
                 this.showToast('error', 'Payment Error', errorMsg);
             });
+    }
+
+    /**
+     * Close payment success modal
+     */
+    handleClosePaymentSuccessModal() {
+        if (this.paymentSuccessCountdownInterval) {
+            clearInterval(this.paymentSuccessCountdownInterval);
+            this.paymentSuccessCountdownInterval = null;
+        }
+        this.showPaymentSuccessModal = false;
+        this.paymentSuccessCountdownSeconds = 0;
+        this.paymentSuccessData = {
+            amount: '',
+            date: '',
+            transactionId: '',
+            paymentMethod: ''
+        };
+    }
+
+    /**
+     * Handle view payment history from success modal
+     */
+    handleViewPaymentHistoryFromSuccess() {
+        this.handleClosePaymentSuccessModal();
+        setTimeout(() => {
+            const paymentSummarySection = this.template.querySelector('.payment-summary-section');
+            if (paymentSummarySection) {
+                paymentSummarySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 300);
     }
 
     /**
@@ -792,6 +873,13 @@ showAllCases = false;
     get formattedOutstandingAmount() {
         const amount = this.orderDetails?.Outstanding_Amount__c || 0;
         return this.formatCurrency(amount);
+    }
+
+    /**
+     * Get maximum payment amount (outstanding amount)
+     */
+    get maxPaymentAmount() {
+        return this.orderDetails?.Outstanding_Amount__c || 0;
     }
 
     /**
