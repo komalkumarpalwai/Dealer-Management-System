@@ -59,17 +59,12 @@ ERROR: {!errorMessage}
 </td>
 <td>
 <div style="font-size:13px;font-weight:bold;color:#1a3a5c">ARRAYMINDS</div>
-<div style="font-size:7.5px;color:#555">Dealer Management System</div>
+<div style="font-size:7.5px;color:#555">Partner Portal</div>
 </td>
 </tr>
 </table>
 </td>
-<td width="40%" align="right" valign="top">
-<div style="font-size:10px;font-weight:bold;color:#1a1a1a">{!customerName}</div>
-<div style="font-size:8px;color:#555">{!billingStreet}</div>
-<div style="font-size:8px;color:#555">{!billingCity}, {!billingPostalCode}, {!billingCountry}</div>
-<div style="font-size:8px;color:#555">{!customerPhone}</div>
-</td>
+
 </tr>
 </table>
 
@@ -254,7 +249,7 @@ ERROR: {!errorMessage}
 <!-- ===== FOOTER ===== -->
 <table width="100%" style="margin-top:20px">
 <tr>
-<td style="background:#eef3fb;border:1px solid #ccd8ee;padding:10px;font-size:8px;color:#555">
+<td style="background:#eef3fb;border:1px solid #ccd8ee;padding:10px;font-size:8px;color:#000000">
 This is a computer-generated document and does not require a physical signature. For any discrepancies, please contact our accounts department within 24 hours of receipt. Thank you for your business.
 </td>
 </tr>
@@ -263,10 +258,10 @@ This is a computer-generated document and does not require a physical signature.
 <!-- FOOTER COMPANY INFO -->
 <table width="100%" style="margin-top:10px;border-top:1px solid #d0daea">
 <tr>
-<td align="center" style="padding-top:8px;font-size:8px;font-weight:bold;color:#1a3a5c">ARRAYMINDS</td>
+<td align="center" style="padding-top:8px;font-size:12px;font-weight:bold;color:#1a3a5c">ARRAYMINDS</td>
 </tr>
 <tr>
-<td align="center" style="font-size:7px;color:#888">Dealer Management System | https://www.arrayminds.com</td>
+<td align="center" style="font-size:10px;color:#888">Array Minds Partner Portal | https://www.arrayminds.com</td>
 </tr>
 </table>
 
