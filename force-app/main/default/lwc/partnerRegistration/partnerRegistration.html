@@ -280,13 +280,7 @@
                                     required>
                                 </lightning-input>
 
-                                <lightning-input
-                                    label="Account Holder Name"
-                                    placeholder="As per bank records"
-                                    value={accountHolderName}
-                                    onchange={handleChange}
-                                    data-field="accountHolderName">
-                                </lightning-input>
+                              
 
                                 <div class="helper">
                                     <lightning-icon icon-name="utility:info" size="xx-small" alternative-text="Info"></lightning-icon>
@@ -390,6 +384,14 @@
 
                         <div class="form-grid">
                             <div class="field-group">
+                                  <lightning-input
+                                    label="Account Holder Name"
+                                    placeholder="As per bank records"
+                                    value={accountHolderName}
+                                    onchange={handleChange}
+                                    data-field="accountHolderName">
+                                </lightning-input> 
+                                
                                 <lightning-input
                                     label="Bank Name"
                                     placeholder="State Bank of India"
